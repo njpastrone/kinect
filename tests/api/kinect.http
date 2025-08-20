@@ -1,0 +1,269 @@
+# Kinect API Test Collection
+# Use with REST Client extension for VS Code
+# Or with any HTTP client that supports .http files
+
+### Variables
+@baseUrl = http://localhost:3001/api
+@contentType = application/json
+@accessToken = {{loginUser.response.body.data.tokens.accessToken}}
+
+### Health Check
+GET {{baseUrl}}/../health
+
+### ===== AUTHENTICATION =====
+
+### Register New User
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "test.user@kinect.app",
+  "password": "testpass123",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+### Login Demo User
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "demo.active@kinect.app",
+  "password": "demo123"
+}
+
+### Refresh Token
+POST {{baseUrl}}/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### ===== CONTACT LISTS =====
+
+### Get All Contact Lists
+GET {{baseUrl}}/lists
+Authorization: Bearer {{accessToken}}
+
+### Create Contact List
+# @name createList
+POST {{baseUrl}}/lists
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "API Test List",
+  "description": "Created via API testing",
+  "color": "#3B82F6"
+}
+
+### Update Contact List
+PUT {{baseUrl}}/lists/{{createList.response.body.data._id}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Updated API Test List",
+  "description": "Updated via API testing",
+  "color": "#10B981"
+}
+
+### Delete Contact List
+DELETE {{baseUrl}}/lists/{{createList.response.body.data._id}}
+Authorization: Bearer {{accessToken}}
+
+### ===== CONTACTS =====
+
+### Get All Contacts (Paginated)
+GET {{baseUrl}}/contacts?page=1&limit=10
+Authorization: Bearer {{accessToken}}
+
+### Get Contacts by Category
+GET {{baseUrl}}/contacts?category=BEST_FRIEND
+Authorization: Bearer {{accessToken}}
+
+### Create Contact
+# @name createContact
+POST {{baseUrl}}/contacts
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "firstName": "API",
+  "lastName": "TestContact",
+  "phoneNumber": "+1-555-TEST",
+  "email": "api.test@example.com",
+  "category": "FRIEND",
+  "notes": "Created via API testing",
+  "birthday": "1990-05-15"
+}
+
+### Get Single Contact
+GET {{baseUrl}}/contacts/{{createContact.response.body.data._id}}
+Authorization: Bearer {{accessToken}}
+
+### Update Contact
+PUT {{baseUrl}}/contacts/{{createContact.response.body.data._id}}
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "firstName": "API",
+  "lastName": "UpdatedContact",
+  "phoneNumber": "+1-555-UPDATED",
+  "category": "BEST_FRIEND",
+  "notes": "Updated via API testing"
+}
+
+### Log Contact Interaction
+POST {{baseUrl}}/contacts/{{createContact.response.body.data._id}}/log-contact
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "type": "PHONE_CALL",
+  "notes": "API test phone call"
+}
+
+### Delete Contact
+DELETE {{baseUrl}}/contacts/{{createContact.response.body.data._id}}
+Authorization: Bearer {{accessToken}}
+
+### ===== DEVELOPER TOOLS =====
+
+### Sync Phone Logs
+POST {{baseUrl}}/dev/sync-phone-logs
+Authorization: Bearer {{accessToken}}
+
+### Bulk Sync Phone Logs (30 days)
+POST {{baseUrl}}/dev/bulk-sync-phone-logs
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "days": 30
+}
+
+### Start Auto Sync
+POST {{baseUrl}}/dev/start-auto-sync
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "intervalMinutes": 60
+}
+
+### Stop Auto Sync
+POST {{baseUrl}}/dev/stop-auto-sync
+Authorization: Bearer {{accessToken}}
+
+### Get Sync Statistics
+GET {{baseUrl}}/dev/sync-stats
+Authorization: Bearer {{accessToken}}
+
+### ===== ERROR TESTING =====
+
+### Invalid Login Credentials
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "invalid@email.com",
+  "password": "wrongpassword"
+}
+
+### Unauthorized Access (No Token)
+GET {{baseUrl}}/contacts
+
+### Invalid Contact Data
+POST {{baseUrl}}/contacts
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "firstName": "",
+  "lastName": "",
+  "email": "invalid-email-format",
+  "category": "INVALID_CATEGORY"
+}
+
+### Duplicate Email Registration
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "demo.active@kinect.app",
+  "password": "anypassword",
+  "firstName": "Duplicate",
+  "lastName": "User"
+}
+
+### Non-existent Contact
+GET {{baseUrl}}/contacts/507f1f77bcf86cd799439011
+Authorization: Bearer {{accessToken}}
+
+### ===== BULK OPERATIONS =====
+
+### Create Multiple Contacts
+POST {{baseUrl}}/contacts
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Bulk",
+  "lastName": "Contact1",
+  "phoneNumber": "+1-555-BULK1",
+  "category": "FRIEND"
+}
+
+###
+POST {{baseUrl}}/contacts
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Bulk",
+  "lastName": "Contact2",
+  "phoneNumber": "+1-555-BULK2",
+  "category": "ACQUAINTANCE"
+}
+
+###
+POST {{baseUrl}}/contacts
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Bulk",
+  "lastName": "Contact3",
+  "phoneNumber": "+1-555-BULK3",
+  "category": "BEST_FRIEND"
+}
+
+### ===== PERFORMANCE TESTING =====
+
+### Large Page Size Request
+GET {{baseUrl}}/contacts?page=1&limit=100
+Authorization: Bearer {{accessToken}}
+
+### Search with Filters
+GET {{baseUrl}}/contacts?category=FRIEND&page=1&limit=20
+Authorization: Bearer {{accessToken}}
+
+### Rapid Fire Requests (uncomment to test)
+# GET {{baseUrl}}/contacts
+# Authorization: Bearer {{accessToken}}
+
+# ###
+# GET {{baseUrl}}/lists
+# Authorization: Bearer {{accessToken}}
+
+# ###
+# GET {{baseUrl}}/contacts
+# Authorization: Bearer {{accessToken}}
+
+# ###
+# GET {{baseUrl}}/lists
+# Authorization: Bearer {{accessToken}}

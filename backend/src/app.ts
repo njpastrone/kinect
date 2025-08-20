@@ -10,6 +10,7 @@ import authRoutes from './api/routes/auth.routes';
 import contactsRoutes from './api/routes/contacts.routes';
 import listsRoutes from './api/routes/lists.routes';
 import notificationsRoutes from './api/routes/notifications.routes';
+import devRoutes from './api/routes/dev.routes';
 import { errorHandler, notFound } from './api/middleware/error.middleware';
 
 dotenv.config();
@@ -45,6 +46,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/contacts', contactsRoutes);
 app.use('/api/lists', listsRoutes);
 app.use('/api/notifications', notificationsRoutes);
+
+// Dev routes only in development
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/api/dev', devRoutes);
+}
 
 app.use(notFound);
 app.use(errorHandler);

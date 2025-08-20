@@ -9,7 +9,10 @@
     "start": "node dist/app.js",
     "test": "jest",
     "lint": "eslint src",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "seed": "ts-node src/scripts/seed.ts",
+    "reset": "ts-node src/scripts/reset.ts reset",
+    "reset-and-seed": "ts-node src/scripts/reset.ts reset-and-seed"
   },
   "dependencies": {
     "@kinect/shared": "^1.0.0",

@@ -43,7 +43,18 @@ export default [
         document: 'readonly',
         navigator: 'readonly',
         fetch: 'readonly',
-        localStorage: 'readonly'
+        localStorage: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        alert: 'readonly',
+        confirm: 'readonly',
+        Blob: 'readonly',
+        URL: 'readonly',
+        FileReader: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLInputElement: 'readonly'
       }
     },
     plugins: {

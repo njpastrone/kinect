@@ -18,10 +18,18 @@
     "build:shared": "npm run build --workspace=shared",
     "build:all": "npm run build --workspaces",
     "test": "npm run test --workspaces",
+    "test:api": "echo 'Open tests/api/kinect.http in VS Code with REST Client extension or import tests/api/kinect.postman_collection.json into Postman'",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
     "lint": "npm run lint --workspaces",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "clean": "npm run clean --workspaces --if-present",
-    "prepare": "husky"
+    "prepare": "husky",
+    "seed": "cd backend && npm run seed",
+    "reset-db": "cd backend && npm run reset",
+    "demo": "concurrently \"npm run dev:backend\" \"npm run dev:web\" --names \"API,WEB\" --prefix-colors \"blue,green\"",
+    "demo:seed": "npm run seed && npm run demo"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.8.0",
@@ -35,7 +43,8 @@
     "prettier": "^3.3.3",
     "glob": "^11.0.0",
     "rimraf": "^6.0.1",
-    "@xmldom/xmldom": "^0.9.3"
+    "@xmldom/xmldom": "^0.9.3",
+    "@playwright/test": "^1.40.0"
   },
   "engines": {
     "node": ">=18.0.0",
