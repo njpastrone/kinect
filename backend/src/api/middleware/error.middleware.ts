@@ -15,9 +15,9 @@ export class AppError extends Error {
 
 export const errorHandler = (
   err: Error | AppError | Joi.ValidationError,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void => {
   let statusCode = 500;
   let message = 'Internal server error';
@@ -46,7 +46,7 @@ export const errorHandler = (
   });
 };
 
-export const notFound = (req: Request, res: Response, next: NextFunction): void => {
+export const notFound = (req: Request, _res: Response, next: NextFunction): void => {
   const error = new AppError(`Not found - ${req.originalUrl}`, 404);
   next(error);
 };

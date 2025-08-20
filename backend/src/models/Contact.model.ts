@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { IContact, ContactCategory } from '@kinect/shared';
 
-export interface IContactDocument extends IContact, Document {}
+export interface IContactDocument extends Omit<IContact, '_id'>, Document {}
 
 const contactSchema = new Schema<IContactDocument>({
   userId: {

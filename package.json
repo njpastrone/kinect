@@ -16,21 +16,26 @@
     "build:backend": "npm run build --workspace=backend",
     "build:web": "npm run build --workspace=frontend-web",
     "build:shared": "npm run build --workspace=shared",
+    "build:all": "npm run build --workspaces",
     "test": "npm run test --workspaces",
     "lint": "npm run lint --workspaces",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "prepare": "husky install"
+    "clean": "npm run clean --workspaces --if-present",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "concurrently": "^8.2.2",
-    "eslint": "^8.57.0",
+    "@typescript-eslint/eslint-plugin": "^8.8.0",
+    "@typescript-eslint/parser": "^8.8.0",
+    "concurrently": "^9.0.1",
+    "eslint": "^9.12.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-react": "^7.34.1",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "husky": "^9.0.11",
-    "prettier": "^3.2.5"
+    "eslint-plugin-react": "^7.37.1",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "husky": "^9.1.6",
+    "prettier": "^3.3.3",
+    "glob": "^11.0.0",
+    "rimraf": "^6.0.1",
+    "@xmldom/xmldom": "^0.9.3"
   },
   "engines": {
     "node": ">=18.0.0",

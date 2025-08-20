@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { IUserWithPassword } from '@kinect/shared';
 
-export interface IUserDocument extends IUserWithPassword, Document {
+export interface IUserDocument extends Omit<IUserWithPassword, '_id'>, Document {
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 

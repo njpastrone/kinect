@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { ContactList } from '../../models/ContactList.model';
 import { Contact } from '../../models/Contact.model';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware';
@@ -10,7 +10,7 @@ const router = Router();
 
 router.use(authenticate);
 
-router.get('/', asyncHandler(async (req: AuthRequest, res) => {
+router.get('/', asyncHandler(async (req: AuthRequest, res: Response) => {
   const lists = await ContactList.find({ userId: req.userId })
     .sort({ name: 1 });
 
@@ -20,7 +20,7 @@ router.get('/', asyncHandler(async (req: AuthRequest, res) => {
   });
 }));
 
-router.get('/:id', asyncHandler(async (req: AuthRequest, res) => {
+router.get('/:id', asyncHandler(async (req: AuthRequest, res: Response) => {
   const list = await ContactList.findOne({
     _id: req.params.id,
     userId: req.userId
@@ -44,7 +44,7 @@ router.get('/:id', asyncHandler(async (req: AuthRequest, res) => {
   });
 }));
 
-router.post('/', validate(listValidation.create), asyncHandler(async (req: AuthRequest, res) => {
+router.post('/', validate(listValidation.create), asyncHandler(async (req: AuthRequest, res: Response) => {
   const existingList = await ContactList.findOne({
     userId: req.userId,
     name: req.body.name
@@ -66,7 +66,7 @@ router.post('/', validate(listValidation.create), asyncHandler(async (req: AuthR
   });
 }));
 
-router.put('/:id', validate(listValidation.update), asyncHandler(async (req: AuthRequest, res) => {
+router.put('/:id', validate(listValidation.update), asyncHandler(async (req: AuthRequest, res: Response) => {
   const list = await ContactList.findOneAndUpdate(
     { _id: req.params.id, userId: req.userId },
     req.body,
@@ -83,7 +83,7 @@ router.put('/:id', validate(listValidation.update), asyncHandler(async (req: Aut
   });
 }));
 
-router.delete('/:id', asyncHandler(async (req: AuthRequest, res) => {
+router.delete('/:id', asyncHandler(async (req: AuthRequest, res: Response) => {
   const list = await ContactList.findOneAndDelete({
     _id: req.params.id,
     userId: req.userId
@@ -104,7 +104,7 @@ router.delete('/:id', asyncHandler(async (req: AuthRequest, res) => {
   });
 }));
 
-router.post('/:id/contacts/:contactId', asyncHandler(async (req: AuthRequest, res) => {
+router.post('/:id/contacts/:contactId', asyncHandler(async (req: AuthRequest, res: Response) => {
   const list = await ContactList.findOne({
     _id: req.params.id,
     userId: req.userId
@@ -137,7 +137,7 @@ router.post('/:id/contacts/:contactId', asyncHandler(async (req: AuthRequest, re
   });
 }));
 
-router.delete('/:id/contacts/:contactId', asyncHandler(async (req: AuthRequest, res) => {
+router.delete('/:id/contacts/:contactId', asyncHandler(async (req: AuthRequest, res: Response) => {
   const list = await ContactList.findOne({
     _id: req.params.id,
     userId: req.userId

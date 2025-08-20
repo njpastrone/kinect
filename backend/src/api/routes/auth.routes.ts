@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { User } from '../../models/User.model';
 import { AuthService } from '../../services/auth.service';
 import { authValidation, validate } from '../../utils/validation';
@@ -7,7 +7,7 @@ import { AppError } from '../middleware/error.middleware';
 
 const router = Router();
 
-router.post('/register', validate(authValidation.register), asyncHandler(async (req, res) => {
+router.post('/register', validate(authValidation.register), asyncHandler(async (req: Request, res: Response) => {
   const { email, password, firstName, lastName } = req.body;
 
   const existingUser = await User.findOne({ email });
@@ -22,7 +22,7 @@ router.post('/register', validate(authValidation.register), asyncHandler(async (
     lastName
   });
 
-  const tokens = AuthService.generateTokens(user._id.toString());
+  const tokens = AuthService.generateTokens(user._id?.toString() || '');
 
   res.status(201).json({
     success: true,
@@ -33,7 +33,7 @@ router.post('/register', validate(authValidation.register), asyncHandler(async (
   });
 }));
 
-router.post('/login', validate(authValidation.login), asyncHandler(async (req, res) => {
+router.post('/login', validate(authValidation.login), asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
@@ -46,7 +46,7 @@ router.post('/login', validate(authValidation.login), asyncHandler(async (req, r
     throw new AppError('Invalid credentials', 401);
   }
 
-  const tokens = AuthService.generateTokens(user._id.toString());
+  const tokens = AuthService.generateTokens(user._id?.toString() || '');
 
   res.json({
     success: true,
@@ -57,7 +57,7 @@ router.post('/login', validate(authValidation.login), asyncHandler(async (req, r
   });
 }));
 
-router.post('/refresh', validate(authValidation.refreshToken), asyncHandler(async (req, res) => {
+router.post('/refresh', validate(authValidation.refreshToken), asyncHandler(async (req: Request, res: Response) => {
   const { refreshToken } = req.body;
 
   try {
@@ -68,7 +68,7 @@ router.post('/refresh', validate(authValidation.refreshToken), asyncHandler(asyn
       throw new AppError('User not found', 404);
     }
 
-    const tokens = AuthService.generateTokens(user._id.toString());
+    const tokens = AuthService.generateTokens(user._id?.toString() || '');
 
     res.json({
       success: true,

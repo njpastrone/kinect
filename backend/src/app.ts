@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -35,7 +35,7 @@ const limiter = rateLimit({
 
 app.use('/api/', limiter);
 
-app.get('/health', (req, res) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 

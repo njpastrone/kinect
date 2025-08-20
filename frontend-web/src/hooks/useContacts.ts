@@ -21,7 +21,7 @@ interface ContactsState {
   logInteraction: (contactId: string, type: string, notes?: string) => Promise<void>;
 }
 
-export const useContacts = create<ContactsState>((set, get) => ({
+export const useContacts = create<ContactsState>((set) => ({
   contacts: [],
   lists: [],
   selectedContact: null,

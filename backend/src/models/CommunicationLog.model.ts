@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { ICommunicationLog } from '@kinect/shared';
 
-export interface ICommunicationLogDocument extends ICommunicationLog, Document {}
+export interface ICommunicationLogDocument extends Omit<ICommunicationLog, '_id'>, Document {}
 
 const communicationLogSchema = new Schema<ICommunicationLogDocument>({
   userId: {

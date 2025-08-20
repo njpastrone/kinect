@@ -2,14 +2,18 @@
   "name": "@kinect/shared",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf dist && tsc",
     "dev": "tsc --watch",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src",
+    "clean": "rimraf dist"
   },
   "devDependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "^5.6.2",
+    "rimraf": "^6.0.1",
+    "glob": "^11.0.0"
   }
 }

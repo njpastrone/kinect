@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { Contact } from '../../models/Contact.model';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler } from '../middleware/error.middleware';
@@ -8,15 +8,15 @@ const router = Router();
 
 router.use(authenticate);
 
-router.get('/upcoming', asyncHandler(async (req: AuthRequest, res) => {
+router.get('/upcoming', asyncHandler(async (req: AuthRequest, res: Response) => {
   const contacts = await Contact.find({ userId: req.userId });
   
   const now = new Date();
   const upcomingReminders = contacts.map(contact => {
-    const lastContact = contact.lastContactDate || contact.createdAt;
+    const lastContact = contact.lastContactDate || contact.createdAt || new Date();
     const daysSinceContact = Math.floor((now.getTime() - new Date(lastContact).getTime()) / (1000 * 60 * 60 * 24));
     
-    let reminderDays = DEFAULT_REMINDER_INTERVALS.FRIEND;
+    let reminderDays: number = DEFAULT_REMINDER_INTERVALS.FRIEND;
     switch (contact.category) {
       case 'BEST_FRIEND':
         reminderDays = DEFAULT_REMINDER_INTERVALS.BEST_FRIEND;
@@ -51,7 +51,7 @@ router.get('/upcoming', asyncHandler(async (req: AuthRequest, res) => {
   });
 }));
 
-router.get('/settings', asyncHandler(async (req: AuthRequest, res) => {
+router.get('/settings', asyncHandler(async (req: AuthRequest, res: Response) => {
   res.json({
     success: true,
     data: {
