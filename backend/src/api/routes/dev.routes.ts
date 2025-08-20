@@ -76,7 +76,7 @@ router.post('/start-auto-sync', asyncHandler(async (req: AuthRequest, res: Respo
  * POST /api/dev/stop-auto-sync
  * Stop automatic phone log sync simulation
  */
-router.post('/stop-auto-sync', asyncHandler(async (req: AuthRequest, res: Response) => {
+router.post('/stop-auto-sync', asyncHandler(async (_req: AuthRequest, res: Response) => {
   mockPhoneService.stopAutoSync();
   
   res.json({
@@ -90,7 +90,7 @@ router.post('/stop-auto-sync', asyncHandler(async (req: AuthRequest, res: Respon
  * GET /api/dev/sync-stats
  * Get current sync statistics
  */
-router.get('/sync-stats', asyncHandler(async (req: AuthRequest, res: Response) => {
+router.get('/sync-stats', asyncHandler(async (_req: AuthRequest, res: Response) => {
   res.json({
     success: true,
     data: mockPhoneService.getStats()

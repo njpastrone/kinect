@@ -89,7 +89,7 @@ export class MockPhoneLogService {
         });
         
         // Update contact's last contact date if this event is more recent
-        if (event.timestamp > contact.lastContactDate) {
+        if (!contact.lastContactDate || event.timestamp > contact.lastContactDate) {
           await Contact.findByIdAndUpdate(contact._id, {
             lastContactDate: event.timestamp
           });
