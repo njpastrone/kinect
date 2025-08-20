@@ -9,7 +9,7 @@ interface ContactsState {
   selectedList: IContactList | null;
   isLoading: boolean;
   error: string | null;
-  
+
   fetchContacts: () => Promise<void>;
   fetchLists: () => Promise<void>;
   createContact: (data: Partial<IContact>) => Promise<void>;
@@ -53,9 +53,9 @@ export const useContacts = create<ContactsState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const contact = await api.createContact(data);
-      set((state) => ({ 
-        contacts: [...state.contacts, contact], 
-        isLoading: false 
+      set((state) => ({
+        contacts: [...state.contacts, contact],
+        isLoading: false,
       }));
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
@@ -68,8 +68,8 @@ export const useContacts = create<ContactsState>((set) => ({
     try {
       const updated = await api.updateContact(id, data);
       set((state) => ({
-        contacts: state.contacts.map(c => c._id === id ? updated : c),
-        isLoading: false
+        contacts: state.contacts.map((c) => (c._id === id ? updated : c)),
+        isLoading: false,
       }));
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
@@ -82,8 +82,8 @@ export const useContacts = create<ContactsState>((set) => ({
     try {
       await api.deleteContact(id);
       set((state) => ({
-        contacts: state.contacts.filter(c => c._id !== id),
-        isLoading: false
+        contacts: state.contacts.filter((c) => c._id !== id),
+        isLoading: false,
       }));
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
@@ -95,9 +95,9 @@ export const useContacts = create<ContactsState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const list = await api.createList(data);
-      set((state) => ({ 
-        lists: [...state.lists, list], 
-        isLoading: false 
+      set((state) => ({
+        lists: [...state.lists, list],
+        isLoading: false,
       }));
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
@@ -110,8 +110,8 @@ export const useContacts = create<ContactsState>((set) => ({
     try {
       const updated = await api.updateList(id, data);
       set((state) => ({
-        lists: state.lists.map(l => l._id === id ? updated : l),
-        isLoading: false
+        lists: state.lists.map((l) => (l._id === id ? updated : l)),
+        isLoading: false,
       }));
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
@@ -124,8 +124,8 @@ export const useContacts = create<ContactsState>((set) => ({
     try {
       await api.deleteList(id);
       set((state) => ({
-        lists: state.lists.filter(l => l._id !== id),
-        isLoading: false
+        lists: state.lists.filter((l) => l._id !== id),
+        isLoading: false,
       }));
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
@@ -137,13 +137,11 @@ export const useContacts = create<ContactsState>((set) => ({
     try {
       const result = await api.logContactInteraction(contactId, type, notes);
       set((state) => ({
-        contacts: state.contacts.map(c => 
-          c._id === contactId ? result.contact : c
-        )
+        contacts: state.contacts.map((c) => (c._id === contactId ? result.contact : c)),
       }));
     } catch (error: any) {
       set({ error: error.message });
       throw error;
     }
-  }
+  },
 }));

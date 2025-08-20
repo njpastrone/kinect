@@ -10,7 +10,12 @@ interface AddContactModalProps {
 }
 
 export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClose, contact }) => {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<Partial<IContact>>();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<Partial<IContact>>();
   const { createContact, updateContact } = useContacts();
 
   useEffect(() => {
@@ -40,10 +45,8 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-4">
-          {contact ? 'Edit Contact' : 'Add New Contact'}
-        </h2>
-        
+        <h2 className="text-2xl font-bold mb-4">{contact ? 'Edit Contact' : 'Add New Contact'}</h2>
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -56,7 +59,7 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
                 <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>
               )}
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700">Last Name</label>
               <input

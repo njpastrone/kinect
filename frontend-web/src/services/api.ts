@@ -1,12 +1,12 @@
 import axios, { AxiosInstance } from 'axios';
-import { 
-  IAuthResponse, 
-  ILoginRequest, 
+import {
+  IAuthResponse,
+  ILoginRequest,
   IRegisterRequest,
   IContact,
   IContactList,
   ApiResponse,
-  PaginatedResponse
+  PaginatedResponse,
 } from '@kinect/shared';
 
 class ApiService {
@@ -17,8 +17,8 @@ class ApiService {
     this.api = axios.create({
       baseURL: '/api',
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
 
     this.api.interceptors.request.use((config) => {
@@ -64,7 +64,7 @@ class ApiService {
     if (!refreshToken) throw new Error('No refresh token');
 
     const response = await this.api.post<ApiResponse<IAuthResponse>>('/auth/refresh', {
-      refreshToken
+      refreshToken,
     });
 
     const { tokens } = response.data.data!;
@@ -95,7 +95,9 @@ class ApiService {
   }
 
   async getContacts(params?: any): Promise<PaginatedResponse<IContact>> {
-    const response = await this.api.get<ApiResponse<PaginatedResponse<IContact>>>('/contacts', { params });
+    const response = await this.api.get<ApiResponse<PaginatedResponse<IContact>>>('/contacts', {
+      params,
+    });
     return response.data.data!;
   }
 
@@ -129,7 +131,9 @@ class ApiService {
   }
 
   async getList(id: string): Promise<IContactList & { contacts: IContact[] }> {
-    const response = await this.api.get<ApiResponse<IContactList & { contacts: IContact[] }>>(`/lists/${id}`);
+    const response = await this.api.get<ApiResponse<IContactList & { contacts: IContact[] }>>(
+      `/lists/${id}`
+    );
     return response.data.data!;
   }
 
@@ -148,12 +152,16 @@ class ApiService {
   }
 
   async addContactToList(listId: string, contactId: string): Promise<IContactList> {
-    const response = await this.api.post<ApiResponse<IContactList>>(`/lists/${listId}/contacts/${contactId}`);
+    const response = await this.api.post<ApiResponse<IContactList>>(
+      `/lists/${listId}/contacts/${contactId}`
+    );
     return response.data.data!;
   }
 
   async removeContactFromList(listId: string, contactId: string): Promise<IContactList> {
-    const response = await this.api.delete<ApiResponse<IContactList>>(`/lists/${listId}/contacts/${contactId}`);
+    const response = await this.api.delete<ApiResponse<IContactList>>(
+      `/lists/${listId}/contacts/${contactId}`
+    );
     return response.data.data!;
   }
 

@@ -21,7 +21,7 @@ export const authenticate = async (
     const decoded = AuthService.verifyAccessToken(token);
     req.userId = decoded.userId;
     next();
-  } catch (error) {
+  } catch (_error) {
     res.status(401).json({ success: false, error: 'Invalid or expired token' });
   }
 };

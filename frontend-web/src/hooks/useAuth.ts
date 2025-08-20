@@ -23,15 +23,15 @@ export const useAuth = create<AuthState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await api.login(data);
-      set({ 
-        user: response.user, 
-        isAuthenticated: true, 
-        isLoading: false 
+      set({
+        user: response.user,
+        isAuthenticated: true,
+        isLoading: false,
       });
     } catch (error: any) {
-      set({ 
-        error: error.response?.data?.error || 'Login failed', 
-        isLoading: false 
+      set({
+        error: error.response?.data?.error || 'Login failed',
+        isLoading: false,
       });
       throw error;
     }
@@ -41,15 +41,15 @@ export const useAuth = create<AuthState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await api.register(data);
-      set({ 
-        user: response.user, 
-        isAuthenticated: true, 
-        isLoading: false 
+      set({
+        user: response.user,
+        isAuthenticated: true,
+        isLoading: false,
       });
     } catch (error: any) {
-      set({ 
-        error: error.response?.data?.error || 'Registration failed', 
-        isLoading: false 
+      set({
+        error: error.response?.data?.error || 'Registration failed',
+        isLoading: false,
       });
       throw error;
     }
@@ -57,10 +57,10 @@ export const useAuth = create<AuthState>((set) => ({
 
   logout: () => {
     api.logout();
-    set({ 
-      user: null, 
-      isAuthenticated: false, 
-      error: null 
+    set({
+      user: null,
+      isAuthenticated: false,
+      error: null,
     });
   },
 
@@ -71,5 +71,5 @@ export const useAuth = create<AuthState>((set) => ({
     } else {
       set({ isAuthenticated: false, isLoading: false });
     }
-  }
+  },
 }));

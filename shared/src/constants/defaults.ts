@@ -2,7 +2,7 @@ export const DEFAULT_REMINDER_INTERVALS = {
   BEST_FRIEND: 30,
   FRIEND: 90,
   ACQUAINTANCE: 180,
-  CUSTOM: 60
+  CUSTOM: 60,
 } as const;
 
 export const API_ENDPOINTS = {
@@ -10,25 +10,25 @@ export const API_ENDPOINTS = {
     LOGIN: '/auth/login',
     REGISTER: '/auth/register',
     REFRESH: '/auth/refresh',
-    LOGOUT: '/auth/logout'
+    LOGOUT: '/auth/logout',
   },
   CONTACTS: {
     BASE: '/contacts',
     BY_ID: '/contacts/:id',
-    BY_LIST: '/contacts/list/:listId'
+    BY_LIST: '/contacts/list/:listId',
   },
   LISTS: {
     BASE: '/lists',
-    BY_ID: '/lists/:id'
+    BY_ID: '/lists/:id',
   },
   NOTIFICATIONS: {
     SETTINGS: '/notifications/settings',
-    UPCOMING: '/notifications/upcoming'
+    UPCOMING: '/notifications/upcoming',
   },
   COMMUNICATION: {
     LOGS: '/communication/logs',
-    SYNC: '/communication/sync'
-  }
+    SYNC: '/communication/sync',
+  },
 } as const;
 
 export const ERROR_MESSAGES = {
@@ -37,5 +37,5 @@ export const ERROR_MESSAGES = {
   USER_EXISTS: 'User already exists',
   NOT_FOUND: 'Resource not found',
   VALIDATION_ERROR: 'Validation error',
-  SERVER_ERROR: 'Internal server error'
+  SERVER_ERROR: 'Internal server error',
 } as const;

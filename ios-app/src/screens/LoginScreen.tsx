@@ -62,15 +62,13 @@ export const LoginScreen: React.FC = () => {
             secureTextEntry
             editable={!isLoading}
           />
-          
+
           <TouchableOpacity
             style={[styles.button, isLoading && styles.buttonDisabled]}
             onPress={handleLogin}
             disabled={isLoading}
           >
-            <Text style={styles.buttonText}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
-            </Text>
+            <Text style={styles.buttonText}>{isLoading ? 'Signing in...' : 'Sign In'}</Text>
           </TouchableOpacity>
         </View>
       </View>

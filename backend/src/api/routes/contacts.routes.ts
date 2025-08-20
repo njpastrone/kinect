@@ -10,120 +10,140 @@ const router = Router();
 
 router.use(authenticate);
 
-router.get('/', asyncHandler(async (req: AuthRequest, res: Response) => {
-  const { page = 1, limit = 20, category, listId } = req.query;
-  
-  const query: any = { userId: req.userId };
-  if (category) query.category = category;
-  if (listId) query.listId = listId;
+router.get(
+  '/',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { page = 1, limit = 20, category, listId } = req.query;
 
-  const contacts = await Contact.find(query)
-    .sort({ lastName: 1, firstName: 1 })
-    .limit(Number(limit))
-    .skip((Number(page) - 1) * Number(limit));
+    const query: Record<string, any> = { userId: req.userId };
+    if (category) query.category = category;
+    if (listId) query.listId = listId;
 
-  const total = await Contact.countDocuments(query);
+    const contacts = await Contact.find(query)
+      .sort({ lastName: 1, firstName: 1 })
+      .limit(Number(limit))
+      .skip((Number(page) - 1) * Number(limit));
 
-  res.json({
-    success: true,
-    data: {
-      items: contacts,
-      totalItems: total,
-      currentPage: Number(page),
-      totalPages: Math.ceil(total / Number(limit)),
-      hasMore: Number(page) < Math.ceil(total / Number(limit))
+    const total = await Contact.countDocuments(query);
+
+    res.json({
+      success: true,
+      data: {
+        items: contacts,
+        totalItems: total,
+        currentPage: Number(page),
+        totalPages: Math.ceil(total / Number(limit)),
+        hasMore: Number(page) < Math.ceil(total / Number(limit)),
+      },
+    });
+  })
+);
+
+router.get(
+  '/:id',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const contact = await Contact.findOne({
+      _id: req.params.id,
+      userId: req.userId,
+    });
+
+    if (!contact) {
+      throw new AppError('Contact not found', 404);
     }
-  });
-}));
 
-router.get('/:id', asyncHandler(async (req: AuthRequest, res: Response) => {
-  const contact = await Contact.findOne({
-    _id: req.params.id,
-    userId: req.userId
-  });
+    res.json({
+      success: true,
+      data: contact,
+    });
+  })
+);
 
-  if (!contact) {
-    throw new AppError('Contact not found', 404);
-  }
+router.post(
+  '/',
+  validate(contactValidation.create),
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const contact = await Contact.create({
+      ...req.body,
+      userId: req.userId,
+    });
 
-  res.json({
-    success: true,
-    data: contact
-  });
-}));
+    res.status(201).json({
+      success: true,
+      data: contact,
+    });
+  })
+);
 
-router.post('/', validate(contactValidation.create), asyncHandler(async (req: AuthRequest, res: Response) => {
-  const contact = await Contact.create({
-    ...req.body,
-    userId: req.userId
-  });
+router.put(
+  '/:id',
+  validate(contactValidation.update),
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const contact = await Contact.findOneAndUpdate(
+      { _id: req.params.id, userId: req.userId },
+      req.body,
+      { new: true, runValidators: true }
+    );
 
-  res.status(201).json({
-    success: true,
-    data: contact
-  });
-}));
+    if (!contact) {
+      throw new AppError('Contact not found', 404);
+    }
 
-router.put('/:id', validate(contactValidation.update), asyncHandler(async (req: AuthRequest, res: Response) => {
-  const contact = await Contact.findOneAndUpdate(
-    { _id: req.params.id, userId: req.userId },
-    req.body,
-    { new: true, runValidators: true }
-  );
+    res.json({
+      success: true,
+      data: contact,
+    });
+  })
+);
 
-  if (!contact) {
-    throw new AppError('Contact not found', 404);
-  }
+router.delete(
+  '/:id',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const contact = await Contact.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.userId,
+    });
 
-  res.json({
-    success: true,
-    data: contact
-  });
-}));
+    if (!contact) {
+      throw new AppError('Contact not found', 404);
+    }
 
-router.delete('/:id', asyncHandler(async (req: AuthRequest, res: Response) => {
-  const contact = await Contact.findOneAndDelete({
-    _id: req.params.id,
-    userId: req.userId
-  });
+    await CommunicationLog.deleteMany({ contactId: req.params.id });
 
-  if (!contact) {
-    throw new AppError('Contact not found', 404);
-  }
+    res.json({
+      success: true,
+      message: 'Contact deleted successfully',
+    });
+  })
+);
 
-  await CommunicationLog.deleteMany({ contactId: req.params.id });
+router.post(
+  '/:id/log-contact',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { type = 'OTHER', notes = '' } = req.body;
 
-  res.json({
-    success: true,
-    message: 'Contact deleted successfully'
-  });
-}));
+    const contact = await Contact.findOneAndUpdate(
+      { _id: req.params.id, userId: req.userId },
+      { lastContactDate: new Date() },
+      { new: true }
+    );
 
-router.post('/:id/log-contact', asyncHandler(async (req: AuthRequest, res: Response) => {
-  const { type = 'OTHER', notes = '' } = req.body;
+    if (!contact) {
+      throw new AppError('Contact not found', 404);
+    }
 
-  const contact = await Contact.findOneAndUpdate(
-    { _id: req.params.id, userId: req.userId },
-    { lastContactDate: new Date() },
-    { new: true }
-  );
+    const log = await CommunicationLog.create({
+      userId: req.userId,
+      contactId: req.params.id,
+      type,
+      timestamp: new Date(),
+      notes,
+    });
 
-  if (!contact) {
-    throw new AppError('Contact not found', 404);
-  }
-
-  const log = await CommunicationLog.create({
-    userId: req.userId,
-    contactId: req.params.id,
-    type,
-    timestamp: new Date(),
-    notes
-  });
-
-  res.json({
-    success: true,
-    data: { contact, log }
-  });
-}));
+    res.json({
+      success: true,
+      data: { contact, log },
+    });
+  })
+);
 
 export default router;

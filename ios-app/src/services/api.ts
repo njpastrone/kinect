@@ -1,13 +1,13 @@
 import axios, { AxiosInstance } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { 
-  IAuthResponse, 
-  ILoginRequest, 
+import {
+  IAuthResponse,
+  ILoginRequest,
   IRegisterRequest,
   IContact,
   IContactList,
   ApiResponse,
-  PaginatedResponse
+  PaginatedResponse,
 } from '@kinect/shared';
 
 const API_BASE_URL = 'http://localhost:3001/api';
@@ -19,8 +19,8 @@ class ApiService {
     this.api = axios.create({
       baseURL: API_BASE_URL,
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
 
     this.api.interceptors.request.use(async (config) => {
@@ -58,7 +58,7 @@ class ApiService {
     if (!refreshToken) throw new Error('No refresh token');
 
     const response = await this.api.post<ApiResponse<IAuthResponse>>('/auth/refresh', {
-      refreshToken
+      refreshToken,
     });
 
     const { tokens } = response.data.data!;
@@ -89,7 +89,9 @@ class ApiService {
   }
 
   async getContacts(params?: any): Promise<PaginatedResponse<IContact>> {
-    const response = await this.api.get<ApiResponse<PaginatedResponse<IContact>>>('/contacts', { params });
+    const response = await this.api.get<ApiResponse<PaginatedResponse<IContact>>>('/contacts', {
+      params,
+    });
     return response.data.data!;
   }
 

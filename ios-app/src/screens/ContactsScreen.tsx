@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  RefreshControl,
-} from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import api from '../services/api';
 import { IContact } from '@kinect/shared';
 
@@ -35,10 +28,14 @@ export const ContactsScreen: React.FC = () => {
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'BEST_FRIEND': return '#10B981';
-      case 'FRIEND': return '#3B82F6';
-      case 'ACQUAINTANCE': return '#6B7280';
-      default: return '#8B5CF6';
+      case 'BEST_FRIEND':
+        return '#10B981';
+      case 'FRIEND':
+        return '#3B82F6';
+      case 'ACQUAINTANCE':
+        return '#6B7280';
+      default:
+        return '#8B5CF6';
     }
   };
 
@@ -49,9 +46,7 @@ export const ContactsScreen: React.FC = () => {
           {item.firstName} {item.lastName}
         </Text>
         <View style={[styles.categoryBadge, { backgroundColor: getCategoryColor(item.category) }]}>
-          <Text style={styles.categoryText}>
-            {item.category.replace('_', ' ')}
-          </Text>
+          <Text style={styles.categoryText}>{item.category.replace('_', ' ')}</Text>
         </View>
       </View>
       {item.email && <Text style={styles.contactDetail}>📧 {item.email}</Text>}
@@ -69,9 +64,7 @@ export const ContactsScreen: React.FC = () => {
         renderItem={renderContact}
         keyExtractor={(item) => item._id!}
         contentContainerStyle={styles.listContainer}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyText}>No contacts yet</Text>

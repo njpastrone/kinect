@@ -1,21 +1,25 @@
 # Kinect - Stay Connected App
 
 ## Overview
+
 Kinect is a relationship management application that helps users maintain meaningful connections with friends and loved ones by tracking communication patterns and sending timely reminders.
 
 ## Core Features
 
 ### 1. Relationship Management
+
 - Create and manage categorized contact lists (Best Friends, Friends, Acquaintances, Custom)
 - Store essential contact information (name, birthday, relationship category)
 - Full CRUD operations for lists and contacts
 
 ### 2. Communication Tracking
+
 - Integration with phone call logs via API
 - Automatic tracking of last contact date for each person
 - Real-time synchronization of communication data
 
 ### 3. Smart Notifications
+
 - Customizable reminder intervals per relationship category
 - Default notification schedule:
   - Best Friends: 30 days
@@ -24,6 +28,7 @@ Kinect is a relationship management application that helps users maintain meanin
 - Push notifications when contact thresholds are exceeded
 
 ### 4. Platform Support
+
 - Web application (responsive design)
 - iOS native application
 - Shared backend infrastructure
@@ -31,6 +36,7 @@ Kinect is a relationship management application that helps users maintain meanin
 ## Technical Requirements
 
 ### MVP Scope
+
 - User authentication and account management
 - Basic contact list functionality
 - Phone log API integration (read-only access)
@@ -39,6 +45,7 @@ Kinect is a relationship management application that helps users maintain meanin
 - Data persistence and user privacy
 
 ### Technology Stack (Recommended)
+
 - **Backend**: Node.js/Express or Python/FastAPI
 - **Database**: PostgreSQL or MongoDB
 - **Frontend Web**: React or Vue.js
@@ -48,24 +55,27 @@ Kinect is a relationship management application that helps users maintain meanin
 - **Notifications**: Push notification service (Firebase/OneSignal)
 
 ## Project Structure
+
 kinect/
 ├── backend/
-│   ├── api/
-│   ├── models/
-│   ├── services/
-│   └── config/
+│ ├── api/
+│ ├── models/
+│ ├── services/
+│ └── config/
 ├── frontend-web/
-│   ├── src/
-│   └── public/
+│ ├── src/
+│ └── public/
 ├── ios-app/
-│   └── Kinect/
+│ └── Kinect/
 └── shared/
 └── types/
 
 ## Getting Started
+
 [Setup instructions will be added as development progresses]
 
 ## Privacy & Security
+
 - Minimal data collection (only necessary contact info)
 - Encrypted data storage
 - User consent for phone log access

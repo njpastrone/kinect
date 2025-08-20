@@ -6,9 +6,9 @@ db.createUser({
   roles: [
     {
       role: 'readWrite',
-      db: 'kinect'
-    }
-  ]
+      db: 'kinect',
+    },
+  ],
 });
 
 db.createCollection('users');

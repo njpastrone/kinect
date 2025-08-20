@@ -2,7 +2,7 @@ export enum ContactCategory {
   BEST_FRIEND = 'BEST_FRIEND',
   FRIEND = 'FRIEND',
   ACQUAINTANCE = 'ACQUAINTANCE',
-  CUSTOM = 'CUSTOM'
+  CUSTOM = 'CUSTOM',
 }
 
 export interface IContact {

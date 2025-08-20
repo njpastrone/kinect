@@ -42,7 +42,9 @@ export const Settings: React.FC = () => {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">Name</label>
-              <p className="mt-1 text-gray-900">{user?.firstName} {user?.lastName}</p>
+              <p className="mt-1 text-gray-900">
+                {user?.firstName} {user?.lastName}
+              </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">Email</label>
@@ -61,7 +63,7 @@ export const Settings: React.FC = () => {
               </div>
               <span className="text-lg font-semibold">{settings?.bestFriendDays || 30} days</span>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Friends Reminder</p>
@@ -69,13 +71,15 @@ export const Settings: React.FC = () => {
               </div>
               <span className="text-lg font-semibold">{settings?.friendDays || 90} days</span>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Acquaintances Reminder</p>
                 <p className="text-sm text-gray-500">Days between reminders</p>
               </div>
-              <span className="text-lg font-semibold">{settings?.acquaintanceDays || 180} days</span>
+              <span className="text-lg font-semibold">
+                {settings?.acquaintanceDays || 180} days
+              </span>
             </div>
 
             <div className="pt-4 border-t">
@@ -85,7 +89,12 @@ export const Settings: React.FC = () => {
                   <p className="text-sm text-gray-500">Receive push notifications on your device</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" checked={settings?.enablePushNotifications} className="sr-only peer" readOnly />
+                  <input
+                    type="checkbox"
+                    checked={settings?.enablePushNotifications}
+                    className="sr-only peer"
+                    readOnly
+                  />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>

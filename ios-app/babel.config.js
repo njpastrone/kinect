@@ -1,4 +1,4 @@
-module.exports = function(api) {
+module.exports = function (api) {
   api.cache(true);
   return {
     presets: ['babel-preset-expo'],
@@ -8,7 +8,7 @@ module.exports = function(api) {
       '@babel/plugin-transform-private-methods',
       '@babel/plugin-transform-nullish-coalescing-operator',
       '@babel/plugin-transform-optional-chaining',
-      '@babel/plugin-transform-logical-assignment-operators'
+      '@babel/plugin-transform-logical-assignment-operators',
     ],
   };
 };

@@ -63,18 +63,17 @@ export const Dashboard: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Overdue Contacts</h2>
             <div className="space-y-3">
               {reminders.slice(0, 5).map((reminder) => (
-                <div key={reminder.contact._id} className="flex justify-between items-center p-3 bg-red-50 rounded">
+                <div
+                  key={reminder.contact._id}
+                  className="flex justify-between items-center p-3 bg-red-50 rounded"
+                >
                   <div>
                     <p className="font-medium">
                       {reminder.contact.firstName} {reminder.contact.lastName}
                     </p>
-                    <p className="text-sm text-gray-600">
-                      {reminder.daysOverdue} days overdue
-                    </p>
+                    <p className="text-sm text-gray-600">{reminder.daysOverdue} days overdue</p>
                   </div>
-                  <button className="text-blue-600 hover:text-blue-800 text-sm">
-                    Contact Now
-                  </button>
+                  <button className="text-blue-600 hover:text-blue-800 text-sm">Contact Now</button>
                 </div>
               ))}
             </div>

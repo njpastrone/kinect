@@ -25,6 +25,7 @@ cp backend/.env.example backend/.env
 ```
 
 Update the `.env` file with your configuration:
+
 - MongoDB connection string
 - JWT secrets (generate secure random strings for production)
 - API URLs
@@ -58,6 +59,7 @@ npm run dev:all
 ```
 
 This will start:
+
 - Backend API on http://localhost:3001
 - Web Frontend on http://localhost:5173
 
@@ -79,6 +81,7 @@ npm run dev:ios
 ### Backend API
 
 The backend runs on Express with TypeScript and includes:
+
 - JWT authentication with refresh tokens
 - MongoDB models for User, Contact, ContactList, and CommunicationLog
 - RESTful API endpoints
@@ -86,6 +89,7 @@ The backend runs on Express with TypeScript and includes:
 - Error handling middleware
 
 API endpoints:
+
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `POST /api/auth/refresh` - Refresh access token
@@ -100,6 +104,7 @@ API endpoints:
 ### Frontend Web
 
 React application with Vite, featuring:
+
 - Authentication flow with protected routes
 - Contact management (CRUD operations)
 - Dashboard with statistics
@@ -110,6 +115,7 @@ React application with Vite, featuring:
 ### iOS App
 
 React Native application using Expo:
+
 - Native navigation with React Navigation
 - AsyncStorage for token persistence
 - Shared API service with web
@@ -159,17 +165,20 @@ docker-compose down
 ## Common Issues
 
 ### MongoDB Connection Failed
+
 - Ensure MongoDB is running
 - Check connection string in `.env`
 - If using Docker, wait for containers to fully start
 
 ### Port Already in Use
+
 - Backend default: 3001
 - Frontend default: 5173
 - MongoDB default: 27017
 - Change ports in respective config files if needed
 
 ### iOS Build Issues
+
 - Ensure Xcode is installed and updated
 - Run `cd ios-app && npx pod-install` for native dependencies
 - Clear Metro cache: `npx react-native start --reset-cache`
@@ -177,12 +186,14 @@ docker-compose down
 ## Code Quality
 
 The project uses:
+
 - ESLint for linting
 - Prettier for code formatting
 - Husky for pre-commit hooks
 - TypeScript for type safety
 
 Run manually:
+
 ```bash
 npm run lint
 npm run format

@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Switch,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
@@ -24,13 +17,11 @@ export const SettingsScreen: React.FC = () => {
     <ScrollView style={styles.container}>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Notification Settings</Text>
-        
+
         <View style={styles.settingRow}>
           <View>
             <Text style={styles.settingLabel}>Push Notifications</Text>
-            <Text style={styles.settingDescription}>
-              Receive reminders to contact friends
-            </Text>
+            <Text style={styles.settingDescription}>Receive reminders to contact friends</Text>
           </View>
           <Switch
             value={pushEnabled}
@@ -63,7 +54,7 @@ export const SettingsScreen: React.FC = () => {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Account</Text>
-        
+
         <TouchableOpacity style={styles.settingRow}>
           <Text style={styles.settingLabel}>Profile</Text>
         </TouchableOpacity>

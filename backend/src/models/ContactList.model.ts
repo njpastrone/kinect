@@ -3,31 +3,36 @@ import { IContactList } from '@kinect/shared';
 
 export interface IContactListDocument extends Omit<IContactList, '_id'>, Document {}
 
-const contactListSchema = new Schema<IContactListDocument>({
-  userId: {
-    type: String,
-    required: true,
-    index: true
+const contactListSchema = new Schema<IContactListDocument>(
+  {
+    userId: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      maxlength: 500,
+    },
+    color: {
+      type: String,
+      default: '#3B82F6',
+    },
+    contactIds: [
+      {
+        type: String,
+      },
+    ],
   },
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  description: {
-    type: String,
-    maxlength: 500
-  },
-  color: {
-    type: String,
-    default: '#3B82F6'
-  },
-  contactIds: [{
-    type: String
-  }]
-}, {
-  timestamps: true
-});
+  {
+    timestamps: true,
+  }
+);
 
 contactListSchema.index({ userId: 1, name: 1 }, { unique: true });
 
