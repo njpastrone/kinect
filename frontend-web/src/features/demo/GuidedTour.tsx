@@ -230,7 +230,7 @@ export const TourTriggerButton: React.FC = () => {
       />
       
       {/* Tour highlight styles */}
-      <style jsx global>{`
+      <style>{`
         .tour-highlight {
           position: relative;
           z-index: 46;
