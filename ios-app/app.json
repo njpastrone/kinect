@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Kinect",
+    "slug": "kinect",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kinect.app",
+      "infoPlist": {
+        "NSContactsUsageDescription": "Kinect needs access to your contacts to help you stay connected.",
+        "NSCalendarsUsageDescription": "Kinect can add reminders to your calendar."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.kinect.app",
+      "permissions": ["READ_CONTACTS", "READ_PHONE_STATE"]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

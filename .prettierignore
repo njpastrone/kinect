@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+coverage
+.next
+.expo
+ios/build
+android/build
+*.min.js
+*.min.css
