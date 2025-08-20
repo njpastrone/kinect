@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 import { User } from '../models/User.model';
 import { Contact } from '../models/Contact.model';
 import { ContactList } from '../models/ContactList.model';
@@ -246,10 +245,10 @@ export async function seedDatabase(): Promise<void> {
     const createdUsers = [];
     
     for (const userData of DEMO_USERS) {
-      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      // Don't hash password here - the User model pre-save hook will handle it
       const user = await User.create({
         ...userData,
-        password: hashedPassword
+        password: userData.password
       });
       createdUsers.push(user);
       console.warn(`✅ Created user: ${user.firstName} ${user.lastName} (${user.email})`);
