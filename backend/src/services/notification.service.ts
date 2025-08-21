@@ -36,21 +36,21 @@ class NotificationService {
   private initializeCronJobs() {
     // Daily check at 9 AM
     cron.schedule('0 9 * * *', () => {
-      this.processDailyReminders().catch(error => {
+      this.processDailyReminders().catch((error) => {
         console.error('Daily reminders processing failed:', error);
       });
     });
 
     // Weekly check on Monday at 9 AM
     cron.schedule('0 9 * * 1', () => {
-      this.processWeeklyReminders().catch(error => {
+      this.processWeeklyReminders().catch((error) => {
         console.error('Weekly reminders processing failed:', error);
       });
     });
 
     // Monthly check on 1st of month at 9 AM
     cron.schedule('0 9 1 * *', () => {
-      this.processMonthlyReminders().catch(error => {
+      this.processMonthlyReminders().catch((error) => {
         console.error('Monthly reminders processing failed:', error);
       });
     });
@@ -93,34 +93,32 @@ class NotificationService {
       for (const user of users) {
         try {
           const preferences = this.getUserPreferences(user);
-          
+
           if (!preferences.emailReminders || preferences.reminderFrequency !== frequency) {
             continue;
           }
 
           const overdueContacts = await this.getOverdueContacts(user._id?.toString() || '');
-          
+
           if (overdueContacts.length === 0) {
             continue;
           }
 
           // Respect max contacts per email
           const contactsToNotify = overdueContacts.slice(0, preferences.maxContactsPerEmail);
-          
+
           await emailService.sendContactReminderEmail(user.toJSON() as any, contactsToNotify);
           sentEmails++;
           processedUsers++;
 
           // Add delay to avoid overwhelming email service
           await this.delay(1000);
-          
         } catch (error) {
           console.error(`Failed to process reminders for user ${user.email}:`, error);
         }
       }
 
       console.log(`✅ Processed ${processedUsers} users, sent ${sentEmails} reminder emails`);
-      
     } catch (error) {
       console.error('❌ Failed to process reminders:', error);
     } finally {
@@ -150,7 +148,6 @@ class NotificationService {
 
       // Sort by days since last contact (most overdue first)
       return overdueContacts.sort((a, b) => b.daysSince - a.daysSince);
-      
     } catch (error) {
       console.error('Failed to get overdue contacts:', error);
       return [];
@@ -161,7 +158,7 @@ class NotificationService {
     if (!lastContactDate) {
       return 365; // Treat as very old if no contact date
     }
-    
+
     const today = new Date();
     const diffTime = today.getTime() - lastContactDate.getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -197,7 +194,7 @@ class NotificationService {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   // Manual trigger for testing
@@ -209,15 +206,17 @@ class NotificationService {
       }
 
       const overdueContacts = await this.getOverdueContacts(userId);
-      
+
       if (overdueContacts.length === 0) {
         console.log('No overdue contacts found for test reminder');
         return;
       }
 
-      await emailService.sendContactReminderEmail(user.toJSON() as any, overdueContacts.slice(0, 3));
+      await emailService.sendContactReminderEmail(
+        user.toJSON() as any,
+        overdueContacts.slice(0, 3)
+      );
       console.log(`✅ Test reminder sent to ${user.email}`);
-      
     } catch (error) {
       console.error('Failed to send test reminder:', error);
       throw error;
@@ -234,14 +233,15 @@ class NotificationService {
       const contacts = await Contact.find({ userId });
       let overdueCount = 0;
       let upcomingCount = 0;
-      
+
       for (const contact of contacts) {
         const daysSince = this.getDaysSinceLastContact(contact.lastContactDate);
         const threshold = this.getReminderThreshold(contact);
-        
+
         if (daysSince > threshold) {
           overdueCount++;
-        } else if (daysSince > threshold - 7) { // Within 7 days of being overdue
+        } else if (daysSince > threshold - 7) {
+          // Within 7 days of being overdue
           upcomingCount++;
         }
       }
@@ -255,7 +255,6 @@ class NotificationService {
         upcomingCount,
         nextReminderDate,
       };
-      
     } catch (error) {
       console.error('Failed to get reminder stats:', error);
       return { overdueCount: 0, upcomingCount: 0 };
@@ -271,7 +270,7 @@ class NotificationService {
         next.setDate(now.getDate() + 1);
         break;
       case 'weekly':
-        next.setDate(now.getDate() + (7 - now.getDay() + 1) % 7 || 7); // Next Monday
+        next.setDate(now.getDate() + ((7 - now.getDay() + 1) % 7) || 7); // Next Monday
         break;
       case 'monthly':
         next.setMonth(now.getMonth() + 1, 1); // First of next month

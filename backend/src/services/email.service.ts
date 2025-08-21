@@ -63,7 +63,7 @@ class EmailService {
 
   async sendPasswordResetEmail(user: IUser, resetToken: string): Promise<void> {
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
-    
+
     const html = `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
         <div style="text-align: center; margin-bottom: 30px;">
@@ -131,7 +131,7 @@ class EmailService {
 
   async sendWelcomeEmail(user: IUser): Promise<void> {
     const loginUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login`;
-    
+
     const html = `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
         <div style="text-align: center; margin-bottom: 30px;">
@@ -199,13 +199,13 @@ class EmailService {
   }
 
   async sendContactReminderEmail(
-    user: IUser, 
+    user: IUser,
     overdueContacts: Array<{ name: string; daysSince: number }>
   ): Promise<void> {
     const dashboardUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/dashboard`;
-    
+
     const contactList = overdueContacts
-      .map(contact => `<li>${contact.name} (${contact.daysSince} days ago)</li>`)
+      .map((contact) => `<li>${contact.name} (${contact.daysSince} days ago)</li>`)
       .join('');
 
     const html = `

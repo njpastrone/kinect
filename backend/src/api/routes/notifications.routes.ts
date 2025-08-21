@@ -80,7 +80,7 @@ router.get(
   '/stats',
   asyncHandler(async (req: AuthRequest, res: Response) => {
     const stats = await notificationService.getReminderStats(req.userId!);
-    
+
     res.json({
       success: true,
       data: stats,
@@ -94,7 +94,7 @@ router.post(
   asyncHandler(async (req: AuthRequest, res: Response) => {
     try {
       await notificationService.sendTestReminder(req.userId!);
-      
+
       res.json({
         success: true,
         message: 'Test reminder sent successfully',

@@ -31,7 +31,7 @@ router.post(
     const tokens = AuthService.generateTokens(user._id?.toString() || '');
 
     // Send welcome email (don't wait for it to complete)
-    emailService.sendWelcomeEmail(user.toJSON() as any).catch(error => {
+    emailService.sendWelcomeEmail(user.toJSON() as any).catch((error) => {
       console.error('Failed to send welcome email:', error);
     });
 
@@ -154,7 +154,7 @@ router.post(
       user.resetPasswordToken = undefined;
       user.resetPasswordExpires = undefined;
       await user.save();
-      
+
       console.error('Failed to send password reset email:', emailError);
       throw new AppError('Failed to send reset email', 500);
     }
