@@ -69,7 +69,7 @@ export const useAuth = create<AuthState>((set) => ({
 
   checkAuth: async () => {
     set({ isLoading: true });
-    
+
     const token = localStorage.getItem('accessToken');
     if (!token) {
       set({ isAuthenticated: false, isLoading: false });
@@ -77,12 +77,12 @@ export const useAuth = create<AuthState>((set) => ({
     }
 
     // Add timeout to prevent hanging
-    const timeoutPromise = new Promise((_, reject) => 
+    const timeoutPromise = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('Authentication check timeout')), 10000)
     );
 
     try {
-      const user = await Promise.race([api.getProfile(), timeoutPromise]) as IUser;
+      const user = (await Promise.race([api.getProfile(), timeoutPromise])) as IUser;
       set({
         user,
         isAuthenticated: true,
