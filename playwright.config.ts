@@ -17,9 +17,9 @@ export default defineConfig({
   reporter: [
     ['html'],
     ['json', { outputFile: 'test-results.json' }],
-    ['junit', { outputFile: 'test-results.xml' }]
+    ['junit', { outputFile: 'test-results.xml' }],
   ],
-  
+
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -27,10 +27,10 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    
+
     /* Take screenshot on failure */
     screenshot: 'only-on-failure',
-    
+
     /* Record video on failure */
     video: 'retain-on-failure',
   },
@@ -91,7 +91,7 @@ export default defineConfig({
 
   /* Global setup */
   globalSetup: require.resolve('./tests/e2e/global-setup.ts'),
-  
+
   /* Global teardown */
   globalTeardown: require.resolve('./tests/e2e/global-teardown.ts'),
 

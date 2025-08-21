@@ -14,15 +14,15 @@ router.get(
   '/',
   asyncHandler(async (req: AuthRequest, res: Response) => {
     const lists = await ContactList.find({ userId: req.userId }).sort({ name: 1 });
-    
+
     // Get contact counts and statistics for each list
     const listsWithStats = await Promise.all(
       lists.map(async (list) => {
-        const totalContacts = await Contact.countDocuments({ 
-          listId: list._id, 
-          userId: req.userId 
+        const totalContacts = await Contact.countDocuments({
+          listId: list._id,
+          userId: req.userId,
         });
-        
+
         // Get overdue contacts in this list
         const now = new Date();
         const overdueContacts = await Contact.countDocuments({
@@ -31,9 +31,9 @@ router.get(
           $expr: {
             $gt: [
               { $subtract: [now, '$lastContactDate'] },
-              { $multiply: [list.reminderDays || 30, 24 * 60 * 60 * 1000] }
-            ]
-          }
+              { $multiply: [list.reminderDays || 30, 24 * 60 * 60 * 1000] },
+            ],
+          },
         });
 
         return {

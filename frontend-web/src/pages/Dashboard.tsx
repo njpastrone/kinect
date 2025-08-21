@@ -35,7 +35,7 @@ const ContactNowModal: React.FC<ContactNowModalProps> = ({ contact, onClose, onC
 
   const handleScheduleReminder = async () => {
     if (!reminderDate) return;
-    
+
     try {
       setLoading(true);
       await api.scheduleContactReminder(contact._id!, reminderDate, notes);
@@ -55,12 +55,14 @@ const ContactNowModal: React.FC<ContactNowModalProps> = ({ contact, onClose, onC
           <h2 className="text-xl font-bold text-gray-900">
             Contact {contact.firstName} {contact.lastName}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -72,7 +74,9 @@ const ContactNowModal: React.FC<ContactNowModalProps> = ({ contact, onClose, onC
             </p>
             <p className="text-sm text-gray-600">
               <span className="font-medium">Last contacted:</span>{' '}
-              {contact.lastContactDate ? new Date(contact.lastContactDate).toLocaleDateString() : 'Never'}
+              {contact.lastContactDate
+                ? new Date(contact.lastContactDate).toLocaleDateString()
+                : 'Never'}
             </p>
             <p className="text-sm text-gray-600">
               <span className="font-medium">Days overdue:</span>{' '}
@@ -95,7 +99,12 @@ const ContactNowModal: React.FC<ContactNowModalProps> = ({ contact, onClose, onC
               className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-md flex items-center justify-center gap-2 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
               Mark as Contacted
             </button>
@@ -107,7 +116,12 @@ const ContactNowModal: React.FC<ContactNowModalProps> = ({ contact, onClose, onC
                   className="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center justify-center gap-2 text-sm transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    />
                   </svg>
                   Call
                 </a>
@@ -116,7 +130,12 @@ const ContactNowModal: React.FC<ContactNowModalProps> = ({ contact, onClose, onC
                   className="py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-md flex items-center justify-center gap-2 text-sm transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    />
                   </svg>
                   Text
                 </a>
@@ -159,7 +178,9 @@ const ContactNowModal: React.FC<ContactNowModalProps> = ({ contact, onClose, onC
 
 export const Dashboard: React.FC = () => {
   const [overdueContacts, setOverdueContacts] = useState<OverdueContact[]>([]);
-  const [lists, setLists] = useState<(IContactList & { contactCount: number; overdueCount: number })[]>([]);
+  const [lists, setLists] = useState<
+    (IContactList & { contactCount: number; overdueCount: number })[]
+  >([]);
   const [totalContacts, setTotalContacts] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedContact, setSelectedContact] = useState<OverdueContact | null>(null);
@@ -171,19 +192,18 @@ export const Dashboard: React.FC = () => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Load overdue contacts
       const overdueResponse = await api.getOverdueContacts({ limit: 10 });
       setOverdueContacts(overdueResponse.items);
-      
+
       // Load lists with stats
       const listsResponse = await api.getLists();
       setLists(listsResponse as any);
-      
+
       // Load total contacts count
       const contactsResponse = await api.getContacts({ limit: 1 });
       setTotalContacts(contactsResponse.totalItems);
-      
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     } finally {
@@ -229,8 +249,18 @@ export const Dashboard: React.FC = () => {
                 <p className="text-3xl font-bold text-blue-600 mt-2">{totalContacts}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-full">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                <svg
+                  className="w-8 h-8 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
                 </svg>
               </div>
             </div>
@@ -243,8 +273,18 @@ export const Dashboard: React.FC = () => {
                 <p className="text-3xl font-bold text-red-600 mt-2">{overdueContacts.length}</p>
               </div>
               <div className="p-3 bg-red-100 rounded-full">
-                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="w-8 h-8 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </div>
             </div>
@@ -257,8 +297,18 @@ export const Dashboard: React.FC = () => {
                 <p className="text-3xl font-bold text-green-600 mt-2">{lists.length}</p>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                <svg
+                  className="w-8 h-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
                 </svg>
               </div>
             </div>
@@ -272,7 +322,8 @@ export const Dashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900">Overdue Contacts</h2>
                 <span className="text-sm text-gray-500">
-                  {overdueContacts.length} contact{overdueContacts.length !== 1 ? 's' : ''} need{overdueContacts.length === 1 ? 's' : ''} attention
+                  {overdueContacts.length} contact{overdueContacts.length !== 1 ? 's' : ''} need
+                  {overdueContacts.length === 1 ? 's' : ''} attention
                 </span>
               </div>
             </div>
@@ -291,17 +342,20 @@ export const Dashboard: React.FC = () => {
                         <span className="text-sm text-gray-500">
                           in {contact.list?.name || 'No list'}
                         </span>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getDaysOverdueColor(contact.daysSinceLastContact)}`}>
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getDaysOverdueColor(contact.daysSinceLastContact)}`}
+                        >
                           {Math.floor(contact.daysSinceLastContact)} days overdue
                         </span>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-600">
                         <span>
-                          Last contact: {contact.lastContactDate ? new Date(contact.lastContactDate).toLocaleDateString() : 'Never'}
+                          Last contact:{' '}
+                          {contact.lastContactDate
+                            ? new Date(contact.lastContactDate).toLocaleDateString()
+                            : 'Never'}
                         </span>
-                        {contact.phoneNumber && (
-                          <span>📞 {contact.phoneNumber}</span>
-                        )}
+                        {contact.phoneNumber && <span>📞 {contact.phoneNumber}</span>}
                       </div>
                     </div>
                     <button
@@ -317,12 +371,23 @@ export const Dashboard: React.FC = () => {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow p-8 text-center">
-            <svg className="w-16 h-16 text-green-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-16 h-16 text-green-400 mx-auto mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <h3 className="text-xl font-medium text-gray-900 mb-2">You&apos;re all caught up!</h3>
             <p className="text-gray-600">
-              No overdue contacts. Keep up the great work staying connected with your friends and family.
+              No overdue contacts. Keep up the great work staying connected with your friends and
+              family.
             </p>
           </div>
         )}

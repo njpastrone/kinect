@@ -50,73 +50,67 @@ router.get(
     const pipeline: any[] = [
       // Match contacts for this user
       { $match: { userId: req.userId } },
-      
+
       // Add computed field for days since last contact
       {
         $addFields: {
           daysSinceLastContact: {
-            $divide: [
-              { $subtract: [new Date(), '$lastContactDate'] },
-              1000 * 60 * 60 * 24
-            ]
-          }
-        }
+            $divide: [{ $subtract: [new Date(), '$lastContactDate'] }, 1000 * 60 * 60 * 24],
+          },
+        },
       },
-      
+
       // Join with ContactList to get list info
       {
         $lookup: {
           from: 'contactlists',
           localField: 'listId',
           foreignField: '_id',
-          as: 'list'
-        }
+          as: 'list',
+        },
       },
-      
+
       // Unwind list (convert array to object)
       {
         $unwind: {
           path: '$list',
-          preserveNullAndEmptyArrays: true
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
-      
+
       // Add computed field for reminder threshold
       {
         $addFields: {
           reminderThreshold: {
-            $ifNull: ['$customReminderDays', '$list.reminderDays', 30]
-          }
-        }
+            $ifNull: ['$customReminderDays', '$list.reminderDays', 30],
+          },
+        },
       },
-      
+
       // Filter for overdue contacts
       {
         $match: {
           $expr: {
-            $gt: ['$daysSinceLastContact', '$reminderThreshold']
-          }
-        }
+            $gt: ['$daysSinceLastContact', '$reminderThreshold'],
+          },
+        },
       },
-      
+
       // Sort by days overdue (most overdue first)
       {
-        $sort: { daysSinceLastContact: -1 }
+        $sort: { daysSinceLastContact: -1 },
       },
-      
+
       // Skip and limit for pagination
       { $skip: skip },
-      { $limit: Number(limit) }
+      { $limit: Number(limit) },
     ];
 
     const overdueContacts = await Contact.aggregate(pipeline);
-    
+
     // Get total count of overdue contacts
     const countPipeline: any[] = pipeline.slice(0, -2); // Remove skip and limit
-    const totalOverdue = await Contact.aggregate([
-      ...countPipeline,
-      { $count: 'total' }
-    ]);
+    const totalOverdue = await Contact.aggregate([...countPipeline, { $count: 'total' }]);
 
     const total = totalOverdue[0]?.total || 0;
 

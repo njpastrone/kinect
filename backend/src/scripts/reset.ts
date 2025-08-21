@@ -2,7 +2,7 @@ import { resetDatabase, seedDatabase } from './seed';
 
 async function main() {
   const command = process.argv[2];
-  
+
   try {
     switch (command) {
       case 'reset':

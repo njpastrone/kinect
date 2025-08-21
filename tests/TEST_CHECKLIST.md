@@ -5,13 +5,15 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## 🚀 Quick Start Testing
 
 ### Demo Environment Setup
+
 - [ ] Navigate to `http://localhost:5173`
 - [ ] Login with demo credentials: `demo.active@kinect.app` / `demo123`
 - [ ] Verify demo mode banner appears
 - [ ] Start guided tour (should auto-start for first-time users)
 - [ ] Complete tour to understand all features
 
-### Seed Data Verification  
+### Seed Data Verification
+
 - [ ] Run `npm run seed` to populate database
 - [ ] Verify 3 demo users created (active, moderate, minimal profiles)
 - [ ] Verify contact lists created for each user
@@ -21,6 +23,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## 👤 User Authentication Testing
 
 ### Registration Flow
+
 - [ ] **Valid Registration**
   - Navigate to registration page
   - Enter valid email, password, first name, last name
@@ -34,6 +37,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Try empty required fields → Expected: 400 validation error
 
 ### Login Flow
+
 - [ ] **Valid Login**
   - Enter correct email/password
   - Verify successful login and redirect to dashboard
@@ -45,6 +49,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Empty fields → Expected: 400 validation error
 
 ### Token Management
+
 - [ ] **Token Refresh**
   - Wait for access token to near expiration (or force expire)
   - Make API request to trigger auto-refresh
@@ -59,6 +64,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## 📋 Contact List Management
 
 ### CRUD Operations
+
 - [ ] **Create Contact List**
   - Click "New List" button
   - Enter name, description, choose color
@@ -77,6 +83,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Confirm deletion → Expected: List and associated contacts removed
 
 ### List Organization
+
 - [ ] **Drag and Drop Reordering** (if implemented)
   - Drag lists to reorder
   - Expected: New order persists after refresh
@@ -88,6 +95,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## 👥 Contact Management
 
 ### Contact Creation
+
 - [ ] **Complete Contact**
   - Fill all fields: name, phone, email, birthday, category, notes
   - Choose contact list
@@ -105,6 +113,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Try invalid category → Expected: Validation error
 
 ### Contact Viewing
+
 - [ ] **Contact List Display**
   - Verify contacts show in chosen list
   - Check contact card displays: name, category, last contact date
@@ -116,6 +125,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Check birthday formatting and upcoming birthday indicators
 
 ### Contact Editing
+
 - [ ] **Update Contact Information**
   - Edit name, phone, email, category
   - Change contact list
@@ -127,6 +137,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Expected: Contact appears in new list, removed from old list
 
 ### Contact Deletion
+
 - [ ] **Delete Contact**
   - Delete contact → Expected: Confirmation dialog
   - Confirm deletion → Expected: Contact removed from all lists
@@ -135,9 +146,10 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## ⏰ Reminder System
 
 ### Reminder Calculation
+
 - [ ] **Category-Based Reminders**
   - Best Friends: Check 30-day reminder threshold
-  - Friends: Check 90-day reminder threshold  
+  - Friends: Check 90-day reminder threshold
   - Acquaintances: Check 180-day reminder threshold
   - Expected: Correct reminder states based on last contact date
 
@@ -147,6 +159,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Expected: Custom interval used for reminder calculation
 
 ### Reminder Display
+
 - [ ] **Status Badges**
   - Red badge: Contact overdue (past reminder threshold)
   - Yellow badge: Contact due soon (within 7 days of threshold)
@@ -161,6 +174,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## 📞 Communication Tracking
 
 ### Manual Contact Logging
+
 - [ ] **Log Communication**
   - Select contact → Click "Log Contact"
   - Choose type: Phone Call, Text, Email, In Person, Other
@@ -173,6 +187,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Check interaction types and notes display correctly
 
 ### Phone Integration (Mock)
+
 - [ ] **Mock Phone Sync**
   - Trigger phone sync via dev tools or API
   - Expected: New communication logs created
@@ -186,6 +201,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## 📊 Dashboard Analytics
 
 ### Summary Statistics
+
 - [ ] **Contact Counts**
   - Total contacts
   - Contacts by status (overdue, due soon, recent)
@@ -199,6 +215,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Expected: Calculations match actual data
 
 ### Visual Indicators
+
 - [ ] **Progress Indicators**
   - Relationship health meters
   - Category breakdowns
@@ -207,14 +224,16 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## 🔍 Search and Filtering
 
 ### Search Functionality
+
 - [ ] **Contact Search**
   - Search by first name
-  - Search by last name  
+  - Search by last name
   - Search by phone number
   - Search by email
   - Expected: Relevant results returned
 
 ### Filtering Options
+
 - [ ] **Filter by Category**
   - Filter contacts by Best Friend, Friend, Acquaintance
   - Expected: Only contacts of selected category shown
@@ -231,6 +250,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## ⚙️ Settings and Preferences
 
 ### Notification Settings
+
 - [ ] **Default Reminder Intervals**
   - Modify default intervals for each category
   - Create new contact and verify new defaults applied
@@ -242,6 +262,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Expected: Settings persist and affect notification behavior
 
 ### Profile Settings
+
 - [ ] **User Profile**
   - Update first name, last name
   - Change password
@@ -250,6 +271,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## 📱 Responsive Design Testing
 
 ### Mobile Experience
+
 - [ ] **Phone Layout (375px)**
   - Navigation collapses to hamburger menu
   - Contact cards stack vertically
@@ -262,6 +284,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Forms remain usable
 
 ### Touch Interactions
+
 - [ ] **Touch Targets**
   - All buttons are at least 44px touch target
   - Swipe gestures work on mobile (if implemented)
@@ -270,6 +293,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## 🔐 Security Testing
 
 ### Authentication Security
+
 - [ ] **Protected Routes**
   - Access `/contacts` without login → Expected: Redirect to login
   - Access `/dashboard` without login → Expected: Redirect to login
@@ -281,6 +305,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Expected: No data leakage between users
 
 ### Input Validation
+
 - [ ] **XSS Prevention**
   - Try entering `<script>alert('xss')</script>` in text fields
   - Expected: Script tags escaped/sanitized
@@ -292,6 +317,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## 🚫 Error Handling
 
 ### Network Errors
+
 - [ ] **Offline Behavior**
   - Disconnect network, try to perform actions
   - Expected: Appropriate error messages displayed
@@ -303,12 +329,14 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Retry mechanisms work when applicable
 
 ### Validation Errors
+
 - [ ] **Form Validation**
   - Submit forms with invalid data
   - Expected: Clear error messages
   - Field-level validation provides immediate feedback
 
 ### Edge Cases
+
 - [ ] **Large Data Sets**
   - Create 100+ contacts
   - Expected: App remains responsive
@@ -321,6 +349,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## 🎭 Demo Mode Testing
 
 ### Demo Features
+
 - [ ] **Auto-Login**
   - Demo mode auto-logs in with demo account
   - Expected: Seamless experience for new users
@@ -337,6 +366,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Expected: Showcases all app features effectively
 
 ### Demo Notifications
+
 - [ ] **Contextual Tips**
   - Demo notifications appear for key actions
   - Tips explain what's happening behind the scenes
@@ -345,6 +375,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## 🔧 Developer Tools Testing
 
 ### Dev Panel Features
+
 - [ ] **Time Travel**
   - Enable time travel mode
   - Jump to future dates
@@ -369,6 +400,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## 📈 Performance Testing
 
 ### Load Testing
+
 - [ ] **Large Contact Lists**
   - Create 200+ contacts
   - Navigate through app
@@ -379,6 +411,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Expected: Results appear within 500ms
 
 ### Memory Usage
+
 - [ ] **Memory Leaks**
   - Navigate through app extensively
   - Monitor browser memory usage
@@ -387,18 +420,21 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## 🌐 Browser Compatibility
 
 ### Modern Browsers
+
 - [ ] **Chrome** (latest)
-- [ ] **Firefox** (latest)  
+- [ ] **Firefox** (latest)
 - [ ] **Safari** (latest)
 - [ ] **Edge** (latest)
 
 ### Mobile Browsers
+
 - [ ] **iOS Safari**
 - [ ] **Android Chrome**
 
 ## 🔄 Data Persistence
 
 ### Local Storage
+
 - [ ] **Settings Persistence**
   - Change settings, refresh page
   - Expected: Settings maintained
@@ -408,6 +444,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
   - Expected: User remains logged in
 
 ### Database Consistency
+
 - [ ] **CRUD Operations**
   - Create, read, update, delete operations
   - Expected: Database reflects all changes
@@ -416,6 +453,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 ## ✅ Acceptance Criteria
 
 ### Core Features (Must Have)
+
 - [ ] User can register and login
 - [ ] User can create and manage contact lists
 - [ ] User can add, edit, and delete contacts
@@ -424,6 +462,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 - [ ] Dashboard shows overview of relationship health
 
 ### Enhanced Features (Should Have)
+
 - [ ] Search and filter contacts
 - [ ] Demo mode with guided tour
 - [ ] Responsive design for mobile
@@ -431,6 +470,7 @@ This document outlines comprehensive testing procedures for the Kinect relations
 - [ ] Settings and preferences
 
 ### Nice to Have Features
+
 - [ ] Bulk operations
 - [ ] Data export/import
 - [ ] Advanced analytics
@@ -449,18 +489,21 @@ Document any known issues or limitations:
 ## 🎯 Test Scenarios Priority
 
 ### P0 - Critical (Must work)
+
 - User authentication flow
 - Basic contact CRUD operations
 - Reminder calculation and display
 - Dashboard functionality
 
 ### P1 - Important (Should work)
+
 - Search and filtering
 - Communication logging
 - Settings management
 - Mobile responsiveness
 
 ### P2 - Nice to have (Could work)
+
 - Demo mode features
 - Developer tools
 - Advanced analytics
@@ -469,18 +512,21 @@ Document any known issues or limitations:
 ## 📝 Test Execution Notes
 
 ### Before Testing
+
 1. Run `npm run seed` to populate test data
 2. Use demo credentials for consistent testing
 3. Clear browser cache between test runs
 4. Test in incognito mode to avoid cache issues
 
 ### During Testing
+
 - Take screenshots of any issues
 - Note exact steps to reproduce problems
 - Record browser console errors
 - Test both happy path and error cases
 
 ### After Testing
+
 - Document all findings
 - Categorize issues by severity
 - Create GitHub issues for bugs

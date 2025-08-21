@@ -5,6 +5,7 @@ This directory contains comprehensive testing tools and documentation for the Ki
 ## 🚀 Quick Start
 
 ### 1. Setup Demo Environment
+
 ```bash
 # Install dependencies (if not already done)
 npm install
@@ -17,6 +18,7 @@ npm run demo
 ```
 
 ### 2. Login and Explore
+
 - Navigate to `http://localhost:5173`
 - Login with demo credentials: `demo.active@kinect.app` / `demo123`
 - Follow the guided tour to understand all features
@@ -39,6 +41,7 @@ tests/
 ## 🛠️ Available Testing Tools
 
 ### 1. Demo Mode
+
 - **Purpose**: Interactive demo with realistic data
 - **Access**: Login with demo credentials
 - **Features**:
@@ -48,9 +51,11 @@ tests/
   - Reset functionality to restore demo state
 
 ### 2. API Testing
+
 Choose your preferred tool:
 
 #### Option A: Postman
+
 ```bash
 # Import collection
 1. Open Postman
@@ -60,6 +65,7 @@ Choose your preferred tool:
 ```
 
 #### Option B: VS Code REST Client
+
 ```bash
 # Prerequisites
 1. Install "REST Client" extension in VS Code
@@ -69,6 +75,7 @@ Choose your preferred tool:
 ```
 
 #### Option C: Command Line
+
 ```bash
 # Quick API test
 curl -X POST http://localhost:3001/api/auth/login \
@@ -77,6 +84,7 @@ curl -X POST http://localhost:3001/api/auth/login \
 ```
 
 ### 3. End-to-End Testing
+
 ```bash
 # Run all E2E tests
 npm run test:e2e
@@ -95,9 +103,11 @@ npx playwright test -g "should login with demo credentials"
 ```
 
 ### 4. Developer Tools
+
 Available in development mode:
 
 #### Frontend Dev Tools Panel
+
 - **Toggle**: Click 🛠️ icon in top-left corner
 - **Features**:
   - Time travel (simulate future dates)
@@ -107,6 +117,7 @@ Available in development mode:
   - Data export/import
 
 #### Backend Dev APIs
+
 ```bash
 # Sync mock phone logs
 POST /api/dev/sync-phone-logs
@@ -121,6 +132,7 @@ POST /api/dev/start-auto-sync
 ```
 
 ### 5. Database Management
+
 ```bash
 # Populate with demo data
 npm run seed
@@ -135,6 +147,7 @@ cd backend && npm run reset-and-seed
 ## 🎯 Testing Scenarios
 
 ### Authentication Flow
+
 - [x] Valid login with demo credentials
 - [x] Invalid credentials error handling
 - [x] Token refresh mechanism
@@ -142,6 +155,7 @@ cd backend && npm run reset-and-seed
 - [x] Logout functionality
 
 ### Contact Management
+
 - [x] Create contacts with all fields
 - [x] Edit existing contacts
 - [x] Delete contacts with confirmation
@@ -149,6 +163,7 @@ cd backend && npm run reset-and-seed
 - [x] Move contacts between lists
 
 ### Contact Lists
+
 - [x] Create new lists
 - [x] Edit list properties
 - [x] Delete lists (with/without contacts)
@@ -156,6 +171,7 @@ cd backend && npm run reset-and-seed
 - [x] List organization
 
 ### Reminder System
+
 - [x] Category-based reminder calculations
 - [x] Custom reminder intervals
 - [x] Status badge accuracy (overdue/due soon/recent)
@@ -163,18 +179,21 @@ cd backend && npm run reset-and-seed
 - [x] Reminder updates after logging contact
 
 ### Communication Tracking
+
 - [x] Manual communication logging
 - [x] Communication history display
 - [x] Mock phone sync integration
 - [x] Last contact date updates
 
 ### Search and Filtering
+
 - [x] Search by name, phone, email
 - [x] Filter by category
 - [x] Filter by list
 - [x] Filter by reminder status
 
 ### Responsive Design
+
 - [x] Mobile viewport (375px)
 - [x] Tablet viewport (768px)
 - [x] Touch interactions
@@ -185,18 +204,21 @@ cd backend && npm run reset-and-seed
 The seed script creates 3 demo users with different usage patterns:
 
 ### 1. Alex Johnson (demo.active@kinect.app)
+
 - **Profile**: Active user
 - **Data**: 6 lists, ~18 contacts
 - **Pattern**: Varied reminder states, recent activity
 - **Use Case**: Demonstrates full app capabilities
 
-### 2. Sarah Chen (demo.moderate@kinect.app)  
+### 2. Sarah Chen (demo.moderate@kinect.app)
+
 - **Profile**: Moderate user
 - **Data**: 4 lists, ~12 contacts
 - **Pattern**: Some overdue contacts, mixed activity
 - **Use Case**: Shows typical user behavior
 
 ### 3. Mike Rodriguez (demo.minimal@kinect.app)
+
 - **Profile**: Minimal user
 - **Data**: 2 lists, ~7 contacts
 - **Pattern**: Many overdue, infrequent usage
@@ -205,6 +227,7 @@ The seed script creates 3 demo users with different usage patterns:
 ## 🔧 Configuration
 
 ### Environment Variables
+
 ```bash
 # Backend API URL
 VITE_API_URL=http://localhost:3001/api
@@ -217,6 +240,7 @@ VITE_DEMO_AUTO_LOGIN=true
 ```
 
 ### Playwright Configuration
+
 - **Browsers**: Chrome, Firefox, Safari, Mobile
 - **Parallel**: Yes (except CI)
 - **Retries**: 2x on CI, 0x local
@@ -229,12 +253,14 @@ VITE_DEMO_AUTO_LOGIN=true
 ### Common Issues
 
 #### 1. Tests Failing - Database Not Seeded
+
 ```bash
 # Solution: Manually seed database
 npm run seed
 ```
 
 #### 2. API Tests Failing - Wrong Environment
+
 ```bash
 # Solution: Check base URL
 echo $BASE_URL  # Should be http://localhost:5173
@@ -242,12 +268,14 @@ echo $API_URL   # Should be http://localhost:3001/api
 ```
 
 #### 3. E2E Tests Timing Out
+
 ```bash
 # Solution: Increase timeout or check services
 npx playwright test --timeout=60000
 ```
 
 #### 4. Demo Mode Not Working
+
 ```bash
 # Check localStorage
 localStorage.getItem('demoMode')  # Should be 'true'
@@ -257,11 +285,13 @@ localStorage.getItem('user')      # Should contain demo user
 ### Debug Tools
 
 #### Browser DevTools
-- Network tab: Check API requests/responses  
+
+- Network tab: Check API requests/responses
 - Console: Look for JavaScript errors
 - Application tab: Inspect localStorage
 
 #### Playwright Debug
+
 ```bash
 # Debug specific test
 npx playwright test --debug -g "test name"
@@ -271,6 +301,7 @@ npx playwright codegen localhost:5173
 ```
 
 #### Backend Logs
+
 ```bash
 # View API logs
 npm run dev:backend
@@ -280,6 +311,7 @@ npm run dev:backend
 ## 📈 Performance Testing
 
 ### Metrics to Monitor
+
 - Page load time < 3 seconds
 - Search results < 500ms
 - API response time < 200ms
@@ -287,6 +319,7 @@ npm run dev:backend
 - No memory leaks
 
 ### Load Testing
+
 ```bash
 # Generate bulk test data
 # Via dev tools panel or API
@@ -300,6 +333,7 @@ npm run test:e2e -- --grep "performance"
 ## ✅ Test Coverage Goals
 
 ### Core Features (Must Pass)
+
 - [x] User authentication (login/logout)
 - [x] Contact CRUD operations
 - [x] Contact list management
@@ -308,6 +342,7 @@ npm run test:e2e -- --grep "performance"
 - [x] Basic search/filtering
 
 ### Enhanced Features (Should Pass)
+
 - [x] Demo mode with guided tour
 - [x] Mobile responsive design
 - [x] Phone sync simulation
@@ -315,6 +350,7 @@ npm run test:e2e -- --grep "performance"
 - [x] Error handling
 
 ### Advanced Features (Nice to Have)
+
 - [ ] Bulk operations
 - [ ] Advanced analytics
 - [ ] Data export/import
@@ -324,6 +360,7 @@ npm run test:e2e -- --grep "performance"
 ## 🔄 Continuous Integration
 
 ### GitHub Actions Integration
+
 ```yaml
 name: E2E Tests
 on: [push, pull_request]
@@ -342,6 +379,7 @@ jobs:
 ```
 
 ### Test Reports
+
 - HTML: `playwright-report/index.html`
 - JSON: `test-results.json`
 - JUnit: `test-results.xml`
@@ -349,16 +387,19 @@ jobs:
 ## 📝 Test Maintenance
 
 ### Adding New Tests
+
 1. **API Tests**: Add requests to `kinect.http` or Postman collection
 2. **E2E Tests**: Add scenarios to `userJourneys.spec.ts`
 3. **Manual Tests**: Update `TEST_CHECKLIST.md`
 
 ### Updating Test Data
+
 1. Modify `backend/src/scripts/seed.ts`
 2. Run `npm run seed` to apply changes
 3. Update test expectations if needed
 
 ### Test Cleanup
+
 ```bash
 # Remove old test artifacts
 rm -rf test-results/
@@ -370,12 +411,14 @@ rm test-results.xml
 ## 🤝 Contributing
 
 ### Before Submitting Tests
+
 1. Run full test suite locally
-2. Check test coverage for new features  
+2. Check test coverage for new features
 3. Update documentation if needed
 4. Follow naming conventions
 
 ### Test Naming
+
 - **E2E**: `should [action] [expected outcome]`
 - **API**: `[method] [endpoint] - [scenario]`
 - **Manual**: `[Feature] - [Test Case]`

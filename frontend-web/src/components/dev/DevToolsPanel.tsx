@@ -4,7 +4,7 @@ import { useDevTools, formatDateForTimeTravel, ApiLog } from '../../utils/devToo
 export const DevToolsPanel: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'api' | 'time' | 'data'>('general');
-  
+
   const devTools = useDevTools();
 
   if (!devTools.isEnabled) return null;
@@ -27,10 +27,7 @@ export const DevToolsPanel: React.FC = () => {
         <div className="fixed inset-x-4 top-16 z-40 bg-white border border-gray-300 rounded-lg shadow-xl max-h-96 overflow-hidden">
           <div className="flex items-center justify-between p-3 border-b bg-gray-50">
             <h3 className="font-semibold text-gray-900">Dev Tools</h3>
-            <button
-              onClick={togglePanel}
-              className="text-gray-500 hover:text-gray-700"
-            >
+            <button onClick={togglePanel} className="text-gray-500 hover:text-gray-700">
               ✕
             </button>
           </div>
@@ -41,8 +38,8 @@ export const DevToolsPanel: React.FC = () => {
               { id: 'general', label: 'General' },
               { id: 'api', label: `API (${devTools.apiLogs.length})` },
               { id: 'time', label: 'Time Travel' },
-              { id: 'data', label: 'Data' }
-            ].map(tab => (
+              { id: 'data', label: 'Data' },
+            ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
@@ -88,7 +85,7 @@ const GeneralTab: React.FC<{ devTools: ReturnType<typeof useDevTools> }> = ({ de
         </button>
       </div>
     </div>
-    
+
     <div>
       <h4 className="text-sm font-medium text-gray-900 mb-2">Debug Info</h4>
       <div className="bg-gray-50 p-2 rounded text-xs">
@@ -120,7 +117,7 @@ const ApiTab: React.FC<{ devTools: ReturnType<typeof useDevTools> }> = ({ devToo
         Clear All
       </button>
     </div>
-    
+
     <div className="space-y-2 max-h-48 overflow-y-auto">
       {devTools.apiLogs.length === 0 ? (
         <p className="text-sm text-gray-500">No API calls logged yet</p>
@@ -133,37 +130,45 @@ const ApiTab: React.FC<{ devTools: ReturnType<typeof useDevTools> }> = ({ devToo
 
 const ApiLogEntry: React.FC<{ log: ApiLog }> = ({ log }) => {
   const [expanded, setExpanded] = useState(false);
-  
-  const statusColor = log.status >= 200 && log.status < 300 ? 'text-green-600' :
-                     log.status >= 400 ? 'text-red-600' : 'text-yellow-600';
+
+  const statusColor =
+    log.status >= 200 && log.status < 300
+      ? 'text-green-600'
+      : log.status >= 400
+        ? 'text-red-600'
+        : 'text-yellow-600';
 
   return (
     <div className="border border-gray-200 rounded p-2">
-      <div 
+      <div
         className="flex justify-between items-center cursor-pointer"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center space-x-2">
-          <span className={`text-xs font-mono ${statusColor}`}>
-            {log.status || 'ERR'}
-          </span>
+          <span className={`text-xs font-mono ${statusColor}`}>{log.status || 'ERR'}</span>
           <span className="text-xs font-medium">{log.method}</span>
-          <span className="text-xs text-gray-600 truncate max-w-32">
-            {log.url}
-          </span>
+          <span className="text-xs text-gray-600 truncate max-w-32">{log.url}</span>
         </div>
         <div className="flex items-center space-x-2">
           <span className="text-xs text-gray-500">{log.duration}ms</span>
           <span className="text-xs">{expanded ? '▼' : '▶'}</span>
         </div>
       </div>
-      
+
       {expanded && (
         <div className="mt-2 pt-2 border-t border-gray-100">
           <div className="text-xs space-y-1">
-            <div><strong>URL:</strong> {log.url}</div>
-            <div><strong>Time:</strong> {log.timestamp.toLocaleTimeString()}</div>
-            {log.error && <div className="text-red-600"><strong>Error:</strong> {log.error}</div>}
+            <div>
+              <strong>URL:</strong> {log.url}
+            </div>
+            <div>
+              <strong>Time:</strong> {log.timestamp.toLocaleTimeString()}
+            </div>
+            {log.error && (
+              <div className="text-red-600">
+                <strong>Error:</strong> {log.error}
+              </div>
+            )}
             {log.requestData && (
               <details className="mt-1">
                 <summary className="cursor-pointer text-gray-600">Request Data</summary>
@@ -199,17 +204,13 @@ const TimeTravelTab: React.FC<{ devTools: ReturnType<typeof useDevTools> }> = ({
         />
         <span className="text-sm font-medium">Enable Time Travel</span>
       </label>
-      <p className="text-xs text-gray-500 mt-1">
-        Override current date for testing reminder logic
-      </p>
+      <p className="text-xs text-gray-500 mt-1">Override current date for testing reminder logic</p>
     </div>
 
     {devTools.timeTravel.enabled && (
       <div className="space-y-3">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Current Date
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Current Date</label>
           <input
             type="date"
             value={formatDateForTimeTravel(devTools.timeTravel.currentDate)}
@@ -293,9 +294,7 @@ const DataTab: React.FC<{ devTools: ReturnType<typeof useDevTools> }> = ({ devTo
         >
           🗑️ Clear All Data
         </button>
-        <p className="text-xs text-gray-500">
-          This will clear all local data and reload the page
-        </p>
+        <p className="text-xs text-gray-500">This will clear all local data and reload the page</p>
       </div>
     </div>
 
@@ -306,7 +305,7 @@ const DataTab: React.FC<{ devTools: ReturnType<typeof useDevTools> }> = ({ devTo
           onClick={() => {
             const data = {
               localStorage: { ...localStorage },
-              timestamp: new Date().toISOString()
+              timestamp: new Date().toISOString(),
             };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -333,7 +332,7 @@ const DataTab: React.FC<{ devTools: ReturnType<typeof useDevTools> }> = ({ devTo
                   try {
                     const data = JSON.parse(e.target?.result as string);
                     if (data.localStorage) {
-                      Object.keys(data.localStorage).forEach(key => {
+                      Object.keys(data.localStorage).forEach((key) => {
                         localStorage.setItem(key, data.localStorage[key]);
                       });
                       window.location.reload();

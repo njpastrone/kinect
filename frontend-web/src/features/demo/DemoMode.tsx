@@ -58,7 +58,7 @@ export const DemoModeProvider: React.FC<DemoModeProviderProps> = ({ children }) 
   const setDemoMode = (enabled: boolean) => {
     setIsDemoMode(enabled);
     localStorage.setItem('demoMode', enabled.toString());
-    
+
     if (enabled) {
       showNotification(DEMO_NOTIFICATIONS[0]);
     }
@@ -66,12 +66,12 @@ export const DemoModeProvider: React.FC<DemoModeProviderProps> = ({ children }) 
 
   const showNotification = (notification: DemoNotification) => {
     if (!isDemoMode) return;
-    
-    setNotifications(prev => [...prev, { ...notification, id: Date.now() } as any]);
-    
+
+    setNotifications((prev) => [...prev, { ...notification, id: Date.now() } as any]);
+
     // Auto remove notification after 5 seconds
     setTimeout(() => {
-      setNotifications(prev => prev.slice(1));
+      setNotifications((prev) => prev.slice(1));
     }, 5000);
   };
 
@@ -81,13 +81,13 @@ export const DemoModeProvider: React.FC<DemoModeProviderProps> = ({ children }) 
       showNotification({
         title: 'Demo Reset',
         message: 'Demo data has been reset to initial state',
-        type: 'info'
+        type: 'info',
       });
     } catch (error) {
       showNotification({
         title: 'Reset Failed',
         message: 'Could not reset demo data',
-        type: 'error'
+        type: 'error',
       });
     }
   };
@@ -99,7 +99,7 @@ export const DemoModeProvider: React.FC<DemoModeProviderProps> = ({ children }) 
         setDemoMode,
         showNotification,
         resetDemo,
-        isLoggedInAsDemo
+        isLoggedInAsDemo,
       }}
     >
       {children}
@@ -121,17 +121,24 @@ const DemoNotifications: React.FC<DemoNotificationsProps> = ({ notifications }) 
         <div
           key={index}
           className={`max-w-sm p-4 rounded-lg shadow-lg transition-all duration-300 ${
-            notification.type === 'info' ? 'bg-blue-500 text-white' :
-            notification.type === 'success' ? 'bg-green-500 text-white' :
-            notification.type === 'warning' ? 'bg-yellow-500 text-black' :
-            'bg-red-500 text-white'
+            notification.type === 'info'
+              ? 'bg-blue-500 text-white'
+              : notification.type === 'success'
+                ? 'bg-green-500 text-white'
+                : notification.type === 'warning'
+                  ? 'bg-yellow-500 text-black'
+                  : 'bg-red-500 text-white'
           }`}
         >
           <div className="flex items-start">
             <div className="mr-3 text-xl">
-              {notification.type === 'info' ? 'ℹ️' :
-               notification.type === 'success' ? '✅' :
-               notification.type === 'warning' ? '⚠️' : '❌'}
+              {notification.type === 'info'
+                ? 'ℹ️'
+                : notification.type === 'success'
+                  ? '✅'
+                  : notification.type === 'warning'
+                    ? '⚠️'
+                    : '❌'}
             </div>
             <div>
               <h4 className="font-semibold text-sm">{notification.title}</h4>

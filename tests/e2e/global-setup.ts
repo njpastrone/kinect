@@ -2,15 +2,15 @@ import { chromium, FullConfig } from '@playwright/test';
 
 async function globalSetup(config: FullConfig) {
   console.log('🚀 Starting global setup for E2E tests...');
-  
+
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  
+
   try {
     // Wait for services to be ready
     const baseURL = process.env.BASE_URL || 'http://localhost:5173';
     const apiURL = process.env.API_URL || 'http://localhost:3001/api';
-    
+
     // Check if backend is ready
     console.log('⏳ Waiting for backend to be ready...');
     let backendReady = false;
@@ -25,13 +25,13 @@ async function globalSetup(config: FullConfig) {
       } catch (error) {
         // Continue waiting
       }
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
-    
+
     if (!backendReady) {
       throw new Error('Backend failed to start within timeout');
     }
-    
+
     // Check if frontend is ready
     console.log('⏳ Waiting for frontend to be ready...');
     let frontendReady = false;
@@ -44,21 +44,21 @@ async function globalSetup(config: FullConfig) {
       } catch (error) {
         // Continue waiting
       }
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
-    
+
     if (!frontendReady) {
       throw new Error('Frontend failed to start within timeout');
     }
-    
+
     // Seed the database with test data
     console.log('🌱 Seeding database with test data...');
     try {
       const seedResponse = await page.request.post(`${apiURL}/dev/seed`, {
         headers: { 'Content-Type': 'application/json' },
-        timeout: 60000 // 1 minute for seeding
+        timeout: 60000, // 1 minute for seeding
       });
-      
+
       if (seedResponse.ok()) {
         console.log('✅ Database seeded successfully');
       } else {
@@ -68,9 +68,8 @@ async function globalSetup(config: FullConfig) {
       console.warn('⚠️  Could not seed database:', error);
       console.log('📝 Tests will run with existing data');
     }
-    
+
     console.log('🎉 Global setup completed successfully');
-    
   } catch (error) {
     console.error('❌ Global setup failed:', error);
     throw error;

@@ -14,31 +14,35 @@ interface TooltipPosition {
   placement: 'top' | 'bottom' | 'left' | 'right' | 'center';
 }
 
-export const GuidedTour: React.FC<GuidedTourProps> = ({ 
-  isOpen: externalIsOpen, 
-  onComplete: externalOnComplete, 
-  onSkip: externalOnSkip 
+export const GuidedTour: React.FC<GuidedTourProps> = ({
+  isOpen: externalIsOpen,
+  onComplete: externalOnComplete,
+  onSkip: externalOnSkip,
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
-  const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition>({ 
-    top: 0, 
-    left: 0, 
-    placement: 'center' 
+  const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition>({
+    top: 0,
+    left: 0,
+    placement: 'center',
   });
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const { showNotification, isDemoMode } = useDemoMode();
 
   // Use external control if provided, otherwise use internal state based on demo mode
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
-  const onComplete = externalOnComplete || (() => {
-    setInternalIsOpen(false);
-    localStorage.setItem('hasSeenDemoTour', 'true');
-  });
-  const onSkip = externalOnSkip || (() => {
-    setInternalIsOpen(false);
-    localStorage.setItem('hasSeenDemoTour', 'true');
-  });
+  const onComplete =
+    externalOnComplete ||
+    (() => {
+      setInternalIsOpen(false);
+      localStorage.setItem('hasSeenDemoTour', 'true');
+    });
+  const onSkip =
+    externalOnSkip ||
+    (() => {
+      setInternalIsOpen(false);
+      localStorage.setItem('hasSeenDemoTour', 'true');
+    });
 
   // Auto-open tour for demo mode if not seen before
   useEffect(() => {
@@ -95,7 +99,10 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
       left = Math.max(margin, Math.min(left, viewportWidth - tooltipWidth / 2 - margin));
     } else if (placement === 'left' || placement === 'right') {
       // Adjust vertical position
-      top = Math.max(margin, Math.min(top, viewportHeight + window.scrollY - tooltipHeight / 2 - margin));
+      top = Math.max(
+        margin,
+        Math.min(top, viewportHeight + window.scrollY - tooltipHeight / 2 - margin)
+      );
     }
 
     return { top, left, placement };
@@ -107,7 +114,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
     const findAndHighlightElement = () => {
       const targetSelector = steps[currentStep].target;
       const element = document.querySelector(targetSelector) as HTMLElement;
-      
+
       if (element) {
         setTargetElement(element);
         const position = calculateTooltipPosition(element);
@@ -122,7 +129,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
         setTooltipPosition({
           top: window.innerHeight / 2 + window.scrollY,
           left: window.innerWidth / 2,
-          placement: 'center'
+          placement: 'center',
         });
       }
     };
@@ -175,8 +182,8 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
     }
     showNotification({
       title: 'Tour Completed!',
-      message: 'You\'re all set to explore Kinect. Try adding a contact or syncing your phone logs!',
-      type: 'success'
+      message: "You're all set to explore Kinect. Try adding a contact or syncing your phone logs!",
+      type: 'success',
     });
     onComplete();
   };
@@ -200,7 +207,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
       borderRadius: 8,
       padding: 20,
       boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-      border: '1px solid #E5E7EB'
+      border: '1px solid #E5E7EB',
     };
 
     switch (tooltipPosition.placement) {
@@ -248,54 +255,54 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
   const renderArrow = () => {
     if (tooltipPosition.placement === 'center') return null;
 
-    const arrowClasses = "absolute w-0 h-0 border-8";
-    
+    const arrowClasses = 'absolute w-0 h-0 border-8';
+
     switch (tooltipPosition.placement) {
       case 'top':
         return (
-          <div 
+          <div
             className={`${arrowClasses} border-l-transparent border-r-transparent border-b-transparent border-t-white`}
             style={{
               bottom: -8,
               left: '50%',
               transform: 'translateX(-50%)',
-              filter: 'drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1))'
+              filter: 'drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1))',
             }}
           />
         );
       case 'bottom':
         return (
-          <div 
+          <div
             className={`${arrowClasses} border-l-transparent border-r-transparent border-t-transparent border-b-white`}
             style={{
               top: -8,
               left: '50%',
               transform: 'translateX(-50%)',
-              filter: 'drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.1))'
+              filter: 'drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.1))',
             }}
           />
         );
       case 'left':
         return (
-          <div 
+          <div
             className={`${arrowClasses} border-t-transparent border-b-transparent border-l-transparent border-r-white`}
             style={{
               right: -8,
               top: '50%',
               transform: 'translateY(-50%)',
-              filter: 'drop-shadow(-1px 0 1px rgba(0, 0, 0, 0.1))'
+              filter: 'drop-shadow(-1px 0 1px rgba(0, 0, 0, 0.1))',
             }}
           />
         );
       case 'right':
         return (
-          <div 
+          <div
             className={`${arrowClasses} border-t-transparent border-b-transparent border-r-transparent border-l-white`}
             style={{
               left: -8,
               top: '50%',
               transform: 'translateY(-50%)',
-              filter: 'drop-shadow(1px 0 1px rgba(0, 0, 0, 0.1))'
+              filter: 'drop-shadow(1px 0 1px rgba(0, 0, 0, 0.1))',
             }}
           />
         );
@@ -309,7 +316,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
     if (!targetElement) return null;
 
     const rect = targetElement.getBoundingClientRect();
-    
+
     return (
       <div
         className="fixed pointer-events-none"
@@ -321,7 +328,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
           height: rect.height + 16,
           boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
           borderRadius: 8,
-          border: '2px solid #4F46E5'
+          border: '2px solid #4F46E5',
         }}
       />
     );
@@ -330,11 +337,8 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
   return (
     <>
       {/* Overlay */}
-      <div 
-        className="fixed inset-0 bg-black/50 z-[9998]"
-        style={{ backdropFilter: 'blur(1px)' }}
-      />
-      
+      <div className="fixed inset-0 bg-black/50 z-[9998]" style={{ backdropFilter: 'blur(1px)' }} />
+
       {/* Spotlight effect */}
       {renderSpotlight()}
 
@@ -344,12 +348,8 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
         {renderArrow()}
 
         <div className="mb-4">
-          <h3 className="font-semibold text-xl text-gray-900 mb-3">
-            {steps[currentStep].title}
-          </h3>
-          <p className="text-gray-600 text-sm leading-relaxed">
-            {steps[currentStep].content}
-          </p>
+          <h3 className="font-semibold text-xl text-gray-900 mb-3">{steps[currentStep].title}</h3>
+          <p className="text-gray-600 text-sm leading-relaxed">{steps[currentStep].content}</p>
         </div>
 
         <div className="flex items-center justify-between mb-3">
@@ -364,7 +364,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
             >
               Skip Tour
             </button>
-            
+
             {currentStep > 0 && (
               <button
                 onClick={prevStep}
@@ -373,7 +373,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                 Previous
               </button>
             )}
-            
+
             <button
               onClick={nextStep}
               className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors font-medium"
@@ -435,15 +435,16 @@ export const TourTriggerButton: React.FC = () => {
         title="Take the guided tour"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
       </button>
 
-      <GuidedTour
-        isOpen={isTourOpen}
-        onComplete={completeTour}
-        onSkip={skipTour}
-      />
+      <GuidedTour isOpen={isTourOpen} onComplete={completeTour} onSkip={skipTour} />
     </>
   );
 };
@@ -497,7 +498,7 @@ if (typeof document !== 'undefined') {
       animation: tourFadeIn 0.2s ease-out;
     }
   `;
-  
+
   // Only add if not already added
   if (!document.querySelector('#tour-styles')) {
     tourStyleSheet.id = 'tour-styles';

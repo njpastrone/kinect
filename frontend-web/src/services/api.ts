@@ -182,28 +182,56 @@ class ApiService {
   }
 
   async getListContacts(listId: string, params?: any): Promise<PaginatedResponse<IContact>> {
-    const response = await this.api.get<ApiResponse<PaginatedResponse<IContact>>>(`/lists/${listId}/contacts`, {
-      params,
-    });
+    const response = await this.api.get<ApiResponse<PaginatedResponse<IContact>>>(
+      `/lists/${listId}/contacts`,
+      {
+        params,
+      }
+    );
     return response.data.data!;
   }
 
   // Contact action methods
   async markContactAsContacted(contactId: string): Promise<IContact> {
-    const response = await this.api.patch<ApiResponse<{ contact: IContact }>>(`/contacts/${contactId}/mark-contacted`);
+    const response = await this.api.patch<ApiResponse<{ contact: IContact }>>(
+      `/contacts/${contactId}/mark-contacted`
+    );
     return response.data.data!.contact;
   }
 
-  async scheduleContactReminder(contactId: string, reminderDate: string, notes?: string): Promise<IContact> {
-    const response = await this.api.post<ApiResponse<{ contact: IContact }>>(`/contacts/${contactId}/schedule-reminder`, {
-      reminderDate,
-      notes,
-    });
+  async scheduleContactReminder(
+    contactId: string,
+    reminderDate: string,
+    notes?: string
+  ): Promise<IContact> {
+    const response = await this.api.post<ApiResponse<{ contact: IContact }>>(
+      `/contacts/${contactId}/schedule-reminder`,
+      {
+        reminderDate,
+        notes,
+      }
+    );
     return response.data.data!.contact;
   }
 
-  async getOverdueContacts(params?: any): Promise<PaginatedResponse<IContact & { list?: IContactList; daysSinceLastContact: number; reminderThreshold?: number }>> {
-    const response = await this.api.get<ApiResponse<PaginatedResponse<IContact & { list?: IContactList; daysSinceLastContact: number; reminderThreshold?: number }>>>('/contacts/overdue', {
+  async getOverdueContacts(
+    params?: any
+  ): Promise<
+    PaginatedResponse<
+      IContact & { list?: IContactList; daysSinceLastContact: number; reminderThreshold?: number }
+    >
+  > {
+    const response = await this.api.get<
+      ApiResponse<
+        PaginatedResponse<
+          IContact & {
+            list?: IContactList;
+            daysSinceLastContact: number;
+            reminderThreshold?: number;
+          }
+        >
+      >
+    >('/contacts/overdue', {
       params,
     });
     return response.data.data!;
