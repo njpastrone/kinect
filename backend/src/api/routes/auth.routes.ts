@@ -4,6 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { authValidation, validate } from '../../utils/validation';
 import { asyncHandler } from '../middleware/error.middleware';
 import { AppError } from '../middleware/error.middleware';
+import { authenticate, AuthRequest } from '../middleware/auth.middleware';
 
 const router = Router();
 
@@ -91,6 +92,25 @@ router.post(
     } catch (_error) {
       throw new AppError('Invalid refresh token', 401);
     }
+  })
+);
+
+// Get current user profile
+router.get(
+  '/me',
+  authenticate,
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    res.json({
+      success: true,
+      data: {
+        user: user.toJSON(),
+      },
+    });
   })
 );
 
