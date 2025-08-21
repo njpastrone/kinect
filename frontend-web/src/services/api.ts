@@ -95,6 +95,24 @@ class ApiService {
     localStorage.removeItem('refreshToken');
   }
 
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const response = await this.api.post<ApiResponse<{ message: string }>>(
+      '/auth/forgot-password',
+      {
+        email,
+      }
+    );
+    return response.data.data || { message: response.data.message || 'Password reset email sent' };
+  }
+
+  async resetPassword(token: string, password: string): Promise<ApiResponse<IAuthResponse>> {
+    const response = await this.api.post<ApiResponse<IAuthResponse>>('/auth/reset-password', {
+      token,
+      password,
+    });
+    return response.data;
+  }
+
   async getProfile(): Promise<IUser> {
     const response = await this.api.get<ApiResponse<{ user: IUser }>>('/auth/me');
     return response.data.data!.user;
