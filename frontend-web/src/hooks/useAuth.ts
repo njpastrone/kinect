@@ -23,6 +23,7 @@ export const useAuth = create<AuthState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await api.login(data);
+      localStorage.setItem('user', JSON.stringify(response.user));
       set({
         user: response.user,
         isAuthenticated: true,
@@ -41,6 +42,7 @@ export const useAuth = create<AuthState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await api.register(data);
+      localStorage.setItem('user', JSON.stringify(response.user));
       set({
         user: response.user,
         isAuthenticated: true,
@@ -57,6 +59,7 @@ export const useAuth = create<AuthState>((set) => ({
 
   logout: () => {
     api.logout();
+    localStorage.removeItem('user');
     set({
       user: null,
       isAuthenticated: false,
@@ -64,12 +67,32 @@ export const useAuth = create<AuthState>((set) => ({
     });
   },
 
-  checkAuth: () => {
+  checkAuth: async () => {
     const token = localStorage.getItem('accessToken');
-    if (token) {
-      set({ isAuthenticated: true, isLoading: false });
-    } else {
+    if (!token) {
       set({ isAuthenticated: false, isLoading: false });
+      return;
+    }
+
+    try {
+      const user = await api.getProfile();
+      set({
+        user,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      });
+    } catch (error: any) {
+      // Token is invalid, clear it
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      set({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: null,
+      });
     }
   },
 }));

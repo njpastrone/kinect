@@ -182,7 +182,7 @@ export const DemoBanner: React.FC = () => {
         <div className="flex items-center space-x-2">
           <span className="text-lg">🚀</span>
           <span className="text-sm font-medium">
-            You're in Demo Mode - Explore Kinect with sample data
+            You&apos;re in Demo Mode - Explore Kinect with sample data
           </span>
         </div>
         <div className="flex items-center space-x-2">

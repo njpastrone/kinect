@@ -28,6 +28,7 @@ export interface IContactList {
   name: string;
   description?: string;
   color?: string;
+  reminderDays?: number;
   contactIds: string[];
   createdAt?: Date;
   updatedAt?: Date;
