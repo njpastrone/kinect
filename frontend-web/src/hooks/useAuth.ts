@@ -10,7 +10,7 @@ interface AuthState {
   login: (data: ILoginRequest) => Promise<void>;
   register: (data: IRegisterRequest) => Promise<void>;
   logout: () => void;
-  checkAuth: () => void;
+  checkAuth: () => Promise<void>;
 }
 
 export const useAuth = create<AuthState>((set) => ({
@@ -68,14 +68,21 @@ export const useAuth = create<AuthState>((set) => ({
   },
 
   checkAuth: async () => {
+    set({ isLoading: true });
+    
     const token = localStorage.getItem('accessToken');
     if (!token) {
       set({ isAuthenticated: false, isLoading: false });
       return;
     }
 
+    // Add timeout to prevent hanging
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Authentication check timeout')), 10000)
+    );
+
     try {
-      const user = await api.getProfile();
+      const user = await Promise.race([api.getProfile(), timeoutPromise]) as IUser;
       set({
         user,
         isAuthenticated: true,
@@ -83,7 +90,8 @@ export const useAuth = create<AuthState>((set) => ({
         error: null,
       });
     } catch (error: any) {
-      // Token is invalid, clear it
+      console.error('Auth check failed:', error);
+      // Token is invalid or request failed, clear it
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
