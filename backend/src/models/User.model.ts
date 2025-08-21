@@ -4,6 +4,8 @@ import { IUserWithPassword } from '@kinect/shared';
 
 export interface IUserDocument extends Omit<IUserWithPassword, '_id'>, Document {
   comparePassword(candidatePassword: string): Promise<boolean>;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
 }
 
 const userSchema = new Schema<IUserDocument>(
@@ -29,6 +31,12 @@ const userSchema = new Schema<IUserDocument>(
       type: String,
       required: true,
       trim: true,
+    },
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpires: {
+      type: Date,
     },
   },
   {

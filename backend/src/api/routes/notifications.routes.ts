@@ -1,8 +1,9 @@
 import { Router, Response } from 'express';
 import { Contact } from '../../models/Contact.model';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware';
-import { asyncHandler } from '../middleware/error.middleware';
+import { asyncHandler, AppError } from '../middleware/error.middleware';
 import { DEFAULT_REMINDER_INTERVALS } from '@kinect/shared';
+import { notificationService } from '../../services/notification.service.simple';
 
 const router = Router();
 
@@ -68,9 +69,61 @@ router.get(
         friendDays: DEFAULT_REMINDER_INTERVALS.FRIEND,
         acquaintanceDays: DEFAULT_REMINDER_INTERVALS.ACQUAINTANCE,
         enablePushNotifications: true,
-        enableEmailNotifications: false,
+        enableEmailNotifications: true, // Default to enabled
       },
     });
+  })
+);
+
+// Get reminder statistics
+router.get(
+  '/stats',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const stats = await notificationService.getReminderStats(req.userId!);
+    
+    res.json({
+      success: true,
+      data: stats,
+    });
+  })
+);
+
+// Send test reminder email
+router.post(
+  '/test',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    try {
+      await notificationService.sendTestReminder(req.userId!);
+      
+      res.json({
+        success: true,
+        message: 'Test reminder sent successfully',
+      });
+    } catch (error) {
+      throw new AppError('Failed to send test reminder', 500);
+    }
+  })
+);
+
+// Manual trigger for processing reminders (dev/admin only)
+router.post(
+  '/process',
+  asyncHandler(async (_req: AuthRequest, res: Response) => {
+    // In production, this should be admin-only or removed
+    if (process.env.NODE_ENV === 'production') {
+      throw new AppError('Not available in production', 403);
+    }
+
+    try {
+      await notificationService.processWeeklyReminders();
+
+      res.json({
+        success: true,
+        message: 'Weekly reminders processed successfully',
+      });
+    } catch (error) {
+      throw new AppError('Failed to process reminders', 500);
+    }
   })
 );
 

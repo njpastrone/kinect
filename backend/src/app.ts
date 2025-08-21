@@ -12,6 +12,8 @@ import listsRoutes from './api/routes/lists.routes';
 import notificationsRoutes from './api/routes/notifications.routes';
 import devRoutes from './api/routes/dev.routes';
 import { errorHandler, notFound } from './api/middleware/error.middleware';
+// Import notification service to initialize cron jobs
+import './services/notification.service.simple';
 
 dotenv.config();
 

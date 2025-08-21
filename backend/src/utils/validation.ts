@@ -18,6 +18,15 @@ export const authValidation = {
   refreshToken: Joi.object({
     refreshToken: Joi.string().required(),
   }),
+
+  forgotPassword: Joi.object({
+    email: Joi.string().email().required(),
+  }),
+
+  resetPassword: Joi.object({
+    token: Joi.string().required(),
+    password: Joi.string().min(6).required(),
+  }),
 };
 
 export const contactValidation = {
