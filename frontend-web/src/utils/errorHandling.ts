@@ -94,19 +94,19 @@ export const getUserErrorMessage = (error: any): string => {
   switch (parsed.code) {
     case ErrorType.NETWORK:
       return 'Unable to connect to the server. Please check your internet connection.';
-    
+
     case ErrorType.AUTHENTICATION:
       return 'Authentication failed. Please log in again.';
-    
+
     case ErrorType.AUTHORIZATION:
       return 'You do not have permission to perform this action.';
-    
+
     case ErrorType.NOT_FOUND:
       return 'The requested resource was not found.';
-    
+
     case ErrorType.VALIDATION:
       return parsed.message || 'Please check your input and try again.';
-    
+
     default:
       switch (parsed.status) {
         case 400:
@@ -134,14 +134,14 @@ export const getUserErrorMessage = (error: any): string => {
  */
 export const extractValidationErrors = (error: any): ValidationError[] => {
   const parsed = parseError(error);
-  
+
   if (parsed.code !== ErrorType.VALIDATION || !parsed.details) {
     return [];
   }
 
   // Handle different validation error formats
   if (Array.isArray(parsed.details)) {
-    return parsed.details.map(err => ({
+    return parsed.details.map((err) => ({
       field: err.field || err.path || 'unknown',
       message: err.message || err.msg || 'Invalid value',
       code: err.code || 'VALIDATION_ERROR',
@@ -172,7 +172,7 @@ export const logError = (
   } = {}
 ) => {
   const parsed = parseError(error);
-  
+
   const errorData = {
     timestamp: new Date().toISOString(),
     error: parsed,
@@ -209,7 +209,7 @@ export const retry = async <T>(
       return await operation();
     } catch (error) {
       lastError = error;
-      
+
       if (attempt === maxAttempts) {
         throw error;
       }
@@ -222,11 +222,11 @@ export const retry = async <T>(
 
       // Wait before retrying with exponential backoff
       const delay = delayMs * Math.pow(backoffFactor, attempt - 1);
-      await new Promise(resolve => setTimeout(resolve, delay));
-      
-      logError(error, { 
+      await new Promise((resolve) => setTimeout(resolve, delay));
+
+      logError(error, {
         action: 'retry_attempt',
-        additional: { attempt, maxAttempts, delay }
+        additional: { attempt, maxAttempts, delay },
       });
     }
   }
@@ -264,7 +264,7 @@ export const safeAsync = async <T>(
   } catch (error) {
     const parsedError = parseError(error);
     logError(error, { action: 'safe_async_operation' });
-    
+
     return {
       success: false,
       error: parsedError,

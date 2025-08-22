@@ -31,7 +31,7 @@ export const groupItemsByList = <T extends { listId?: string }>(
 
     const group = grouped.get(listId)!;
     group.items.push(item);
-    
+
     // Calculate overdue count if function provided
     if (isOverdueFn && isOverdueFn(item)) {
       group.overdueCount = (group.overdueCount || 0) + 1;
@@ -72,14 +72,12 @@ export const createSortFunction = <T extends Record<string, any>>(
     switch (sortBy) {
       case 'name':
         if (a.firstName && a.lastName && b.firstName && b.lastName) {
-          comparison = `${a.firstName} ${a.lastName}`.localeCompare(
-            `${b.firstName} ${b.lastName}`
-          );
+          comparison = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
         } else if (a.name && b.name) {
           comparison = a.name.localeCompare(b.name);
         }
         break;
-      
+
       case 'updated':
       case 'lastContactDate': {
         const dateA = a.lastContactDate ? new Date(a.lastContactDate) : new Date(0);
@@ -87,7 +85,7 @@ export const createSortFunction = <T extends Record<string, any>>(
         comparison = dateB.getTime() - dateA.getTime();
         break;
       }
-      
+
       case 'created':
       case 'createdAt': {
         const createdA = a.createdAt ? new Date(a.createdAt) : new Date(0);
@@ -95,21 +93,21 @@ export const createSortFunction = <T extends Record<string, any>>(
         comparison = createdB.getTime() - createdA.getTime();
         break;
       }
-      
+
       case 'count':
       case 'contactCount':
         comparison = (a.contactCount || 0) - (b.contactCount || 0);
         break;
-      
+
       case 'overdue':
       case 'overdueCount':
         comparison = (a.overdueCount || 0) - (b.overdueCount || 0);
         break;
-      
+
       case 'reminderDays':
         comparison = (a.reminderDays || 30) - (b.reminderDays || 30);
         break;
-      
+
       case 'list':
         if (a.list?.name && b.list?.name) {
           comparison = a.list.name.localeCompare(b.list.name);
@@ -117,13 +115,11 @@ export const createSortFunction = <T extends Record<string, any>>(
           comparison = a.listId.localeCompare(b.listId);
         }
         break;
-      
+
       default:
         // Fallback to name sorting
         if (a.firstName && a.lastName && b.firstName && b.lastName) {
-          comparison = `${a.firstName} ${a.lastName}`.localeCompare(
-            `${b.firstName} ${b.lastName}`
-          );
+          comparison = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
         } else if (a.name && b.name) {
           comparison = a.name.localeCompare(b.name);
         }
@@ -136,10 +132,7 @@ export const createSortFunction = <T extends Record<string, any>>(
 /**
  * Helper function to determine if a contact is overdue
  */
-export const isContactOverdue = (
-  contact: IContact,
-  lists: IContactList[]
-): boolean => {
+export const isContactOverdue = (contact: IContact, lists: IContactList[]): boolean => {
   if (!contact.lastContactDate) return true; // No contact logged means overdue
 
   // Determine reminder interval

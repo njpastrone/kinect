@@ -4,14 +4,14 @@ export interface PagePreferences {
   // View preferences
   view: 'grid' | 'list';
   groupByList: boolean;
-  
-  // Sort preferences  
+
+  // Sort preferences
   sortBy: string;
   sortOrder: 'asc' | 'desc';
-  
+
   // Filter preferences
   selectedFilters: string[];
-  
+
   // Page-specific preferences
   showCompleted?: boolean;
   compactMode?: boolean;
@@ -57,11 +57,11 @@ export const usePagePreferences = (
   overrides: Partial<PagePreferences> = {}
 ) => {
   const storageKey = `preferences_${page}`;
-  
+
   const getInitialPreferences = useCallback((): PagePreferences => {
     const stored = localStorage.getItem(storageKey);
     const pageDefaults = { ...DEFAULT_PREFERENCES, ...PAGE_SPECIFIC_DEFAULTS[page], ...overrides };
-    
+
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
@@ -70,7 +70,7 @@ export const usePagePreferences = (
         return pageDefaults;
       }
     }
-    
+
     return pageDefaults;
   }, [page, storageKey, overrides]);
 
@@ -82,7 +82,7 @@ export const usePagePreferences = (
   }, [preferences, storageKey]);
 
   const updatePreferences = useCallback((updates: Partial<PagePreferences>) => {
-    setPreferences(prev => ({ ...prev, ...updates }));
+    setPreferences((prev) => ({ ...prev, ...updates }));
   }, []);
 
   const resetPreferences = useCallback(() => {
@@ -92,40 +92,55 @@ export const usePagePreferences = (
   }, [page, storageKey, overrides]);
 
   // Specific update functions for common operations
-  const updateView = useCallback((view: 'grid' | 'list') => {
-    updatePreferences({ view });
-  }, [updatePreferences]);
+  const updateView = useCallback(
+    (view: 'grid' | 'list') => {
+      updatePreferences({ view });
+    },
+    [updatePreferences]
+  );
 
-  const updateSort = useCallback((sortBy: string, sortOrder?: 'asc' | 'desc') => {
-    updatePreferences({ 
-      sortBy, 
-      sortOrder: sortOrder || preferences.sortOrder 
-    });
-  }, [updatePreferences, preferences.sortOrder]);
+  const updateSort = useCallback(
+    (sortBy: string, sortOrder?: 'asc' | 'desc') => {
+      updatePreferences({
+        sortBy,
+        sortOrder: sortOrder || preferences.sortOrder,
+      });
+    },
+    [updatePreferences, preferences.sortOrder]
+  );
 
   const toggleSortOrder = useCallback(() => {
-    updatePreferences({ 
-      sortOrder: preferences.sortOrder === 'asc' ? 'desc' : 'asc' 
+    updatePreferences({
+      sortOrder: preferences.sortOrder === 'asc' ? 'desc' : 'asc',
     });
   }, [updatePreferences, preferences.sortOrder]);
 
-  const updateGrouping = useCallback((groupByList: boolean) => {
-    updatePreferences({ groupByList });
-  }, [updatePreferences]);
+  const updateGrouping = useCallback(
+    (groupByList: boolean) => {
+      updatePreferences({ groupByList });
+    },
+    [updatePreferences]
+  );
 
-  const addFilter = useCallback((filter: string) => {
-    if (!preferences.selectedFilters.includes(filter)) {
-      updatePreferences({ 
-        selectedFilters: [...preferences.selectedFilters, filter] 
+  const addFilter = useCallback(
+    (filter: string) => {
+      if (!preferences.selectedFilters.includes(filter)) {
+        updatePreferences({
+          selectedFilters: [...preferences.selectedFilters, filter],
+        });
+      }
+    },
+    [updatePreferences, preferences.selectedFilters]
+  );
+
+  const removeFilter = useCallback(
+    (filter: string) => {
+      updatePreferences({
+        selectedFilters: preferences.selectedFilters.filter((f) => f !== filter),
       });
-    }
-  }, [updatePreferences, preferences.selectedFilters]);
-
-  const removeFilter = useCallback((filter: string) => {
-    updatePreferences({ 
-      selectedFilters: preferences.selectedFilters.filter(f => f !== filter) 
-    });
-  }, [updatePreferences, preferences.selectedFilters]);
+    },
+    [updatePreferences, preferences.selectedFilters]
+  );
 
   const clearFilters = useCallback(() => {
     updatePreferences({ selectedFilters: [] });
@@ -135,7 +150,7 @@ export const usePagePreferences = (
     preferences,
     updatePreferences,
     resetPreferences,
-    
+
     // Convenience methods
     updateView,
     updateSort,
@@ -157,15 +172,23 @@ export const useGlobalPreferences = () => {
       try {
         const parsed = JSON.parse(stored);
         return {
-          contacts: { ...DEFAULT_PREFERENCES, ...PAGE_SPECIFIC_DEFAULTS.contacts, ...parsed.contacts },
+          contacts: {
+            ...DEFAULT_PREFERENCES,
+            ...PAGE_SPECIFIC_DEFAULTS.contacts,
+            ...parsed.contacts,
+          },
           lists: { ...DEFAULT_PREFERENCES, ...PAGE_SPECIFIC_DEFAULTS.lists, ...parsed.lists },
-          dashboard: { ...DEFAULT_PREFERENCES, ...PAGE_SPECIFIC_DEFAULTS.dashboard, ...parsed.dashboard },
+          dashboard: {
+            ...DEFAULT_PREFERENCES,
+            ...PAGE_SPECIFIC_DEFAULTS.dashboard,
+            ...parsed.dashboard,
+          },
         };
       } catch {
         // Fall through to defaults
       }
     }
-    
+
     return {
       contacts: { ...DEFAULT_PREFERENCES, ...PAGE_SPECIFIC_DEFAULTS.contacts },
       lists: { ...DEFAULT_PREFERENCES, ...PAGE_SPECIFIC_DEFAULTS.lists },
@@ -177,15 +200,15 @@ export const useGlobalPreferences = () => {
     localStorage.setItem('global_preferences', JSON.stringify(preferences));
   }, [preferences]);
 
-  const updatePagePreferences = useCallback((
-    page: keyof GlobalPreferences, 
-    updates: Partial<PagePreferences>
-  ) => {
-    setPreferences(prev => ({
-      ...prev,
-      [page]: { ...prev[page], ...updates }
-    }));
-  }, []);
+  const updatePagePreferences = useCallback(
+    (page: keyof GlobalPreferences, updates: Partial<PagePreferences>) => {
+      setPreferences((prev) => ({
+        ...prev,
+        [page]: { ...prev[page], ...updates },
+      }));
+    },
+    []
+  );
 
   const resetAllPreferences = useCallback(() => {
     const defaults = {
@@ -211,7 +234,7 @@ export const getPagePreferences = (page: keyof GlobalPreferences): PagePreferenc
   const storageKey = `preferences_${page}`;
   const stored = localStorage.getItem(storageKey);
   const pageDefaults = { ...DEFAULT_PREFERENCES, ...PAGE_SPECIFIC_DEFAULTS[page] };
-  
+
   if (stored) {
     try {
       const parsed = JSON.parse(stored);
@@ -220,14 +243,17 @@ export const getPagePreferences = (page: keyof GlobalPreferences): PagePreferenc
       return pageDefaults;
     }
   }
-  
+
   return pageDefaults;
 };
 
 /**
  * Save preferences for a specific page
  */
-export const savePagePreferences = (page: keyof GlobalPreferences, preferences: PagePreferences) => {
+export const savePagePreferences = (
+  page: keyof GlobalPreferences,
+  preferences: PagePreferences
+) => {
   const storageKey = `preferences_${page}`;
   localStorage.setItem(storageKey, JSON.stringify(preferences));
 };

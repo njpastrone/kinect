@@ -37,25 +37,35 @@ export const ValidationRules = {
     return phoneRegex.test(cleaned);
   },
 
-  minLength: (min: number) => (value: string): boolean => {
-    return value.length >= min;
-  },
+  minLength:
+    (min: number) =>
+    (value: string): boolean => {
+      return value.length >= min;
+    },
 
-  maxLength: (max: number) => (value: string): boolean => {
-    return value.length <= max;
-  },
+  maxLength:
+    (max: number) =>
+    (value: string): boolean => {
+      return value.length <= max;
+    },
 
-  minValue: (min: number) => (value: number): boolean => {
-    return value >= min;
-  },
+  minValue:
+    (min: number) =>
+    (value: number): boolean => {
+      return value >= min;
+    },
 
-  maxValue: (max: number) => (value: number): boolean => {
-    return value <= max;
-  },
+  maxValue:
+    (max: number) =>
+    (value: number): boolean => {
+      return value <= max;
+    },
 
-  pattern: (regex: RegExp) => (value: string): boolean => {
-    return regex.test(value);
-  },
+  pattern:
+    (regex: RegExp) =>
+    (value: string): boolean => {
+      return regex.test(value);
+    },
 
   url: (value: string): boolean => {
     try {
@@ -135,9 +145,7 @@ export const ContactValidation = {
     { rule: ValidationRules.maxLength(255), message: ValidationMessages.maxLength(255) },
   ],
 
-  phoneNumber: [
-    { rule: ValidationRules.phone, message: ValidationMessages.phone },
-  ],
+  phoneNumber: [{ rule: ValidationRules.phone, message: ValidationMessages.phone }],
 
   birthday: [
     { rule: ValidationRules.date, message: ValidationMessages.date },
@@ -235,7 +243,7 @@ export const validateFields = (
  * Check if form is valid based on field validation results
  */
 export const isFormValid = (results: FieldValidationResult): boolean => {
-  return Object.values(results).every(result => result.isValid);
+  return Object.values(results).every((result) => result.isValid);
 };
 
 /**
@@ -282,7 +290,7 @@ export const sanitizeInput = {
     return value
       .trim()
       .toLowerCase()
-      .replace(/\b\w/g, char => char.toUpperCase());
+      .replace(/\b\w/g, (char) => char.toUpperCase());
   },
 
   number: (value: string | number): number => {
@@ -311,7 +319,9 @@ export const useFormValidation = <T extends Record<string, any>>(
 } => {
   const [data, setData] = React.useState<T>(initialData);
   const [errors, setErrors] = React.useState<FieldValidationResult>({});
-  const [touched, setTouched] = React.useState<Record<keyof T, boolean>>({} as Record<keyof T, boolean>);
+  const [touched, setTouched] = React.useState<Record<keyof T, boolean>>(
+    {} as Record<keyof T, boolean>
+  );
 
   const validateAllFields = React.useCallback((): boolean => {
     const results = validateFields(data, schema);
@@ -319,27 +329,33 @@ export const useFormValidation = <T extends Record<string, any>>(
     return isFormValid(results);
   }, [data, schema]);
 
-  const validateSingleField = React.useCallback((field: keyof T): boolean => {
-    if (schema[field]) {
-      const fieldRules = schema[field];
-      const result = validateField(data[field], fieldRules);
-      setErrors(prev => ({ ...prev, [field]: result }));
-      return result.isValid;
-    }
-    return true;
-  }, [data, schema]);
+  const validateSingleField = React.useCallback(
+    (field: keyof T): boolean => {
+      if (schema[field]) {
+        const fieldRules = schema[field];
+        const result = validateField(data[field], fieldRules);
+        setErrors((prev) => ({ ...prev, [field]: result }));
+        return result.isValid;
+      }
+      return true;
+    },
+    [data, schema]
+  );
 
-  const updateField = React.useCallback((field: keyof T, value: any) => {
-    setData(prev => ({ ...prev, [field]: value }));
-    
-    // Mark field as touched
-    setTouched(prev => ({ ...prev, [field]: true }));
-    
-    // Validate field if it has been touched
-    if (touched[field] || value !== initialData[field]) {
-      setTimeout(() => validateSingleField(field), 0);
-    }
-  }, [touched, initialData, validateSingleField]);
+  const updateField = React.useCallback(
+    (field: keyof T, value: any) => {
+      setData((prev) => ({ ...prev, [field]: value }));
+
+      // Mark field as touched
+      setTouched((prev) => ({ ...prev, [field]: true }));
+
+      // Validate field if it has been touched
+      if (touched[field] || value !== initialData[field]) {
+        setTimeout(() => validateSingleField(field), 0);
+      }
+    },
+    [touched, initialData, validateSingleField]
+  );
 
   const resetForm = React.useCallback(() => {
     setData(initialData);

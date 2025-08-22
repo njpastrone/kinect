@@ -48,11 +48,9 @@ export class ErrorBoundary extends Component<Props, State> {
                 />
               </svg>
             </div>
-            
+
             <div className="text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Something went wrong
-              </h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Something went wrong</h3>
               <p className="text-sm text-gray-600 mb-4">
                 We encountered an unexpected error. Please try refreshing the page.
               </p>
@@ -63,7 +61,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 Refresh Page
               </button>
             </div>
-            
+
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="mt-4 p-3 bg-gray-50 rounded-md">
                 <summary className="text-sm font-medium text-gray-700 cursor-pointer">

@@ -10,7 +10,12 @@ import { EmptyState } from '../components/common/EmptyState';
 import { usePagePreferences } from '../hooks/usePreferences';
 import { useContacts } from '../hooks/useContacts';
 import { IContact, IContactList } from '@kinect/shared';
-import { groupItemsByList, sortGroupedItems, createSortFunction, isContactOverdue } from '../utils/grouping';
+import {
+  groupItemsByList,
+  sortGroupedItems,
+  createSortFunction,
+  isContactOverdue,
+} from '../utils/grouping';
 import api from '../services/api';
 
 export const Contacts: React.FC = () => {
@@ -100,11 +105,7 @@ export const Contacts: React.FC = () => {
   const processedContacts = useMemo(() => {
     if (preferences.groupByList) {
       // Group contacts by list using utility
-      const grouped = groupItemsByList(
-        filteredContacts,
-        lists,
-        checkContactOverdue
-      );
+      const grouped = groupItemsByList(filteredContacts, lists, checkContactOverdue);
 
       // Sort contacts within each group
       const sortFunction = createSortFunction(preferences.sortBy, preferences.sortOrder);
@@ -211,7 +212,9 @@ export const Contacts: React.FC = () => {
         ) : filteredContacts.length === 0 ? (
           <EmptyState
             type={searchParams.get('filter') === 'overdue' ? 'overdue' : 'contacts'}
-            title={searchParams.get('filter') === 'overdue' ? 'No overdue contacts' : 'No contacts found'}
+            title={
+              searchParams.get('filter') === 'overdue' ? 'No overdue contacts' : 'No contacts found'
+            }
             description={
               searchParams.get('filter') === 'overdue'
                 ? 'Great job! All your contacts are up to date.'

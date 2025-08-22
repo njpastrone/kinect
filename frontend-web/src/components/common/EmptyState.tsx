@@ -46,25 +46,23 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   className = '',
 }) => {
   const isPositive = type === 'overdue';
-  
+
   return (
     <div className={`text-center py-12 ${className}`}>
-      <div className={`flex justify-center mb-4 ${isPositive ? 'text-green-400' : 'text-gray-300'}`}>
+      <div
+        className={`flex justify-center mb-4 ${isPositive ? 'text-green-400' : 'text-gray-300'}`}
+      >
         {getIcon(type)}
       </div>
-      
-      <h3 className={`text-xl font-medium mb-2 ${
-        isPositive ? 'text-green-700' : 'text-gray-900'
-      }`}>
+
+      <h3 className={`text-xl font-medium mb-2 ${isPositive ? 'text-green-700' : 'text-gray-900'}`}>
         {title}
       </h3>
-      
-      <p className={`max-w-md mx-auto mb-6 ${
-        isPositive ? 'text-green-600' : 'text-gray-600'
-      }`}>
+
+      <p className={`max-w-md mx-auto mb-6 ${isPositive ? 'text-green-600' : 'text-gray-600'}`}>
         {description}
       </p>
-      
+
       {actionLabel && onAction && (
         <button
           onClick={onAction}

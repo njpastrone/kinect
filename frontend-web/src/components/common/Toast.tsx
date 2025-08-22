@@ -16,7 +16,7 @@ interface ToastProps {
 
 const Toast: React.FC<ToastProps> = ({ message, onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
-  
+
   useEffect(() => {
     const timer = setTimeout(() => {
       handleClose();
@@ -76,17 +76,11 @@ const Toast: React.FC<ToastProps> = ({ message, onClose }) => {
       } max-w-sm w-full ${getBgColor()} border rounded-lg shadow-lg p-4`}
     >
       <div className="flex items-start">
-        <div className="flex-shrink-0">
-          {getIcon()}
-        </div>
+        <div className="flex-shrink-0">{getIcon()}</div>
         <div className="ml-3 w-0 flex-1">
-          <p className={`text-sm font-medium ${getTextColor()}`}>
-            {message.title}
-          </p>
+          <p className={`text-sm font-medium ${getTextColor()}`}>{message.title}</p>
           {message.description && (
-            <p className={`mt-1 text-sm ${getTextColor()}`}>
-              {message.description}
-            </p>
+            <p className={`mt-1 text-sm ${getTextColor()}`}>{message.description}</p>
           )}
         </div>
         <div className="ml-4 flex-shrink-0 flex">

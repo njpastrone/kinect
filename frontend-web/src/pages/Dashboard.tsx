@@ -365,9 +365,7 @@ export const Dashboard: React.FC = () => {
 
       switch (preferences.sortBy) {
         case 'name':
-          comparison = `${a.firstName} ${a.lastName}`.localeCompare(
-            `${b.firstName} ${b.lastName}`
-          );
+          comparison = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
           break;
         case 'updated':
           comparison = b.daysSinceLastContact - a.daysSinceLastContact;
@@ -379,9 +377,7 @@ export const Dashboard: React.FC = () => {
           break;
         }
         default:
-          comparison = `${a.firstName} ${a.lastName}`.localeCompare(
-            `${b.firstName} ${b.lastName}`
-          );
+          comparison = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
       }
 
       return preferences.sortOrder === 'asc' ? comparison : -comparison;
@@ -529,10 +525,13 @@ export const Dashboard: React.FC = () => {
                   getDaysOverdueColor={getDaysOverdueColor}
                 />
               ) : (
-                <div className={preferences.view === 'grid' ? 
-                  'grid grid-cols-1 md:grid-cols-2 gap-4' : 
-                  'space-y-4'
-                }>
+                <div
+                  className={
+                    preferences.view === 'grid'
+                      ? 'grid grid-cols-1 md:grid-cols-2 gap-4'
+                      : 'space-y-4'
+                  }
+                >
                   {sortedOverdueContacts.map((contact) => (
                     <OverdueContactItem
                       key={contact._id}

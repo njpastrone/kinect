@@ -39,7 +39,7 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
       } else {
         await createContact(data);
       }
-      
+
       onClose();
       reset();
     } catch (error) {

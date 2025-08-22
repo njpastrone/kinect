@@ -8,11 +8,7 @@ interface LayoutProps {
   listName?: string;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ 
-  children, 
-  showBreadcrumbs = true,
-  listName 
-}) => {
+export const Layout: React.FC<LayoutProps> = ({ children, showBreadcrumbs = true, listName }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />

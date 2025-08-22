@@ -32,8 +32,6 @@ interface ListWithStats extends IContactList {
   overdueCount: number;
 }
 
-
-
 export const Lists: React.FC = () => {
   const navigate = useNavigate();
   const [lists, setLists] = useState<ListWithStats[]>([]);

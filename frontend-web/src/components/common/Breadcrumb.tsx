@@ -15,44 +15,32 @@ interface BreadcrumbProps {
   listName?: string;
 }
 
-export const Breadcrumb: React.FC<BreadcrumbProps> = ({ 
-  items, 
-  className = '', 
-  listName 
-}) => {
+export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '', listName }) => {
   const location = useLocation();
-  
+
   // Generate breadcrumbs automatically if not provided
-  const breadcrumbItems = items || navigationHelpers.getBreadcrumbs(
-    location.pathname + location.search, 
-    listName
-  );
-  
+  const breadcrumbItems =
+    items || navigationHelpers.getBreadcrumbs(location.pathname + location.search, listName);
+
   if (breadcrumbItems.length <= 1) {
     return null; // Don't show breadcrumbs for single items
   }
-  
+
   return (
     <nav className={`flex items-center space-x-1 text-sm text-gray-500 ${className}`}>
-      <Link
-        to="/"
-        className="text-gray-400 hover:text-gray-600 transition-colors"
-        title="Home"
-      >
+      <Link to="/" className="text-gray-400 hover:text-gray-600 transition-colors" title="Home">
         <Home className="w-4 h-4" />
       </Link>
-      
+
       {breadcrumbItems.map((item, index) => {
         const isLast = index === breadcrumbItems.length - 1;
-        
+
         return (
           <React.Fragment key={item.href}>
             <ChevronRight className="w-4 h-4 text-gray-300" />
-            
+
             {isLast ? (
-              <span className="font-medium text-gray-900 truncate max-w-[200px]">
-                {item.label}
-              </span>
+              <span className="font-medium text-gray-900 truncate max-w-[200px]">{item.label}</span>
             ) : (
               <Link
                 to={item.href}

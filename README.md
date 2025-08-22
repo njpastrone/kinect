@@ -75,6 +75,7 @@ kinect/
 **MVP Status**: ✅ **Core Features Complete**
 
 ### Working Features
+
 - ✅ User authentication (register, login, password reset)
 - ✅ Contact management with full CRUD operations
 - ✅ Contact list creation and management
@@ -84,6 +85,7 @@ kinect/
 - ✅ Contact-to-list bidirectional relationships
 
 ### Technology Stack (Implemented)
+
 - **Backend**: Node.js/Express with TypeScript
 - **Database**: MongoDB with Mongoose ODM
 - **Frontend Web**: React with Vite and TypeScript
@@ -95,19 +97,22 @@ kinect/
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - MongoDB (local or Atlas)
 - npm or yarn
 
 ### Installation
 
 1. **Clone the repository**
+
 ```bash
 git clone <repository-url>
 cd kinect
 ```
 
 2. **Install dependencies**
+
 ```bash
 # Backend
 cd backend
@@ -123,6 +128,7 @@ npm install
 ```
 
 3. **Environment Setup**
+
 ```bash
 # Backend - create .env file
 cd backend
@@ -131,21 +137,24 @@ cp .env.example .env
 ```
 
 4. **Start Development Servers**
+
 ```bash
 # Terminal 1 - Backend
 cd backend
 npm run dev
 
-# Terminal 2 - Frontend  
+# Terminal 2 - Frontend
 cd frontend-web
 npm run dev
 ```
 
 5. **Access the Application**
+
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:5000
 
 ### Database Seeding
+
 ```bash
 cd backend
 npm run seed    # Add sample data
