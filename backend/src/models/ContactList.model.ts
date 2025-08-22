@@ -23,6 +23,11 @@ const contactListSchema = new Schema<IContactListDocument>(
       type: String,
       default: '#3B82F6',
     },
+    reminderDays: {
+      type: Number,
+      min: 1,
+      max: 365,
+    },
     contactIds: [
       {
         type: String,

@@ -298,18 +298,28 @@ export const sanitizeInput = {
 export const useFormValidation = <T extends Record<string, any>>(
   initialData: T,
   schema: Record<keyof T, Array<{ rule: (value: any) => boolean; message: string }>>
-) => {
+): {
+  data: T;
+  errors: FieldValidationResult;
+  touched: Record<keyof T, boolean>;
+  updateField: (field: keyof T, value: any) => void;
+  validateAllFields: () => boolean;
+  validateField: (field: keyof T) => boolean;
+  resetForm: () => void;
+  isValid: boolean;
+  fieldErrors: Record<string, string>;
+} => {
   const [data, setData] = React.useState<T>(initialData);
   const [errors, setErrors] = React.useState<FieldValidationResult>({});
   const [touched, setTouched] = React.useState<Record<keyof T, boolean>>({} as Record<keyof T, boolean>);
 
-  const validateAllFields = React.useCallback(() => {
+  const validateAllFields = React.useCallback((): boolean => {
     const results = validateFields(data, schema);
     setErrors(results);
     return isFormValid(results);
   }, [data, schema]);
 
-  const validateField = React.useCallback((field: keyof T) => {
+  const validateSingleField = React.useCallback((field: keyof T): boolean => {
     if (schema[field]) {
       const fieldRules = schema[field];
       const result = validateField(data[field], fieldRules);
@@ -327,9 +337,9 @@ export const useFormValidation = <T extends Record<string, any>>(
     
     // Validate field if it has been touched
     if (touched[field] || value !== initialData[field]) {
-      setTimeout(() => validateField(field), 0);
+      setTimeout(() => validateSingleField(field), 0);
     }
-  }, [touched, initialData, validateField]);
+  }, [touched, initialData, validateSingleField]);
 
   const resetForm = React.useCallback(() => {
     setData(initialData);
@@ -354,7 +364,7 @@ export const useFormValidation = <T extends Record<string, any>>(
     touched,
     updateField,
     validateAllFields,
-    validateField,
+    validateField: validateSingleField,
     resetForm,
     isValid: isFormValid(errors),
     fieldErrors: getFieldErrors(errors),

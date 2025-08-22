@@ -57,6 +57,12 @@ export const useContacts = create<ContactsState>((set) => ({
         contacts: [...state.contacts, contact],
         isLoading: false,
       }));
+      
+      // If contact was assigned to a list, refresh lists to update counts
+      if (data.listId) {
+        const lists = await api.getLists();
+        set((state) => ({ ...state, lists }));
+      }
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
       throw error;
@@ -71,6 +77,12 @@ export const useContacts = create<ContactsState>((set) => ({
         contacts: state.contacts.map((c) => (c._id === id ? updated : c)),
         isLoading: false,
       }));
+      
+      // If listId was changed, refresh lists to update counts
+      if (data.listId !== undefined) {
+        const lists = await api.getLists();
+        set((state) => ({ ...state, lists }));
+      }
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
       throw error;
@@ -85,6 +97,10 @@ export const useContacts = create<ContactsState>((set) => ({
         contacts: state.contacts.filter((c) => c._id !== id),
         isLoading: false,
       }));
+      
+      // Refresh lists to update counts after contact deletion
+      const lists = await api.getLists();
+      set((state) => ({ ...state, lists }));
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
       throw error;

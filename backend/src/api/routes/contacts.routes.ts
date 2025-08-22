@@ -1,5 +1,6 @@
 import { Router, Response } from 'express';
 import { Contact } from '../../models/Contact.model';
+import { ContactList } from '../../models/ContactList.model';
 import { CommunicationLog } from '../../models/CommunicationLog.model';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware';
 import { contactValidation, validate } from '../../utils/validation';
@@ -155,6 +156,19 @@ router.post(
       userId: req.userId,
     });
 
+    // If contact is assigned to a list, update the list's contactIds array
+    if (req.body.listId) {
+      const list = await ContactList.findOne({
+        _id: req.body.listId,
+        userId: req.userId,
+      });
+
+      if (list && !list.contactIds.includes((contact._id as string).toString())) {
+        list.contactIds.push((contact._id as string).toString());
+        await list.save();
+      }
+    }
+
     res.status(201).json({
       success: true,
       data: contact,
@@ -196,6 +210,14 @@ router.delete(
     }
 
     await CommunicationLog.deleteMany({ contactId: req.params.id });
+
+    // Remove contact from any lists that reference it
+    if (contact.listId) {
+      await ContactList.updateOne(
+        { _id: contact.listId, userId: req.userId },
+        { $pull: { contactIds: req.params.id } }
+      );
+    }
 
     res.json({
       success: true,

@@ -16,7 +16,7 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
     reset,
     formState: { errors },
   } = useForm<Partial<IContact>>();
-  const { createContact, updateContact } = useContacts();
+  const { createContact, updateContact, lists, fetchLists } = useContacts();
 
   useEffect(() => {
     if (contact) {
@@ -26,6 +26,12 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
     }
   }, [contact, reset]);
 
+  useEffect(() => {
+    if (isOpen && lists.length === 0) {
+      fetchLists();
+    }
+  }, [isOpen, lists.length, fetchLists]);
+
   const onSubmit = async (data: Partial<IContact>) => {
     try {
       if (contact?._id) {
@@ -33,6 +39,7 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
       } else {
         await createContact(data);
       }
+      
       onClose();
       reset();
     } catch (error) {
@@ -105,6 +112,21 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
             {errors.category && (
               <p className="text-red-500 text-xs mt-1">{errors.category.message}</p>
             )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">List (Optional)</label>
+            <select
+              {...register('listId')}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            >
+              <option value="">No list</option>
+              {lists.map((list) => (
+                <option key={list._id} value={list._id}>
+                  {list.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>

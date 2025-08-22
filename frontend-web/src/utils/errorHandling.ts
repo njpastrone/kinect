@@ -226,9 +226,7 @@ export const retry = async <T>(
       
       logError(error, { 
         action: 'retry_attempt',
-        attempt,
-        maxAttempts,
-        delay 
+        additional: { attempt, maxAttempts, delay }
       });
     }
   }
