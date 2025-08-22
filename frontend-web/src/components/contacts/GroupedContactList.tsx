@@ -60,13 +60,10 @@ export const GroupedContactList: React.FC<GroupedContactListProps> = ({
               )}
             </div>
             {group.list?.color && (
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: group.list.color }}
-              />
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: group.list.color }} />
             )}
           </div>
-          
+
           {group.list?.description && (
             <p className="text-sm text-gray-600">{group.list.description}</p>
           )}
@@ -95,12 +92,8 @@ export const GroupedContactList: React.FC<GroupedContactListProps> = ({
                           {contact.firstName} {contact.lastName}
                         </h3>
                         <div className="flex items-center space-x-4 text-sm text-gray-600">
-                          {contact.phoneNumber && (
-                            <span>📞 {contact.phoneNumber}</span>
-                          )}
-                          {contact.email && (
-                            <span>📧 {contact.email}</span>
-                          )}
+                          {contact.phoneNumber && <span>📞 {contact.phoneNumber}</span>}
+                          {contact.email && <span>📧 {contact.email}</span>}
                           {contact.lastContactDate && (
                             <span>
                               Last contact: {new Date(contact.lastContactDate).toLocaleDateString()}

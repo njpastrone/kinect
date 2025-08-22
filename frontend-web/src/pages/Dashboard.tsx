@@ -41,9 +41,7 @@ const OverdueContactItem: React.FC<OverdueContactItemProps> = ({
           {contact.firstName} {contact.lastName}
         </h3>
         {showListName && (
-          <span className="text-sm text-gray-500">
-            in {contact.list?.name || 'No list'}
-          </span>
+          <span className="text-sm text-gray-500">in {contact.list?.name || 'No list'}</span>
         )}
         <span
           className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getDaysOverdueColor(contact.daysSinceLastContact)}`}
@@ -94,13 +92,13 @@ const GroupedOverdueContacts: React.FC<GroupedOverdueContactsProps> = ({
   // Group contacts by list
   const groupedContacts = React.useMemo(() => {
     const groups = new Map<string, { list: IContactList | null; contacts: OverdueContact[] }>();
-    
-    overdueContacts.forEach(contact => {
+
+    overdueContacts.forEach((contact) => {
       const listId = contact.list?._id || 'no-list';
       if (!groups.has(listId)) {
         groups.set(listId, {
           list: contact.list || null,
-          contacts: []
+          contacts: [],
         });
       }
       groups.get(listId)!.contacts.push(contact);
@@ -119,21 +117,14 @@ const GroupedOverdueContacts: React.FC<GroupedOverdueContactsProps> = ({
         <div key={group.list?._id || 'no-list'} className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <h3 className="text-lg font-medium text-gray-900">
-                {group.list?.name || 'No List'}
-              </h3>
-              <span className="text-sm text-gray-500">
-                ({group.contacts.length} overdue)
-              </span>
+              <h3 className="text-lg font-medium text-gray-900">{group.list?.name || 'No List'}</h3>
+              <span className="text-sm text-gray-500">({group.contacts.length} overdue)</span>
             </div>
             {group.list?.color && (
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: group.list.color }}
-              />
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: group.list.color }} />
             )}
           </div>
-          
+
           <div className="space-y-3 ml-4">
             {group.contacts.map((contact) => (
               <OverdueContactItem
@@ -384,7 +375,7 @@ export const Dashboard: React.FC = () => {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div 
+          <div
             onClick={() => navigate('/contacts')}
             className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer"
           >
@@ -411,7 +402,7 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div 
+          <div
             onClick={() => navigate('/contacts?filter=overdue')}
             className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer"
           >
@@ -438,7 +429,7 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div 
+          <div
             onClick={() => navigate('/lists')}
             className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer"
           >
@@ -477,10 +468,12 @@ export const Dashboard: React.FC = () => {
                     <input
                       type="checkbox"
                       checked={preferences.groupByList}
-                      onChange={(e) => updatePreferences({
-                        ...preferences,
-                        groupByList: e.target.checked
-                      })}
+                      onChange={(e) =>
+                        updatePreferences({
+                          ...preferences,
+                          groupByList: e.target.checked,
+                        })
+                      }
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                     <span className="text-sm font-medium text-gray-700">Group by List</span>
@@ -494,7 +487,7 @@ export const Dashboard: React.FC = () => {
             </div>
             <div className="p-6">
               {preferences.groupByList ? (
-                <GroupedOverdueContacts 
+                <GroupedOverdueContacts
                   overdueContacts={overdueContacts}
                   onLogContact={setLogContactModal}
                   onContactNow={setSelectedContact}
@@ -548,8 +541,8 @@ export const Dashboard: React.FC = () => {
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {lists.map((list) => (
-                  <div 
-                    key={list._id} 
+                  <div
+                    key={list._id}
                     onClick={() => navigate(`/lists/${list._id}`)}
                     className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer"
                   >

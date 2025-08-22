@@ -204,7 +204,9 @@ class DevToolsManager {
    * Reset demo data
    */
   async resetDemo(): Promise<void> {
-    if (window.confirm('Reset demo data? This will restore the original demo contacts and lists.')) {
+    if (
+      window.confirm('Reset demo data? This will restore the original demo contacts and lists.')
+    ) {
       try {
         const response = await fetch('/api/dev/reset-demo', {
           method: 'POST',
@@ -215,15 +217,15 @@ class DevToolsManager {
         });
 
         const result = await response.json();
-        
+
         if (result.success) {
           console.warn('Demo data reset successful:', result);
-          
+
           // Clear localStorage caches
           const keysToKeep = ['accessToken', 'refreshToken', 'kinect_dev_tools'];
-          const keysToRemove = Object.keys(localStorage).filter(key => !keysToKeep.includes(key));
-          keysToRemove.forEach(key => localStorage.removeItem(key));
-          
+          const keysToRemove = Object.keys(localStorage).filter((key) => !keysToKeep.includes(key));
+          keysToRemove.forEach((key) => localStorage.removeItem(key));
+
           // Reload the page to refresh data
           window.location.reload();
         } else {

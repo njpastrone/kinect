@@ -485,8 +485,11 @@ export async function seedDemoDataForUser(user: any): Promise<void> {
 
   try {
     // Determine profile type based on email
-    const profile = user.email.includes('active') ? 'active' : 
-                   user.email.includes('moderate') ? 'moderate' : 'minimal';
+    const profile = user.email.includes('active')
+      ? 'active'
+      : user.email.includes('moderate')
+        ? 'moderate'
+        : 'minimal';
 
     // Determine how many lists and contacts based on profile
     const listCount = profile === 'active' ? 6 : profile === 'moderate' ? 4 : 2;

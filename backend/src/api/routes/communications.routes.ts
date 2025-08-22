@@ -30,7 +30,7 @@ router.post(
     }
 
     const logTimestamp = new Date(timestamp);
-    
+
     // Update contact's lastContactDate if this is the most recent communication
     if (!contact.lastContactDate || logTimestamp > contact.lastContactDate) {
       await Contact.findByIdAndUpdate(contactId, {

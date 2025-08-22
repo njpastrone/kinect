@@ -23,7 +23,7 @@ export const ViewOptions: React.FC<ViewOptionsProps> = ({
   const handleChange = (updates: Partial<ViewPreferences>) => {
     const newPreferences = { ...preferences, ...updates };
     onChange(newPreferences);
-    
+
     // Save to localStorage
     localStorage.setItem('viewPreferences', JSON.stringify(newPreferences));
   };
@@ -31,7 +31,7 @@ export const ViewOptions: React.FC<ViewOptionsProps> = ({
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
       <h3 className="text-lg font-medium text-gray-900">View Options</h3>
-      
+
       <div className="flex flex-wrap gap-4">
         {/* Group by List Toggle */}
         {showGroupToggle && (
@@ -59,8 +59,18 @@ export const ViewOptions: React.FC<ViewOptionsProps> = ({
                     : 'text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                <svg
+                  className="w-4 h-4 inline mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                  />
                 </svg>
                 Grid
               </button>
@@ -72,8 +82,18 @@ export const ViewOptions: React.FC<ViewOptionsProps> = ({
                     : 'text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                <svg
+                  className="w-4 h-4 inline mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                  />
                 </svg>
                 List
               </button>
@@ -99,18 +119,30 @@ export const ViewOptions: React.FC<ViewOptionsProps> = ({
         {/* Sort Order */}
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => handleChange({ 
-              sortOrder: preferences.sortOrder === 'asc' ? 'desc' : 'asc' 
-            })}
+            onClick={() =>
+              handleChange({
+                sortOrder: preferences.sortOrder === 'asc' ? 'desc' : 'asc',
+              })
+            }
             className="flex items-center space-x-1 text-sm text-gray-700 hover:text-gray-900"
           >
             {preferences.sortOrder === 'asc' ? (
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7l4-4m0 0l4 4m-4-4v18" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7l4-4m0 0l4 4m-4-4v18"
+                />
               </svg>
             ) : (
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 17l-4 4m0 0l-4-4m4 4V3" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 17l-4 4m0 0l-4-4m4 4V3"
+                />
               </svg>
             )}
             <span>{preferences.sortOrder === 'asc' ? 'A→Z' : 'Z→A'}</span>
@@ -132,7 +164,7 @@ export const useViewPreferences = (defaultPreferences?: Partial<ViewPreferences>
       groupByList: false,
       ...defaultPreferences,
     };
-    
+
     if (stored) {
       try {
         return { ...defaults, ...JSON.parse(stored) };
@@ -140,7 +172,7 @@ export const useViewPreferences = (defaultPreferences?: Partial<ViewPreferences>
         return defaults;
       }
     }
-    
+
     return defaults;
   };
 

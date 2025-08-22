@@ -29,20 +29,20 @@ export const LogContactModal: React.FC<LogContactModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       setLoading(true);
-      
+
       // Combine date and time
       const timestamp = new Date(`${date}T${time}`);
-      
+
       await api.logCommunication({
         contactId: contact._id!,
         type: method,
         timestamp,
         notes: notes.trim() || undefined,
       });
-      
+
       onContactLogged();
       onClose();
     } catch (error) {
@@ -74,9 +74,7 @@ export const LogContactModal: React.FC<LogContactModalProps> = ({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Contact Method
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Contact Method</label>
             <div className="grid grid-cols-2 gap-2">
               {CONTACT_METHODS.map((methodOption) => (
                 <button

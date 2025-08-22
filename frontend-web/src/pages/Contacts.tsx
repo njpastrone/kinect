@@ -50,17 +50,17 @@ export const Contacts: React.FC = () => {
   // Filter contacts based on URL parameters
   const filteredContacts = useMemo(() => {
     let filtered = contacts;
-    
+
     const filter = searchParams.get('filter');
     if (filter === 'overdue') {
       // This would need additional logic to determine overdue status
       // For now, we'll just return all contacts
       filtered = contacts;
     }
-    
+
     const listId = searchParams.get('listId');
     if (listId) {
-      filtered = contacts.filter(contact => contact.listId === listId);
+      filtered = contacts.filter((contact) => contact.listId === listId);
     }
 
     return filtered;
@@ -71,20 +71,20 @@ export const Contacts: React.FC = () => {
     if (preferences.groupByList) {
       // Group contacts by list
       const grouped = new Map<string, { list: IContactList | null; contacts: IContact[] }>();
-      
-      filteredContacts.forEach(contact => {
+
+      filteredContacts.forEach((contact) => {
         const listId = contact.listId || 'no-list';
-        const list = lists.find(l => l._id === contact.listId) || null;
-        
+        const list = lists.find((l) => l._id === contact.listId) || null;
+
         if (!grouped.has(listId)) {
           grouped.set(listId, { list, contacts: [] });
         }
-        
+
         grouped.get(listId)!.contacts.push(contact);
       });
 
       // Convert to array and sort groups
-      const groupedArray = Array.from(grouped.values()).map(group => ({
+      const groupedArray = Array.from(grouped.values()).map((group) => ({
         ...group,
         overdueCount: 0, // TODO: Calculate overdue count
       }));
@@ -93,19 +93,21 @@ export const Contacts: React.FC = () => {
       groupedArray.sort((a, b) => {
         const nameA = a.list?.name || 'No List';
         const nameB = b.list?.name || 'No List';
-        return preferences.sortOrder === 'asc' 
+        return preferences.sortOrder === 'asc'
           ? nameA.localeCompare(nameB)
           : nameB.localeCompare(nameA);
       });
 
       // Sort contacts within each group
-      groupedArray.forEach(group => {
+      groupedArray.forEach((group) => {
         group.contacts.sort((a, b) => {
           let comparison = 0;
-          
+
           switch (preferences.sortBy) {
             case 'name':
-              comparison = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+              comparison = `${a.firstName} ${a.lastName}`.localeCompare(
+                `${b.firstName} ${b.lastName}`
+              );
               break;
             case 'updated': {
               const dateA = a.lastContactDate ? new Date(a.lastContactDate) : new Date(0);
@@ -114,9 +116,11 @@ export const Contacts: React.FC = () => {
               break;
             }
             default:
-              comparison = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+              comparison = `${a.firstName} ${a.lastName}`.localeCompare(
+                `${b.firstName} ${b.lastName}`
+              );
           }
-          
+
           return preferences.sortOrder === 'asc' ? comparison : -comparison;
         });
       });
@@ -126,10 +130,12 @@ export const Contacts: React.FC = () => {
       // Return sorted contacts without grouping
       const sorted = [...filteredContacts].sort((a, b) => {
         let comparison = 0;
-        
+
         switch (preferences.sortBy) {
           case 'name':
-            comparison = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+            comparison = `${a.firstName} ${a.lastName}`.localeCompare(
+              `${b.firstName} ${b.lastName}`
+            );
             break;
           case 'updated': {
             const dateA = a.lastContactDate ? new Date(a.lastContactDate) : new Date(0);
@@ -138,9 +144,11 @@ export const Contacts: React.FC = () => {
             break;
           }
           default:
-            comparison = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+            comparison = `${a.firstName} ${a.lastName}`.localeCompare(
+              `${b.firstName} ${b.lastName}`
+            );
         }
-        
+
         return preferences.sortOrder === 'asc' ? comparison : -comparison;
       });
 
@@ -179,9 +187,9 @@ export const Contacts: React.FC = () => {
             viewMode={preferences.view}
           />
         ) : (
-          <ContactList 
-            contacts={processedContacts as IContact[]} 
-            onEditContact={handleEditContact} 
+          <ContactList
+            contacts={processedContacts as IContact[]}
+            onEditContact={handleEditContact}
           />
         )}
 

@@ -127,7 +127,6 @@ router.get(
   })
 );
 
-
 router.get(
   '/:id',
   asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -234,7 +233,6 @@ router.post(
     });
   })
 );
-
 
 // Mark contact as contacted (update lastContact to current timestamp)
 router.patch(

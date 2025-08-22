@@ -300,7 +300,9 @@ const DataTab: React.FC<{ devTools: ReturnType<typeof useDevTools> }> = ({ devTo
         >
           🗑️ Clear All Data
         </button>
-        <p className="text-xs text-gray-500">Reset demo will reload fresh demo data. Clear all will remove all local data.</p>
+        <p className="text-xs text-gray-500">
+          Reset demo will reload fresh demo data. Clear all will remove all local data.
+        </p>
       </div>
     </div>
 
