@@ -1,16 +1,18 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useParams } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
 import { ContactList } from '../components/contacts/ContactList';
 import { GroupedContactList } from '../components/contacts/GroupedContactList';
 import { AddContactModal } from '../components/contacts/AddContactModal';
-import { ViewOptions, useViewPreferences } from '../components/common/ViewOptions';
+import { ControlBar } from '../components/common/ControlBar';
+import { useViewPreferences, ViewPreferences } from '../components/common/ViewOptions';
 import { useContacts } from '../hooks/useContacts';
 import { IContact, IContactList } from '@kinect/shared';
 import api from '../services/api';
 
 export const Contacts: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const { listId: routeListId } = useParams<{ listId: string }>();
   const { contacts, fetchContacts, isLoading } = useContacts();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<IContact | null>(null);
@@ -47,24 +49,83 @@ export const Contacts: React.FC = () => {
     fetchContacts();
   };
 
-  // Filter contacts based on URL parameters
+  const handleDeleteContact = async (contactId: string) => {
+    try {
+      await api.deleteContact(contactId);
+      fetchContacts(); // Refresh the contacts list
+    } catch (error) {
+      console.error('Failed to delete contact:', error);
+      throw error; // Re-throw so the modal can handle the error
+    }
+  };
+
+  const handleUpdateContact = async (contactId: string, updates: Partial<IContact>) => {
+    try {
+      await api.updateContact(contactId, updates);
+      fetchContacts(); // Refresh the contacts list
+    } catch (error) {
+      console.error('Failed to update contact:', error);
+      throw error; // Re-throw so the modal can handle the error
+    }
+  };
+
+  // Helper function to determine if a contact is overdue
+  const isContactOverdue = (contact: IContact): boolean => {
+    if (!contact.lastContactDate) return true; // No contact logged means overdue
+
+    // Determine reminder interval
+    let reminderDays = contact.customReminderDays;
+
+    if (!reminderDays) {
+      // Use list reminder days if contact is in a list
+      if (contact.listId) {
+        const contactList = lists.find((list) => list._id === contact.listId);
+        reminderDays = contactList?.reminderDays;
+      }
+
+      // Fallback to category-based defaults
+      if (!reminderDays) {
+        switch (contact.category) {
+          case 'BEST_FRIEND':
+            reminderDays = 30;
+            break;
+          case 'FRIEND':
+            reminderDays = 90;
+            break;
+          case 'ACQUAINTANCE':
+            reminderDays = 180;
+            break;
+          default:
+            reminderDays = 90;
+        }
+      }
+    }
+
+    const daysSinceContact = Math.floor(
+      (Date.now() - new Date(contact.lastContactDate).getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    return daysSinceContact > reminderDays;
+  };
+
+  // Filter contacts based on URL parameters and route params
   const filteredContacts = useMemo(() => {
     let filtered = contacts;
 
-    const filter = searchParams.get('filter');
-    if (filter === 'overdue') {
-      // This would need additional logic to determine overdue status
-      // For now, we'll just return all contacts
-      filtered = contacts;
-    }
-
-    const listId = searchParams.get('listId');
+    // Handle list filtering from either route params or query params
+    const listId = routeListId || searchParams.get('listId');
     if (listId) {
       filtered = contacts.filter((contact) => contact.listId === listId);
     }
 
+    const filter = searchParams.get('filter');
+    if (filter === 'overdue') {
+      // Filter for overdue contacts
+      filtered = filtered.filter(isContactOverdue);
+    }
+
     return filtered;
-  }, [contacts, searchParams]);
+  }, [contacts, searchParams, routeListId, lists]);
 
   // Sort and group contacts
   const processedContacts = useMemo(() => {
@@ -156,11 +217,60 @@ export const Contacts: React.FC = () => {
     }
   }, [filteredContacts, lists, preferences]);
 
+  // Get current list name for title
+  const currentList = useMemo(() => {
+    const listId = routeListId || searchParams.get('listId');
+    return listId ? lists.find((list) => list._id === listId) : null;
+  }, [routeListId, searchParams, lists]);
+
+  // Get page title based on filters
+  const pageTitle = useMemo(() => {
+    const filter = searchParams.get('filter');
+    if (filter === 'overdue') {
+      return 'Overdue Contacts';
+    }
+    return currentList ? `${currentList.name} Contacts` : 'Contacts';
+  }, [currentList, searchParams]);
+
+  // Get page subtitle with count
+  const pageSubtitle = useMemo(() => {
+    const filter = searchParams.get('filter');
+    if (filter === 'overdue') {
+      return `${filteredContacts.length} overdue contact${filteredContacts.length !== 1 ? 's' : ''}`;
+    }
+    if (currentList) {
+      return `${filteredContacts.length} contact${filteredContacts.length !== 1 ? 's' : ''} in this list`;
+    }
+    return null;
+  }, [currentList, filteredContacts.length, searchParams]);
+
+  // Sort options for contacts
+  const contactSortOptions = [
+    { value: 'name', label: 'Name' },
+    { value: 'updated', label: 'Last Contact' },
+    { value: 'created', label: 'Date Added' },
+  ];
+
+  const handleGroupByChange = (grouped: boolean) => {
+    updatePreferences({ ...preferences, groupByList: grouped });
+  };
+
+  const handleSortChange = (sortBy: string, sortOrder: 'asc' | 'desc') => {
+    updatePreferences({ ...preferences, sortBy: sortBy as ViewPreferences['sortBy'], sortOrder });
+  };
+
+  const handleViewChange = (view: 'grid' | 'list') => {
+    updatePreferences({ ...preferences, view });
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Contacts</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">{pageTitle}</h1>
+            {pageSubtitle && <p className="mt-1 text-sm text-gray-600">{pageSubtitle}</p>}
+          </div>
           <button
             onClick={handleAddContact}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
@@ -169,11 +279,23 @@ export const Contacts: React.FC = () => {
           </button>
         </div>
 
-        <ViewOptions
-          preferences={preferences}
-          onChange={updatePreferences}
-          showViewToggle={true}
-          showGroupToggle={true}
+        <ControlBar
+          view={preferences.view}
+          onViewChange={handleViewChange}
+          grouped={preferences.groupByList}
+          onGroupChange={handleGroupByChange}
+          showGroupBy={true}
+          sortBy={preferences.sortBy}
+          sortOrder={preferences.sortOrder}
+          onSortChange={handleSortChange}
+          sortOptions={contactSortOptions}
+          title={
+            searchParams.get('filter') === 'overdue'
+              ? 'Overdue Contact Options'
+              : currentList
+                ? `${currentList.name} Options`
+                : 'Contact Options'
+          }
         />
 
         {isLoading ? (
@@ -183,13 +305,20 @@ export const Contacts: React.FC = () => {
         ) : preferences.groupByList ? (
           <GroupedContactList
             groupedContacts={processedContacts as any}
+            lists={lists}
             onEditContact={handleEditContact}
+            onDeleteContact={handleDeleteContact}
+            onUpdateContact={handleUpdateContact}
             viewMode={preferences.view}
           />
         ) : (
           <ContactList
             contacts={processedContacts as IContact[]}
+            lists={lists}
             onEditContact={handleEditContact}
+            onDeleteContact={handleDeleteContact}
+            onUpdateContact={handleUpdateContact}
+            viewMode={preferences.view}
           />
         )}
 

@@ -10,13 +10,19 @@ interface GroupedContactsData {
 
 interface GroupedContactListProps {
   groupedContacts: GroupedContactsData[];
+  lists?: IContactList[];
   onEditContact: (contact: IContact) => void;
+  onDeleteContact?: (contactId: string) => void;
+  onUpdateContact?: (contactId: string, updates: Partial<IContact>) => void;
   viewMode: 'grid' | 'list';
 }
 
 export const GroupedContactList: React.FC<GroupedContactListProps> = ({
   groupedContacts,
+  lists = [],
   onEditContact,
+  onDeleteContact,
+  onUpdateContact,
   viewMode,
 }) => {
   if (groupedContacts.length === 0) {
@@ -43,7 +49,7 @@ export const GroupedContactList: React.FC<GroupedContactListProps> = ({
 
   return (
     <div className="space-y-8">
-      {groupedContacts.map((group, index) => (
+      {groupedContacts.map((group) => (
         <div key={group.list?._id || 'no-list'} className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -74,7 +80,10 @@ export const GroupedContactList: React.FC<GroupedContactListProps> = ({
                 <ContactCard
                   key={contact._id}
                   contact={contact}
+                  lists={lists}
                   onEdit={() => onEditContact(contact)}
+                  onDelete={onDeleteContact}
+                  onUpdate={onUpdateContact}
                 />
               ))}
             </div>

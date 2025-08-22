@@ -70,6 +70,14 @@ function App() {
             }
           />
           <Route
+            path="/lists/:listId"
+            element={
+              <ProtectedRoute>
+                <Contacts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/settings"
             element={
               <ProtectedRoute>

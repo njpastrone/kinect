@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { IContactList } from '@kinect/shared';
 import { ListCard } from '../components/lists/ListCard';
 import { Layout } from '../components/layout/Layout';
+import { ControlBar } from '../components/common/ControlBar';
 import api from '../services/api';
 
 const REMINDER_PRESETS = [
@@ -26,13 +28,55 @@ interface ListWithStats extends IContactList {
   overdueCount: number;
 }
 
+interface ListViewPreferences {
+  view: 'grid' | 'list';
+  sortBy: 'name' | 'contactCount' | 'reminderDays' | 'overdueCount';
+  sortOrder: 'asc' | 'desc';
+}
+
+// Hook for managing list view preferences
+const useListViewPreferences = () => {
+  const getInitialPreferences = (): ListViewPreferences => {
+    const stored = localStorage.getItem('listViewPreferences');
+    const defaults: ListViewPreferences = {
+      view: 'grid',
+      sortBy: 'name',
+      sortOrder: 'asc',
+    };
+
+    if (stored) {
+      try {
+        return { ...defaults, ...JSON.parse(stored) };
+      } catch {
+        return defaults;
+      }
+    }
+
+    return defaults;
+  };
+
+  const [preferences, setPreferences] = useState<ListViewPreferences>(getInitialPreferences);
+
+  const updatePreferences = (newPreferences: ListViewPreferences) => {
+    setPreferences(newPreferences);
+    localStorage.setItem('listViewPreferences', JSON.stringify(newPreferences));
+  };
+
+  return {
+    preferences,
+    updatePreferences,
+  };
+};
+
 export const Lists: React.FC = () => {
+  const navigate = useNavigate();
   const [lists, setLists] = useState<ListWithStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingList, setEditingList] = useState<IContactList | null>(null);
+  const { preferences: viewPreferences, updatePreferences } = useListViewPreferences();
   const [formData, setFormData] = useState<ListFormData>({
     name: '',
     description: '',
@@ -136,13 +180,61 @@ export const Lists: React.FC = () => {
   };
 
   const handleViewContacts = (listId: string) => {
-    // Navigate to contacts page with list filter
-    window.location.href = `/contacts?listId=${listId}`;
+    // Navigate to contacts page with list filter using React Router
+    navigate(`/lists/${listId}`);
   };
 
   const openCreateModal = () => {
     resetForm();
     setShowCreateModal(true);
+  };
+
+  // Sort lists based on preferences
+  const sortedLists = useMemo(() => {
+    const sorted = [...lists].sort((a, b) => {
+      let comparison = 0;
+
+      switch (viewPreferences.sortBy) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case 'contactCount':
+          comparison = a.contactCount - b.contactCount;
+          break;
+        case 'reminderDays':
+          comparison = (a.reminderDays || 30) - (b.reminderDays || 30);
+          break;
+        case 'overdueCount':
+          comparison = a.overdueCount - b.overdueCount;
+          break;
+        default:
+          comparison = a.name.localeCompare(b.name);
+      }
+
+      return viewPreferences.sortOrder === 'asc' ? comparison : -comparison;
+    });
+
+    return sorted;
+  }, [lists, viewPreferences]);
+
+  // Sort options for lists
+  const listSortOptions = [
+    { value: 'name', label: 'Name' },
+    { value: 'contactCount', label: 'Contact Count' },
+    { value: 'reminderDays', label: 'Reminder Interval' },
+    { value: 'overdueCount', label: 'Overdue Count' },
+  ];
+
+  const handleSortChange = (sortBy: string, sortOrder: 'asc' | 'desc') => {
+    updatePreferences({
+      ...viewPreferences,
+      sortBy: sortBy as ListViewPreferences['sortBy'],
+      sortOrder,
+    });
+  };
+
+  const handleViewChange = (view: 'grid' | 'list') => {
+    updatePreferences({ ...viewPreferences, view });
   };
 
   const ListForm = ({ isEdit = false }: { isEdit?: boolean }) => (
@@ -298,6 +390,19 @@ export const Lists: React.FC = () => {
           </button>
         </div>
 
+        {/* Control Bar */}
+        {lists.length > 0 && (
+          <ControlBar
+            view={viewPreferences.view}
+            onViewChange={handleViewChange}
+            sortBy={viewPreferences.sortBy}
+            sortOrder={viewPreferences.sortOrder}
+            onSortChange={handleSortChange}
+            sortOptions={listSortOptions}
+            title="List Options"
+          />
+        )}
+
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
@@ -356,14 +461,21 @@ export const Lists: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {lists.map((list) => (
+          <div
+            className={
+              viewPreferences.view === 'grid'
+                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+                : 'space-y-4'
+            }
+          >
+            {sortedLists.map((list) => (
               <ListCard
                 key={list._id}
                 list={list}
                 onEdit={handleEdit}
                 onDelete={handleDeleteList}
                 onViewContacts={handleViewContacts}
+                viewMode={viewPreferences.view}
               />
             ))}
           </div>

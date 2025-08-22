@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
+import { ControlBar } from '../components/common/ControlBar';
 import { IContact, IContactList } from '@kinect/shared';
 import { LogContactModal } from '../components/contacts/LogContactModal';
 import { useViewPreferences } from '../components/common/ViewOptions';
@@ -461,29 +462,24 @@ export const Dashboard: React.FC = () => {
         {overdueContacts.length > 0 ? (
           <div className="bg-white rounded-lg shadow">
             <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">Overdue Contacts</h2>
-                <div className="flex items-center space-x-4">
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={preferences.groupByList}
-                      onChange={(e) =>
-                        updatePreferences({
-                          ...preferences,
-                          groupByList: e.target.checked,
-                        })
-                      }
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-medium text-gray-700">Group by List</span>
-                  </label>
-                  <span className="text-sm text-gray-500">
-                    {overdueContacts.length} contact{overdueContacts.length !== 1 ? 's' : ''} need
-                    {overdueContacts.length === 1 ? 's' : ''} attention
-                  </span>
-                </div>
+                <span className="text-sm text-gray-500">
+                  {overdueContacts.length} contact{overdueContacts.length !== 1 ? 's' : ''} need
+                  {overdueContacts.length === 1 ? 's' : ''} attention
+                </span>
               </div>
+              <ControlBar
+                grouped={preferences.groupByList}
+                onGroupChange={(grouped) =>
+                  updatePreferences({
+                    ...preferences,
+                    groupByList: grouped,
+                  })
+                }
+                showGroupBy={true}
+                title="Overdue Contact Options"
+              />
             </div>
             <div className="p-6">
               {preferences.groupByList ? (
