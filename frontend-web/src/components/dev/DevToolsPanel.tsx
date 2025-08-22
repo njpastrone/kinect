@@ -289,12 +289,18 @@ const DataTab: React.FC<{ devTools: ReturnType<typeof useDevTools> }> = ({ devTo
       <h4 className="text-sm font-medium text-gray-900 mb-2">Data Management</h4>
       <div className="space-y-2">
         <button
+          onClick={() => devTools.resetDemo()}
+          className="w-full px-3 py-2 bg-yellow-100 text-yellow-700 rounded text-sm hover:bg-yellow-200"
+        >
+          🔄 Reset Demo Data
+        </button>
+        <button
           onClick={() => devTools.clearAllData()}
           className="w-full px-3 py-2 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200"
         >
           🗑️ Clear All Data
         </button>
-        <p className="text-xs text-gray-500">This will clear all local data and reload the page</p>
+        <p className="text-xs text-gray-500">Reset demo will reload fresh demo data. Clear all will remove all local data.</p>
       </div>
     </div>
 

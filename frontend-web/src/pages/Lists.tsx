@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IContactList } from '@kinect/shared';
 import { ListCard } from '../components/lists/ListCard';
+import { Layout } from '../components/layout/Layout';
 import api from '../services/api';
 
 const REMINDER_PRESETS = [
@@ -262,19 +263,17 @@ export const Lists: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-gray-500">Loading lists...</div>
-          </div>
+      <Layout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-gray-500">Loading lists...</div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <Layout>
+      <div className="space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -390,6 +389,6 @@ export const Lists: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </Layout>
   );
 };

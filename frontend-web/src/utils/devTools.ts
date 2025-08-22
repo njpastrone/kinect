@@ -201,6 +201,43 @@ class DevToolsManager {
   }
 
   /**
+   * Reset demo data
+   */
+  async resetDemo(): Promise<void> {
+    if (window.confirm('Reset demo data? This will restore the original demo contacts and lists.')) {
+      try {
+        const response = await fetch('/api/dev/reset-demo', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+          console.warn('Demo data reset successful:', result);
+          
+          // Clear localStorage caches
+          const keysToKeep = ['accessToken', 'refreshToken', 'kinect_dev_tools'];
+          const keysToRemove = Object.keys(localStorage).filter(key => !keysToKeep.includes(key));
+          keysToRemove.forEach(key => localStorage.removeItem(key));
+          
+          // Reload the page to refresh data
+          window.location.reload();
+        } else {
+          console.error('Demo reset failed:', result);
+          alert('Failed to reset demo data. Check console for details.');
+        }
+      } catch (error) {
+        console.error('Demo reset error:', error);
+        alert('Error resetting demo data. Check console for details.');
+      }
+    }
+  }
+
+  /**
    * Clear all data (for testing)
    */
   async clearAllData(): Promise<void> {
@@ -374,6 +411,7 @@ export function useDevTools() {
     setCurrentDate: devTools.setCurrentDate.bind(devTools),
     getCurrentDate: devTools.getCurrentDate.bind(devTools),
     generateBulkContacts: devTools.generateBulkContacts.bind(devTools),
+    resetDemo: devTools.resetDemo.bind(devTools),
     clearAllData: devTools.clearAllData.bind(devTools),
     simulatePhoneSync: devTools.simulatePhoneSync.bind(devTools),
     clearApiLogs: devTools.clearApiLogs.bind(devTools),

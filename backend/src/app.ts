@@ -10,6 +10,7 @@ import authRoutes from './api/routes/auth.routes';
 import contactsRoutes from './api/routes/contacts.routes';
 import listsRoutes from './api/routes/lists.routes';
 import notificationsRoutes from './api/routes/notifications.routes';
+import communicationsRoutes from './api/routes/communications.routes';
 import devRoutes from './api/routes/dev.routes';
 import { errorHandler, notFound } from './api/middleware/error.middleware';
 // Import notification service to initialize cron jobs
@@ -48,6 +49,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/contacts', contactsRoutes);
 app.use('/api/lists', listsRoutes);
 app.use('/api/notifications', notificationsRoutes);
+app.use('/api/communications', communicationsRoutes);
 
 // Dev routes only in development
 if (process.env.NODE_ENV !== 'production') {

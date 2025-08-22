@@ -480,6 +480,73 @@ export async function resetDatabase(): Promise<void> {
   }
 }
 
+export async function seedDemoDataForUser(user: any): Promise<void> {
+  console.warn(`🌱 Seeding demo data for user: ${user.firstName} ${user.lastName}...`);
+
+  try {
+    // Determine profile type based on email
+    const profile = user.email.includes('active') ? 'active' : 
+                   user.email.includes('moderate') ? 'moderate' : 'minimal';
+
+    // Determine how many lists and contacts based on profile
+    const listCount = profile === 'active' ? 6 : profile === 'moderate' ? 4 : 2;
+    const listsToCreate = CONTACT_LISTS.slice(0, listCount);
+
+    // Create contact lists
+    const createdLists = [];
+    for (const listData of listsToCreate) {
+      const list = await ContactList.create({
+        ...listData,
+        userId: user._id?.toString(),
+      });
+      createdLists.push(list);
+    }
+
+    // Filter contacts based on available lists
+    const availableListNames = createdLists.map((l) => l.name);
+    const contactsForUser = DEMO_CONTACTS.filter((c) => availableListNames.includes(c.listName));
+
+    // Adjust contact count based on profile
+    const contactCount =
+      profile === 'active'
+        ? contactsForUser.length
+        : profile === 'moderate'
+          ? Math.ceil(contactsForUser.length * 0.7)
+          : Math.ceil(contactsForUser.length * 0.4);
+
+    const contactsToCreate = contactsForUser.slice(0, contactCount);
+
+    // Create contacts
+    const createdContacts = [];
+    for (const contactData of contactsToCreate) {
+      const list = createdLists.find((l) => l.name === contactData.listName);
+      const contact = await Contact.create({
+        ...contactData,
+        userId: user._id?.toString(),
+        listId: list?._id?.toString(),
+        lastContactDate: getRandomPastDate(contactData.lastContactDaysAgo),
+      });
+      createdContacts.push(contact);
+
+      // Generate communication logs for this contact
+      const logs = generateCommunicationLogs(
+        user._id?.toString() || '',
+        contact._id?.toString() || '',
+        contactData.lastContactDaysAgo
+      );
+
+      await CommunicationLog.insertMany(logs);
+    }
+
+    console.warn(
+      `✅ Seeded ${createdLists.length} lists and ${createdContacts.length} contacts for ${user.firstName}`
+    );
+  } catch (error) {
+    console.error('❌ Seeding for user failed:', error);
+    throw error;
+  }
+}
+
 // CLI execution
 if (require.main === module) {
   const command = process.argv[2];

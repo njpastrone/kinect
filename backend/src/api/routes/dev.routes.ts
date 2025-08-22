@@ -3,6 +3,10 @@ import { MockPhoneLogService } from '../../services/mockPhoneLog.service';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler } from '../middleware/error.middleware';
 import { AppError } from '../middleware/error.middleware';
+import { User } from '../../models/User.model';
+import { Contact } from '../../models/Contact.model';
+import { ContactList } from '../../models/ContactList.model';
+import { CommunicationLog } from '../../models/CommunicationLog.model';
 
 const router = Router();
 const mockPhoneService = new MockPhoneLogService();
@@ -109,6 +113,50 @@ router.get(
       success: true,
       data: mockPhoneService.getStats(),
     });
+  })
+);
+
+/**
+ * POST /api/dev/reset-demo
+ * Reset demo data for the authenticated user
+ */
+router.post(
+  '/reset-demo',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!req.userId) {
+      throw new AppError('User ID not found', 400);
+    }
+
+    try {
+      // Find demo user
+      const user = await User.findById(req.userId);
+      if (!user) {
+        throw new AppError('User not found', 404);
+      }
+
+      // Delete user's existing data
+      await Promise.all([
+        Contact.deleteMany({ userId: req.userId }),
+        ContactList.deleteMany({ userId: req.userId }),
+        CommunicationLog.deleteMany({ userId: req.userId }),
+      ]);
+
+      // Re-seed data for this user only
+      const { seedDemoDataForUser } = await import('../../scripts/seed');
+      await seedDemoDataForUser(user);
+
+      res.json({
+        success: true,
+        message: 'Demo data reset and reseeded successfully',
+        data: {
+          userId: req.userId,
+          userEmail: user.email,
+        },
+      });
+    } catch (error) {
+      console.error('Reset demo failed:', error);
+      throw new AppError('Failed to reset demo data', 500);
+    }
   })
 );
 

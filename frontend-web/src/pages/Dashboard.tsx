@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
 import { IContact, IContactList } from '@kinect/shared';
+import { LogContactModal } from '../components/contacts/LogContactModal';
+import { useViewPreferences } from '../components/common/ViewOptions';
 import api from '../services/api';
 
 interface OverdueContact extends IContact {
@@ -14,6 +17,140 @@ interface ContactNowModalProps {
   onClose: () => void;
   onContactMarked: () => void;
 }
+
+// Helper components
+interface OverdueContactItemProps {
+  contact: OverdueContact;
+  onLogContact: (contact: OverdueContact) => void;
+  onContactNow: (contact: OverdueContact) => void;
+  getDaysOverdueColor: (days: number) => string;
+  showListName?: boolean;
+}
+
+const OverdueContactItem: React.FC<OverdueContactItemProps> = ({
+  contact,
+  onLogContact,
+  onContactNow,
+  getDaysOverdueColor,
+  showListName = false,
+}) => (
+  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+    <div className="flex-1">
+      <div className="flex items-center gap-3 mb-2">
+        <h3 className="font-medium text-gray-900">
+          {contact.firstName} {contact.lastName}
+        </h3>
+        {showListName && (
+          <span className="text-sm text-gray-500">
+            in {contact.list?.name || 'No list'}
+          </span>
+        )}
+        <span
+          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getDaysOverdueColor(contact.daysSinceLastContact)}`}
+        >
+          {Math.floor(contact.daysSinceLastContact)} days overdue
+        </span>
+      </div>
+      <div className="flex items-center gap-4 text-sm text-gray-600">
+        <span>
+          Last contact:{' '}
+          {contact.lastContactDate
+            ? new Date(contact.lastContactDate).toLocaleDateString()
+            : 'Never'}
+        </span>
+        {contact.phoneNumber && <span>📞 {contact.phoneNumber}</span>}
+      </div>
+    </div>
+    <div className="flex gap-2">
+      <button
+        onClick={() => onLogContact(contact)}
+        className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors"
+      >
+        Log Contact
+      </button>
+      <button
+        onClick={() => onContactNow(contact)}
+        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
+      >
+        Contact Now
+      </button>
+    </div>
+  </div>
+);
+
+interface GroupedOverdueContactsProps {
+  overdueContacts: OverdueContact[];
+  onLogContact: (contact: OverdueContact) => void;
+  onContactNow: (contact: OverdueContact) => void;
+  getDaysOverdueColor: (days: number) => string;
+}
+
+const GroupedOverdueContacts: React.FC<GroupedOverdueContactsProps> = ({
+  overdueContacts,
+  onLogContact,
+  onContactNow,
+  getDaysOverdueColor,
+}) => {
+  // Group contacts by list
+  const groupedContacts = React.useMemo(() => {
+    const groups = new Map<string, { list: IContactList | null; contacts: OverdueContact[] }>();
+    
+    overdueContacts.forEach(contact => {
+      const listId = contact.list?._id || 'no-list';
+      if (!groups.has(listId)) {
+        groups.set(listId, {
+          list: contact.list || null,
+          contacts: []
+        });
+      }
+      groups.get(listId)!.contacts.push(contact);
+    });
+
+    return Array.from(groups.values()).sort((a, b) => {
+      const nameA = a.list?.name || 'No List';
+      const nameB = b.list?.name || 'No List';
+      return nameA.localeCompare(nameB);
+    });
+  }, [overdueContacts]);
+
+  return (
+    <div className="space-y-6">
+      {groupedContacts.map((group) => (
+        <div key={group.list?._id || 'no-list'} className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <h3 className="text-lg font-medium text-gray-900">
+                {group.list?.name || 'No List'}
+              </h3>
+              <span className="text-sm text-gray-500">
+                ({group.contacts.length} overdue)
+              </span>
+            </div>
+            {group.list?.color && (
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: group.list.color }}
+              />
+            )}
+          </div>
+          
+          <div className="space-y-3 ml-4">
+            {group.contacts.map((contact) => (
+              <OverdueContactItem
+                key={contact._id}
+                contact={contact}
+                onLogContact={onLogContact}
+                onContactNow={onContactNow}
+                getDaysOverdueColor={getDaysOverdueColor}
+                showListName={false}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const ContactNowModal: React.FC<ContactNowModalProps> = ({ contact, onClose, onContactMarked }) => {
   const [loading, setLoading] = useState(false);
@@ -177,6 +314,7 @@ const ContactNowModal: React.FC<ContactNowModalProps> = ({ contact, onClose, onC
 };
 
 export const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [overdueContacts, setOverdueContacts] = useState<OverdueContact[]>([]);
   const [lists, setLists] = useState<
     (IContactList & { contactCount: number; overdueCount: number })[]
@@ -184,6 +322,10 @@ export const Dashboard: React.FC = () => {
   const [totalContacts, setTotalContacts] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedContact, setSelectedContact] = useState<OverdueContact | null>(null);
+  const [logContactModal, setLogContactModal] = useState<OverdueContact | null>(null);
+  const { preferences, updatePreferences } = useViewPreferences({
+    groupByList: false, // Default to ungrouped on dashboard
+  });
 
   useEffect(() => {
     loadDashboardData();
@@ -242,7 +384,10 @@ export const Dashboard: React.FC = () => {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div 
+            onClick={() => navigate('/contacts')}
+            className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer"
+          >
             <div className="flex items-center">
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900">Total Contacts</h3>
@@ -266,7 +411,10 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div 
+            onClick={() => navigate('/contacts?filter=overdue')}
+            className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer"
+          >
             <div className="flex items-center">
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900">Overdue Contacts</h3>
@@ -290,7 +438,10 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div 
+            onClick={() => navigate('/lists')}
+            className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer"
+          >
             <div className="flex items-center">
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900">Active Lists</h3>
@@ -321,52 +472,48 @@ export const Dashboard: React.FC = () => {
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900">Overdue Contacts</h2>
-                <span className="text-sm text-gray-500">
-                  {overdueContacts.length} contact{overdueContacts.length !== 1 ? 's' : ''} need
-                  {overdueContacts.length === 1 ? 's' : ''} attention
-                </span>
+                <div className="flex items-center space-x-4">
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={preferences.groupByList}
+                      onChange={(e) => updatePreferences({
+                        ...preferences,
+                        groupByList: e.target.checked
+                      })}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm font-medium text-gray-700">Group by List</span>
+                  </label>
+                  <span className="text-sm text-gray-500">
+                    {overdueContacts.length} contact{overdueContacts.length !== 1 ? 's' : ''} need
+                    {overdueContacts.length === 1 ? 's' : ''} attention
+                  </span>
+                </div>
               </div>
             </div>
             <div className="p-6">
-              <div className="space-y-4">
-                {overdueContacts.map((contact) => (
-                  <div
-                    key={contact._id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-medium text-gray-900">
-                          {contact.firstName} {contact.lastName}
-                        </h3>
-                        <span className="text-sm text-gray-500">
-                          in {contact.list?.name || 'No list'}
-                        </span>
-                        <span
-                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getDaysOverdueColor(contact.daysSinceLastContact)}`}
-                        >
-                          {Math.floor(contact.daysSinceLastContact)} days overdue
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <span>
-                          Last contact:{' '}
-                          {contact.lastContactDate
-                            ? new Date(contact.lastContactDate).toLocaleDateString()
-                            : 'Never'}
-                        </span>
-                        {contact.phoneNumber && <span>📞 {contact.phoneNumber}</span>}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setSelectedContact(contact)}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
-                    >
-                      Contact Now
-                    </button>
-                  </div>
-                ))}
-              </div>
+              {preferences.groupByList ? (
+                <GroupedOverdueContacts 
+                  overdueContacts={overdueContacts}
+                  onLogContact={setLogContactModal}
+                  onContactNow={setSelectedContact}
+                  getDaysOverdueColor={getDaysOverdueColor}
+                />
+              ) : (
+                <div className="space-y-4">
+                  {overdueContacts.map((contact) => (
+                    <OverdueContactItem
+                      key={contact._id}
+                      contact={contact}
+                      onLogContact={setLogContactModal}
+                      onContactNow={setSelectedContact}
+                      getDaysOverdueColor={getDaysOverdueColor}
+                      showListName={true}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ) : (
@@ -401,7 +548,11 @@ export const Dashboard: React.FC = () => {
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {lists.map((list) => (
-                  <div key={list._id} className="border border-gray-200 rounded-lg p-4">
+                  <div 
+                    key={list._id} 
+                    onClick={() => navigate(`/lists/${list._id}`)}
+                    className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-medium text-gray-900">{list.name}</h3>
                       {list.overdueCount > 0 && (
@@ -426,6 +577,15 @@ export const Dashboard: React.FC = () => {
             contact={selectedContact}
             onClose={() => setSelectedContact(null)}
             onContactMarked={handleContactMarked}
+          />
+        )}
+
+        {/* Log Contact Modal */}
+        {logContactModal && (
+          <LogContactModal
+            contact={logContactModal}
+            onClose={() => setLogContactModal(null)}
+            onContactLogged={handleContactMarked}
           />
         )}
       </div>

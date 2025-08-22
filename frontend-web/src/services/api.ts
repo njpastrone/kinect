@@ -149,6 +149,23 @@ class ApiService {
     return response.data.data;
   }
 
+  async logCommunication(data: {
+    contactId: string;
+    type: string;
+    timestamp: Date;
+    notes?: string;
+    duration?: number;
+  }): Promise<any> {
+    const response = await this.api.post('/communications/log', {
+      contactId: data.contactId,
+      type: data.type,
+      timestamp: data.timestamp.toISOString(),
+      notes: data.notes,
+      duration: data.duration,
+    });
+    return response.data.data;
+  }
+
   async getLists(): Promise<IContactList[]> {
     const response = await this.api.get<ApiResponse<IContactList[]>>('/lists');
     return response.data.data!;
