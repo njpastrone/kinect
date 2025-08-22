@@ -182,7 +182,12 @@ export const ListCard: React.FC<ListCardProps> = ({
       <div className="p-4 border-b border-gray-100">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">{list.name}</h3>
+            <div className="flex items-center gap-3 mb-1">
+              <h3 className="text-lg font-semibold text-gray-900">{list.name}</h3>
+              {list.color && (
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: list.color }} />
+              )}
+            </div>
             {list.description && <p className="text-sm text-gray-600 mb-2">{list.description}</p>}
             <div className="flex items-center gap-4 text-sm text-gray-500">
               <span className="flex items-center gap-1">

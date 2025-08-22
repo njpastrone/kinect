@@ -4,6 +4,10 @@ import { IContactList } from '@kinect/shared';
 import { ListCard } from '../components/lists/ListCard';
 import { Layout } from '../components/layout/Layout';
 import { ControlBar } from '../components/common/ControlBar';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { EmptyState } from '../components/common/EmptyState';
+import { usePagePreferences } from '../hooks/usePreferences';
+import { routes } from '../utils/navigation';
 import api from '../services/api';
 
 const REMINDER_PRESETS = [
@@ -28,45 +32,7 @@ interface ListWithStats extends IContactList {
   overdueCount: number;
 }
 
-interface ListViewPreferences {
-  view: 'grid' | 'list';
-  sortBy: 'name' | 'contactCount' | 'reminderDays' | 'overdueCount';
-  sortOrder: 'asc' | 'desc';
-}
 
-// Hook for managing list view preferences
-const useListViewPreferences = () => {
-  const getInitialPreferences = (): ListViewPreferences => {
-    const stored = localStorage.getItem('listViewPreferences');
-    const defaults: ListViewPreferences = {
-      view: 'grid',
-      sortBy: 'name',
-      sortOrder: 'asc',
-    };
-
-    if (stored) {
-      try {
-        return { ...defaults, ...JSON.parse(stored) };
-      } catch {
-        return defaults;
-      }
-    }
-
-    return defaults;
-  };
-
-  const [preferences, setPreferences] = useState<ListViewPreferences>(getInitialPreferences);
-
-  const updatePreferences = (newPreferences: ListViewPreferences) => {
-    setPreferences(newPreferences);
-    localStorage.setItem('listViewPreferences', JSON.stringify(newPreferences));
-  };
-
-  return {
-    preferences,
-    updatePreferences,
-  };
-};
 
 export const Lists: React.FC = () => {
   const navigate = useNavigate();
@@ -76,7 +42,7 @@ export const Lists: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingList, setEditingList] = useState<IContactList | null>(null);
-  const { preferences: viewPreferences, updatePreferences } = useListViewPreferences();
+  const { preferences: viewPreferences, updateView, updateSort } = usePagePreferences('lists');
   const [formData, setFormData] = useState<ListFormData>({
     name: '',
     description: '',
@@ -181,7 +147,7 @@ export const Lists: React.FC = () => {
 
   const handleViewContacts = (listId: string) => {
     // Navigate to contacts page with list filter using React Router
-    navigate(`/lists/${listId}`);
+    navigate(routes.lists.view(listId));
   };
 
   const openCreateModal = () => {
@@ -226,15 +192,11 @@ export const Lists: React.FC = () => {
   ];
 
   const handleSortChange = (sortBy: string, sortOrder: 'asc' | 'desc') => {
-    updatePreferences({
-      ...viewPreferences,
-      sortBy: sortBy as ListViewPreferences['sortBy'],
-      sortOrder,
-    });
+    updateSort(sortBy, sortOrder);
   };
 
   const handleViewChange = (view: 'grid' | 'list') => {
-    updatePreferences({ ...viewPreferences, view });
+    updateView(view);
   };
 
   const ListForm = ({ isEdit = false }: { isEdit?: boolean }) => (
@@ -357,7 +319,7 @@ export const Lists: React.FC = () => {
     return (
       <Layout>
         <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500">Loading lists...</div>
+          <LoadingSpinner size="lg" text="Loading lists..." />
         </div>
       </Layout>
     );
@@ -427,39 +389,13 @@ export const Lists: React.FC = () => {
 
         {/* Lists Grid */}
         {lists.length === 0 ? (
-          <div className="text-center py-12">
-            <svg
-              className="w-16 h-16 text-gray-300 mx-auto mb-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1}
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-              />
-            </svg>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">No lists yet</h3>
-            <p className="text-gray-600 mb-6">
-              Create your first list to organize your contacts with custom reminder intervals
-            </p>
-            <button
-              onClick={openCreateModal}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Create Your First List
-            </button>
-          </div>
+          <EmptyState
+            type="lists"
+            title="No lists yet"
+            description="Create your first list to organize your contacts with custom reminder intervals"
+            actionLabel="Create Your First List"
+            onAction={openCreateModal}
+          />
         ) : (
           <div
             className={

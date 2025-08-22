@@ -2,7 +2,7 @@ import React from 'react';
 
 export interface ViewPreferences {
   view: 'grid' | 'list';
-  sortBy: 'name' | 'count' | 'updated' | 'overdue';
+  sortBy: 'name' | 'count' | 'updated' | 'overdue' | 'list';
   sortOrder: 'asc' | 'desc';
   groupByList: boolean;
 }

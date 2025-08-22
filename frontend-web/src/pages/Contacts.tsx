@@ -5,9 +5,12 @@ import { ContactList } from '../components/contacts/ContactList';
 import { GroupedContactList } from '../components/contacts/GroupedContactList';
 import { AddContactModal } from '../components/contacts/AddContactModal';
 import { ControlBar } from '../components/common/ControlBar';
-import { useViewPreferences, ViewPreferences } from '../components/common/ViewOptions';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { EmptyState } from '../components/common/EmptyState';
+import { usePagePreferences } from '../hooks/usePreferences';
 import { useContacts } from '../hooks/useContacts';
 import { IContact, IContactList } from '@kinect/shared';
+import { groupItemsByList, sortGroupedItems, createSortFunction, isContactOverdue } from '../utils/grouping';
 import api from '../services/api';
 
 export const Contacts: React.FC = () => {
@@ -17,7 +20,7 @@ export const Contacts: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<IContact | null>(null);
   const [lists, setLists] = useState<IContactList[]>([]);
-  const { preferences, updatePreferences } = useViewPreferences();
+  const { preferences, updateView, updateSort, updateGrouping } = usePagePreferences('contacts');
 
   useEffect(() => {
     fetchContacts();
@@ -70,42 +73,8 @@ export const Contacts: React.FC = () => {
   };
 
   // Helper function to determine if a contact is overdue
-  const isContactOverdue = (contact: IContact): boolean => {
-    if (!contact.lastContactDate) return true; // No contact logged means overdue
-
-    // Determine reminder interval
-    let reminderDays = contact.customReminderDays;
-
-    if (!reminderDays) {
-      // Use list reminder days if contact is in a list
-      if (contact.listId) {
-        const contactList = lists.find((list) => list._id === contact.listId);
-        reminderDays = contactList?.reminderDays;
-      }
-
-      // Fallback to category-based defaults
-      if (!reminderDays) {
-        switch (contact.category) {
-          case 'BEST_FRIEND':
-            reminderDays = 30;
-            break;
-          case 'FRIEND':
-            reminderDays = 90;
-            break;
-          case 'ACQUAINTANCE':
-            reminderDays = 180;
-            break;
-          default:
-            reminderDays = 90;
-        }
-      }
-    }
-
-    const daysSinceContact = Math.floor(
-      (Date.now() - new Date(contact.lastContactDate).getTime()) / (1000 * 60 * 60 * 24)
-    );
-
-    return daysSinceContact > reminderDays;
+  const checkContactOverdue = (contact: IContact): boolean => {
+    return isContactOverdue(contact, lists);
   };
 
   // Filter contacts based on URL parameters and route params
@@ -121,7 +90,7 @@ export const Contacts: React.FC = () => {
     const filter = searchParams.get('filter');
     if (filter === 'overdue') {
       // Filter for overdue contacts
-      filtered = filtered.filter(isContactOverdue);
+      filtered = filtered.filter(checkContactOverdue);
     }
 
     return filtered;
@@ -130,92 +99,29 @@ export const Contacts: React.FC = () => {
   // Sort and group contacts
   const processedContacts = useMemo(() => {
     if (preferences.groupByList) {
-      // Group contacts by list
-      const grouped = new Map<string, { list: IContactList | null; contacts: IContact[] }>();
-
-      filteredContacts.forEach((contact) => {
-        const listId = contact.listId || 'no-list';
-        const list = lists.find((l) => l._id === contact.listId) || null;
-
-        if (!grouped.has(listId)) {
-          grouped.set(listId, { list, contacts: [] });
-        }
-
-        grouped.get(listId)!.contacts.push(contact);
-      });
-
-      // Convert to array and sort groups
-      const groupedArray = Array.from(grouped.values()).map((group) => ({
-        ...group,
-        overdueCount: 0, // TODO: Calculate overdue count
-      }));
-
-      // Sort groups by list name
-      groupedArray.sort((a, b) => {
-        const nameA = a.list?.name || 'No List';
-        const nameB = b.list?.name || 'No List';
-        return preferences.sortOrder === 'asc'
-          ? nameA.localeCompare(nameB)
-          : nameB.localeCompare(nameA);
-      });
+      // Group contacts by list using utility
+      const grouped = groupItemsByList(
+        filteredContacts,
+        lists,
+        checkContactOverdue
+      );
 
       // Sort contacts within each group
-      groupedArray.forEach((group) => {
-        group.contacts.sort((a, b) => {
-          let comparison = 0;
+      const sortFunction = createSortFunction(preferences.sortBy, preferences.sortOrder);
+      const sortedGroups = sortGroupedItems(grouped, sortFunction);
 
-          switch (preferences.sortBy) {
-            case 'name':
-              comparison = `${a.firstName} ${a.lastName}`.localeCompare(
-                `${b.firstName} ${b.lastName}`
-              );
-              break;
-            case 'updated': {
-              const dateA = a.lastContactDate ? new Date(a.lastContactDate) : new Date(0);
-              const dateB = b.lastContactDate ? new Date(b.lastContactDate) : new Date(0);
-              comparison = dateB.getTime() - dateA.getTime();
-              break;
-            }
-            default:
-              comparison = `${a.firstName} ${a.lastName}`.localeCompare(
-                `${b.firstName} ${b.lastName}`
-              );
-          }
-
-          return preferences.sortOrder === 'asc' ? comparison : -comparison;
-        });
-      });
-
-      return groupedArray;
+      // Transform to match expected format
+      return sortedGroups.map((group) => ({
+        list: group.list,
+        contacts: group.items,
+        overdueCount: group.overdueCount || 0,
+      }));
     } else {
       // Return sorted contacts without grouping
-      const sorted = [...filteredContacts].sort((a, b) => {
-        let comparison = 0;
-
-        switch (preferences.sortBy) {
-          case 'name':
-            comparison = `${a.firstName} ${a.lastName}`.localeCompare(
-              `${b.firstName} ${b.lastName}`
-            );
-            break;
-          case 'updated': {
-            const dateA = a.lastContactDate ? new Date(a.lastContactDate) : new Date(0);
-            const dateB = b.lastContactDate ? new Date(b.lastContactDate) : new Date(0);
-            comparison = dateB.getTime() - dateA.getTime();
-            break;
-          }
-          default:
-            comparison = `${a.firstName} ${a.lastName}`.localeCompare(
-              `${b.firstName} ${b.lastName}`
-            );
-        }
-
-        return preferences.sortOrder === 'asc' ? comparison : -comparison;
-      });
-
-      return sorted;
+      const sortFunction = createSortFunction(preferences.sortBy, preferences.sortOrder);
+      return [...filteredContacts].sort(sortFunction);
     }
-  }, [filteredContacts, lists, preferences]);
+  }, [filteredContacts, lists, preferences, checkContactOverdue]);
 
   // Get current list name for title
   const currentList = useMemo(() => {
@@ -252,19 +158,19 @@ export const Contacts: React.FC = () => {
   ];
 
   const handleGroupByChange = (grouped: boolean) => {
-    updatePreferences({ ...preferences, groupByList: grouped });
+    updateGrouping(grouped);
   };
 
   const handleSortChange = (sortBy: string, sortOrder: 'asc' | 'desc') => {
-    updatePreferences({ ...preferences, sortBy: sortBy as ViewPreferences['sortBy'], sortOrder });
+    updateSort(sortBy, sortOrder);
   };
 
   const handleViewChange = (view: 'grid' | 'list') => {
-    updatePreferences({ ...preferences, view });
+    updateView(view);
   };
 
   return (
-    <Layout>
+    <Layout listName={currentList?.name}>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
@@ -300,8 +206,22 @@ export const Contacts: React.FC = () => {
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="text-gray-500">Loading contacts...</div>
+            <LoadingSpinner size="lg" text="Loading contacts..." />
           </div>
+        ) : filteredContacts.length === 0 ? (
+          <EmptyState
+            type={searchParams.get('filter') === 'overdue' ? 'overdue' : 'contacts'}
+            title={searchParams.get('filter') === 'overdue' ? 'No overdue contacts' : 'No contacts found'}
+            description={
+              searchParams.get('filter') === 'overdue'
+                ? 'Great job! All your contacts are up to date.'
+                : currentList
+                  ? `No contacts in "${currentList.name}" yet.`
+                  : 'Add your first contact to get started with relationship management.'
+            }
+            actionLabel={searchParams.get('filter') === 'overdue' ? undefined : 'Add Contact'}
+            onAction={searchParams.get('filter') === 'overdue' ? undefined : handleAddContact}
+          />
         ) : preferences.groupByList ? (
           <GroupedContactList
             groupedContacts={processedContacts as any}

@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
 import { ControlBar } from '../components/common/ControlBar';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { EmptyState } from '../components/common/EmptyState';
 import { IContact, IContactList } from '@kinect/shared';
 import { LogContactModal } from '../components/contacts/LogContactModal';
-import { useViewPreferences } from '../components/common/ViewOptions';
+import { usePagePreferences } from '../hooks/usePreferences';
+import { routes } from '../utils/navigation';
 import api from '../services/api';
 
 interface OverdueContact extends IContact {
@@ -315,9 +318,7 @@ export const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedContact, setSelectedContact] = useState<OverdueContact | null>(null);
   const [logContactModal, setLogContactModal] = useState<OverdueContact | null>(null);
-  const { preferences, updatePreferences } = useViewPreferences({
-    groupByList: false, // Default to ungrouped on dashboard
-  });
+  const { preferences, updateView, updateSort, updateGrouping } = usePagePreferences('dashboard');
 
   useEffect(() => {
     loadDashboardData();
@@ -356,11 +357,44 @@ export const Dashboard: React.FC = () => {
     return 'text-red-600 bg-red-50';
   };
 
+  // Sort overdue contacts based on preferences
+  const sortedOverdueContacts = useMemo(() => {
+    // Create custom sort function for overdue contacts
+    const sortFunction = (a: OverdueContact, b: OverdueContact): number => {
+      let comparison = 0;
+
+      switch (preferences.sortBy) {
+        case 'name':
+          comparison = `${a.firstName} ${a.lastName}`.localeCompare(
+            `${b.firstName} ${b.lastName}`
+          );
+          break;
+        case 'updated':
+          comparison = b.daysSinceLastContact - a.daysSinceLastContact;
+          break;
+        case 'list': {
+          const listA = a.list?.name || 'No List';
+          const listB = b.list?.name || 'No List';
+          comparison = listA.localeCompare(listB);
+          break;
+        }
+        default:
+          comparison = `${a.firstName} ${a.lastName}`.localeCompare(
+            `${b.firstName} ${b.lastName}`
+          );
+      }
+
+      return preferences.sortOrder === 'asc' ? comparison : -comparison;
+    };
+
+    return [...overdueContacts].sort(sortFunction);
+  }, [overdueContacts, preferences]);
+
   if (loading) {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <div className="text-gray-500">Loading dashboard...</div>
+          <LoadingSpinner size="lg" text="Loading dashboard..." />
         </div>
       </Layout>
     );
@@ -377,7 +411,7 @@ export const Dashboard: React.FC = () => {
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div
-            onClick={() => navigate('/contacts')}
+            onClick={() => navigate(routes.contacts.index)}
             className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer"
           >
             <div className="flex items-center">
@@ -404,7 +438,7 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <div
-            onClick={() => navigate('/contacts?filter=overdue')}
+            onClick={() => navigate(routes.contacts.overdue)}
             className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer"
           >
             <div className="flex items-center">
@@ -431,7 +465,7 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <div
-            onClick={() => navigate('/lists')}
+            onClick={() => navigate(routes.lists.index)}
             className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer"
           >
             <div className="flex items-center">
@@ -470,28 +504,36 @@ export const Dashboard: React.FC = () => {
                 </span>
               </div>
               <ControlBar
+                view={preferences.view}
+                onViewChange={updateView}
                 grouped={preferences.groupByList}
-                onGroupChange={(grouped) =>
-                  updatePreferences({
-                    ...preferences,
-                    groupByList: grouped,
-                  })
-                }
+                onGroupChange={updateGrouping}
                 showGroupBy={true}
+                sortBy={preferences.sortBy}
+                sortOrder={preferences.sortOrder}
+                onSortChange={updateSort}
+                sortOptions={[
+                  { value: 'name', label: 'Name' },
+                  { value: 'updated', label: 'Days Overdue' },
+                  { value: 'list', label: 'List Name' },
+                ]}
                 title="Overdue Contact Options"
               />
             </div>
             <div className="p-6">
               {preferences.groupByList ? (
                 <GroupedOverdueContacts
-                  overdueContacts={overdueContacts}
+                  overdueContacts={sortedOverdueContacts}
                   onLogContact={setLogContactModal}
                   onContactNow={setSelectedContact}
                   getDaysOverdueColor={getDaysOverdueColor}
                 />
               ) : (
-                <div className="space-y-4">
-                  {overdueContacts.map((contact) => (
+                <div className={preferences.view === 'grid' ? 
+                  'grid grid-cols-1 md:grid-cols-2 gap-4' : 
+                  'space-y-4'
+                }>
+                  {sortedOverdueContacts.map((contact) => (
                     <OverdueContactItem
                       key={contact._id}
                       contact={contact}
@@ -506,25 +548,13 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <svg
-              className="w-16 h-16 text-green-400 mx-auto mb-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">You&apos;re all caught up!</h3>
-            <p className="text-gray-600">
-              No overdue contacts. Keep up the great work staying connected with your friends and
-              family.
-            </p>
+          <div className="bg-white rounded-lg shadow">
+            <EmptyState
+              type="overdue"
+              title="You're all caught up!"
+              description="No overdue contacts. Keep up the great work staying connected with your friends and family."
+              className="p-8"
+            />
           </div>
         )}
 
@@ -539,7 +569,7 @@ export const Dashboard: React.FC = () => {
                 {lists.map((list) => (
                   <div
                     key={list._id}
-                    onClick={() => navigate(`/lists/${list._id}`)}
+                    onClick={() => navigate(routes.lists.view(list._id!))}
                     className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer"
                   >
                     <div className="flex items-center justify-between mb-2">

@@ -11,6 +11,9 @@ import { Lists } from './pages/Lists';
 import { Settings } from './pages/Settings';
 import { DemoModeProvider, DemoBanner } from './features/demo/DemoMode';
 import { GuidedTour } from './features/demo/GuidedTour';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { ToastContainer, useToast } from './components/common/Toast';
+import { LoadingSpinner } from './components/common/LoadingSpinner';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -18,10 +21,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <div className="text-gray-600">Checking authentication...</div>
-        </div>
+        <LoadingSpinner size="lg" text="Checking authentication..." />
       </div>
     );
   }
@@ -31,65 +31,69 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 function App() {
   const { checkAuth } = useAuth();
+  const { toasts, removeToast } = useToast();
 
   useEffect(() => {
     checkAuth();
   }, []); // Empty dependency array - checkAuth should only run on mount
 
   return (
-    <DemoModeProvider>
-      <Router>
-        <DemoBanner />
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<RegisterForm />} />
-          <Route path="/forgot-password" element={<ForgotPasswordForm />} />
-          <Route path="/reset-password" element={<ResetPasswordForm />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/contacts"
-            element={
-              <ProtectedRoute>
-                <Contacts />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/lists"
-            element={
-              <ProtectedRoute>
-                <Lists />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/lists/:listId"
-            element={
-              <ProtectedRoute>
-                <Contacts />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-        </Routes>
-        <GuidedTour />
-      </Router>
-    </DemoModeProvider>
+    <ErrorBoundary>
+      <DemoModeProvider>
+        <Router>
+          <DemoBanner />
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<RegisterForm />} />
+            <Route path="/forgot-password" element={<ForgotPasswordForm />} />
+            <Route path="/reset-password" element={<ResetPasswordForm />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/contacts"
+              element={
+                <ProtectedRoute>
+                  <Contacts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/lists"
+              element={
+                <ProtectedRoute>
+                  <Lists />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/lists/:listId"
+              element={
+                <ProtectedRoute>
+                  <Contacts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+          </Routes>
+          <GuidedTour />
+          <ToastContainer toasts={toasts} onClose={removeToast} />
+        </Router>
+      </DemoModeProvider>
+    </ErrorBoundary>
   );
 }
 
