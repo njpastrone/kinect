@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0-jammy
+    container_name: kinect-db
+    restart: unless-stopped
+    volumes:
+      - ./data/db:/data/db
+      - ./backups:/backups
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    environment:
+      - MONGO_INITDB_DATABASE=kinect
+    networks:
+      - kinect-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/kinect --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # Backend API
+  backend:
+    build: 
+      context: .
+      dockerfile: ./backend/Dockerfile.selfhosted
+    container_name: kinect-api
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - MONGODB_URI=mongodb://mongodb:27017/kinect
+      - JWT_SECRET=${JWT_SECRET:-$(openssl rand -base64 32)}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-$(openssl rand -base64 32)}
+      - DATA_ENCRYPTION_KEY=${DATA_ENCRYPTION_KEY:-$(openssl rand -base64 32)}
+      - SELF_HOSTED=true
+      - ENABLE_TELEMETRY=false
+      - ENABLE_ANALYTICS=false
+      - ALLOW_REGISTRATION=${ALLOW_REGISTRATION:-true}
+      - CORS_ORIGIN=http://localhost:3000,http://kinect.local
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - kinect-network
+    volumes:
+      - ./config:/app/config
+      - ./imports:/app/imports
+      - ./exports:/app/exports
+      - ./backups:/app/backups
+
+  # Frontend Web Application
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend-web/Dockerfile.selfhosted
+      args:
+        - VITE_API_URL=/api
+        - VITE_SELF_HOSTED=true
+    container_name: kinect-web
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      - backend
+    networks:
+      - kinect-network
+    environment:
+      - NGINX_HOST=${NGINX_HOST:-localhost}
+      - NGINX_PORT=80
+
+  # Optional: Backup service
+  backup:
+    image: mongo:7.0-jammy
+    container_name: kinect-backup
+    profiles: ["backup"]
+    volumes:
+      - ./backups:/backups
+      - ./scripts/backup.sh:/backup.sh:ro
+    networks:
+      - kinect-network
+    entrypoint: ["/bin/bash", "/backup.sh"]
+    depends_on:
+      - mongodb
+
+  # Optional: Auto-updater using Watchtower
+  watchtower:
+    image: containrrr/watchtower
+    container_name: kinect-updater
+    profiles: ["auto-update"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --schedule "0 0 3 * * *" --cleanup kinect-web kinect-api
+    restart: unless-stopped
+
+networks:
+  kinect-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  mongodb-data:
+    driver: local
+  config-data:
+    driver: local
+  import-data:
+    driver: local
+  export-data:
+    driver: local
+  backup-data:
+    driver: local
