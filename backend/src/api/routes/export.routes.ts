@@ -213,9 +213,9 @@ router.post('/preview', authenticate, async (req: AuthRequest, res) => {
     const userId = req.userId!;
     
     // Get user's contacts and lists for preview
-    const Contact = require('../../models/Contact.model').Contact;
-    const ContactList = require('../../models/ContactList.model').ContactList;
-    const User = require('../../models/User.model').User;
+    const { Contact } = await import('../../models/Contact.model');
+    const { ContactList } = await import('../../models/ContactList.model');
+    const { User } = await import('../../models/User.model');
     
     const [user, contacts, lists] = await Promise.all([
       User.findById(userId),
