@@ -46,7 +46,6 @@ services:
     networks:
       - kinect-network
     volumes:
-      - ./config:/app/config
       - ./imports:/app/imports
       - ./exports:/app/exports
       - ./backups:/app/backups

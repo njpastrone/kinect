@@ -3,19 +3,25 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
+# Copy all package.json files first for better caching
 COPY package*.json ./
-COPY ../shared/package*.json ../shared/
+COPY shared/package*.json ./shared/
+COPY backend/package*.json ./backend/
+COPY frontend-web/package*.json ./frontend-web/
 
-# Install dependencies
-RUN npm ci --only=production
+# Install all dependencies at the root level (monorepo)
+ENV HUSKY=0
+RUN npm install
 
-# Copy source code
-COPY . .
-COPY ../shared ../shared
+# Copy all source code
+COPY shared ./shared/
+COPY backend ./backend/
 
-# Build TypeScript
-RUN npm run build
+# Build shared package
+RUN cd shared && npm run build
+
+# Build backend
+RUN cd backend && npm run build
 
 # Production stage
 FROM node:18-alpine
@@ -29,21 +35,22 @@ RUN apk add --no-cache dumb-init
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
-# Copy built application
-COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
-COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
+# Copy files directly preserving structure  
+COPY --from=builder --chown=nodejs:nodejs /app/backend/dist/ /app/
+COPY --from=builder --chown=nodejs:nodejs /app/shared/dist ./shared/
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules/
+COPY --from=builder --chown=nodejs:nodejs /app/backend/package*.json ./
 
-# Create necessary directories
-RUN mkdir -p /app/config /app/imports /app/exports /app/backups && \
+# Create necessary directories (don't create config - it's copied above)
+RUN mkdir -p imports exports backups && \
     chown -R nodejs:nodejs /app
 
 # Switch to non-root user
 USER nodejs
 
-# Health check with better error handling
+# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3001/api/health', (r) => {let d='';r.on('data',c=>d+=c);r.on('end',()=>{try{const j=JSON.parse(d);process.exit(j.status==='healthy'?0:1)}catch{process.exit(1)}})}).on('error',()=>process.exit(1))"
+    CMD node -e "require('http').get('http://localhost:3001/health', (r) => {let d='';r.on('data',c=>d+=c);r.on('end',()=>{try{const j=JSON.parse(d);process.exit(j.status==='OK'?0:1)}catch{process.exit(1)}})}).on('error',()=>process.exit(1))"
 
 # Expose port
 EXPOSE 3001
@@ -51,5 +58,5 @@ EXPOSE 3001
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 
-# Start application
-CMD ["node", "dist/app.js"]
+# Quick debug then start
+CMD ["sh", "-c", "echo 'Config check:' && ls -la /app/config/ && echo 'Starting app...' && node app.js"]
