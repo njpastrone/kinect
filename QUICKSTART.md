@@ -1,14 +1,26 @@
-# Kinect Self-Hosted - 5 Minute Setup
+# Kinect Self-Hosted - Local Setup Guide
 
-Get your private relationship manager running in minutes, not hours.
+Get your private relationship manager running locally from source.
 
-## 🚀 One-Line Install
+> **⚠️ Note**: This is a local development setup. Automated deployment infrastructure is planned but not yet available.
+
+## 🚀 Quick Local Setup
+
+**Prerequisites**: Node.js 18+, Docker, Git
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/kinect/self-hosted/main/install.sh | bash
+# Clone the repository
+git clone <your-kinect-repo-url>
+cd kinect
+
+# Install dependencies
+npm run install:all
+
+# Start with Docker Compose (recommended)
+docker compose -f docker-compose.selfhosted.yml up -d
 ```
 
-**That's it!** Open [http://localhost:3000](http://localhost:3000) in your browser.
+**Access at**: [http://localhost:3000](http://localhost:3000)
 
 ---
 
@@ -21,24 +33,39 @@ curl -sSL https://raw.githubusercontent.com/kinect/self-hosted/main/install.sh |
 
 ---
 
-## ⚡ Quick Start Steps
+## ⚡ Local Setup Steps
 
-### 1. Install & Start (2 minutes)
+### 1. Clone & Install (2 minutes)
 ```bash
-# Download and run installer
-curl -sSL https://get.kinect.app | bash
+# Clone repository
+git clone <your-kinect-repo-url>
+cd kinect
 
-# Or with Docker directly
-docker run -d -p 3000:3000 -v kinect-data:/data kinect/self-hosted
+# Install all workspace dependencies
+npm install
+
+# Or install individual workspaces
+cd backend && npm install
+cd ../frontend-web && npm install
+cd ../shared && npm install
 ```
 
-### 2. Setup Account (1 minute)
+### 2. Start Services (1 minute)
+```bash
+# Option A: Docker Compose (Recommended)
+docker compose -f docker-compose.selfhosted.yml up -d
+
+# Option B: Development mode
+npm run dev:all
+```
+
+### 3. Setup Account (1 minute)
 1. Go to [http://localhost:3000](http://localhost:3000)
 2. Follow the setup wizard
 3. Create your admin account
 4. Configure preferences (optional)
 
-### 3. Add Contacts (2 minutes)
+### 4. Add Contacts (2 minutes)
 Choose your method:
 
 **📁 Import File** (fastest)
@@ -105,14 +132,14 @@ Choose your method:
 ```bash
 cd kinect
 ./scripts/backup.sh
-# Creates encrypted backup in ./backups/
+# Creates backup in ./backups/
 ```
 
-### Update Kinect
+### Import Contacts (Python Script)
 ```bash
 cd kinect
-./scripts/update.sh
-# Updates to latest version safely
+python3 scripts/import-contacts.py your-contacts.csv
+# Supports CSV, vCard, and JSON formats
 ```
 
 ---
@@ -142,14 +169,18 @@ FRONTEND_PORT=3001 ./install.sh
 
 ### Validation
 ```bash
-# Check if everything is working
+# Check if everything is working (if using Docker)
 ./scripts/validate-install.sh
 ```
 
 ### Get Logs
 ```bash
-# See what's happening
-docker-compose -f docker-compose.selfhosted.yml logs -f
+# Docker logs
+docker compose -f docker-compose.selfhosted.yml logs -f
+
+# Development logs
+npm run dev:backend  # Backend logs
+npm run dev:frontend # Frontend logs
 ```
 
 ---
@@ -158,10 +189,10 @@ docker-compose -f docker-compose.selfhosted.yml logs -f
 
 | Issue Type | Where to Get Help |
 |------------|-------------------|
-| **Setup Problems** | [GitHub Issues](https://github.com/kinect/self-hosted/issues) |
-| **Feature Questions** | [Documentation Wiki](https://github.com/kinect/self-hosted/wiki) |
-| **General Discussion** | [GitHub Discussions](https://github.com/kinect/self-hosted/discussions) |
-| **Security Issues** | security@kinect.app |
+| **Setup Problems** | Check logs, review documentation |
+| **Feature Questions** | Review CLAUDE.md and README.md |
+| **General Discussion** | Create GitHub issues in your repo |
+| **Security Issues** | Review SELFHOSTED-DEPLOYMENT.md |
 
 ---
 
@@ -228,10 +259,10 @@ docker-compose -f docker-compose.selfhosted.yml logs -f
 
 ### From Cloud Services
 ```bash
-# Export from existing service
-# Import to Kinect using setup wizard
-# Validate data integrity
-# Cancel old service
+# Export data from existing service (Google, iCloud, etc.)
+# Use Python import script: python3 scripts/import-contacts.py exported-file.csv
+# Validate data integrity through web interface
+# Clean up old service data if satisfied
 ```
 
 ### To Other Systems
@@ -253,4 +284,4 @@ Your private relationship manager is ready. Start building stronger connections 
 
 *Made with ❤️ for privacy-conscious people who value relationships*
 
-**Questions?** Open an issue on [GitHub](https://github.com/kinect/self-hosted) or check the [full documentation](SELFHOSTED-DEPLOYMENT.md).
+**Questions?** Check the documentation files in your repository or create GitHub issues for support.

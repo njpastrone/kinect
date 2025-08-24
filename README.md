@@ -96,11 +96,17 @@ kinect/
 
 ## Getting Started
 
+### Quick Options
+
+**🚀 Self-Hosted Deployment**: See [QUICKSTART.md](QUICKSTART.md) for Docker-based setup
+**🛠️ Development Setup**: Continue below for local development
+
 ### Prerequisites
 
 - Node.js 18+
 - MongoDB (local or Atlas)
 - npm or yarn
+- Docker (for self-hosted deployment)
 
 ### Installation
 

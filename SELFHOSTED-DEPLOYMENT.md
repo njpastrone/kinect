@@ -10,16 +10,31 @@ Kinect Self-Hosted is designed with privacy as the core principle:
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Local Development Setup
 
-### One-Line Installation
+> **⚠️ Important**: This guide covers local development setup. Automated deployment infrastructure is planned but not yet available.
+
+### Prerequisites
+- Node.js 18+
+- Docker and Docker Compose
+- Git
+- MongoDB (if running natively)
+
+### Clone and Setup
 
 ```bash
-# Using Docker (Recommended)
-curl -sSL https://raw.githubusercontent.com/kinect/self-hosted/main/install.sh | bash
+# Clone your repository
+git clone <your-kinect-repo-url>
+cd kinect
 
-# Or pull and run directly
-docker run -d -p 3000:3000 -v kinect-data:/data --name kinect kinect/self-hosted:latest
+# Install dependencies
+npm install
+
+# Copy environment template
+cp .env.selfhosted.example .env
+
+# Start with Docker Compose
+docker compose -f docker-compose.selfhosted.yml up -d
 ```
 
 ### Access Your Instance
@@ -31,7 +46,7 @@ Open browser to: `http://localhost:3000`
 
 ### Option 1: Docker Compose (Recommended)
 
-The simplest way to get started with full stack deployment.
+Use the included Docker Compose configuration for local deployment.
 
 ```yaml
 # docker-compose.yml
@@ -95,48 +110,45 @@ networks:
     driver: bridge
 ```
 
-### Option 2: Native Installation
+### Option 2: Native Development
 
-For users who prefer running without Docker:
+For local development without Docker:
 
 ```bash
-# Prerequisites
-- Node.js 18+ 
-- MongoDB 6.0+
-- Git
-
-# Installation steps
-git clone https://github.com/kinect/self-hosted.git
-cd kinect-self-hosted
+# Prerequisites installed: Node.js 18+, MongoDB 6.0+
 
 # Install dependencies
-npm run install:all
+npm install
+cd backend && npm install
+cd ../frontend-web && npm install
+cd ../shared && npm install
 
 # Configure environment
-cp .env.selfhosted.example .env
-nano .env  # Edit configuration
+cp .env.selfhosted.example backend/.env
+# Edit backend/.env with your settings
 
-# Initialize database
-npm run db:init
+# Start MongoDB locally (macOS with Homebrew)
+brew services start mongodb-community
 
-# Start services
-npm run start:selfhosted
+# Start development servers
+npm run dev:all
+# Or separately:
+# npm run dev:backend
+# npm run dev:frontend
 ```
 
-### Option 3: Desktop Application (Electron)
+### Option 3: Build Production Images
 
-Complete desktop experience with native OS integration:
+Build your own Docker images for production deployment:
 
 ```bash
-# Download for your OS
-# macOS
-curl -L https://github.com/kinect/releases/latest/kinect-desktop-mac.dmg
+# Build backend image
+docker build -f backend/Dockerfile.selfhosted -t kinect-backend:local .
 
-# Windows
-curl -L https://github.com/kinect/releases/latest/kinect-desktop-win.exe
+# Build frontend image
+docker build -f frontend-web/Dockerfile.selfhosted -t kinect-frontend:local .
 
-# Linux (AppImage)
-curl -L https://github.com/kinect/releases/latest/kinect-desktop.AppImage
+# Use in custom docker-compose.yml
 ```
 
 ---

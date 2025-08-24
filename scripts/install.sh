@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Kinect Self-Hosted Installation Script
-# This script sets up Kinect with Docker Compose
+# Kinect Self-Hosted Local Installation Script
+# This script sets up Kinect with Docker Compose from local source
 
 set -e
 
@@ -12,9 +12,15 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-INSTALL_DIR="${KINECT_INSTALL_DIR:-$HOME/kinect}"
-REPO_URL="https://github.com/kinect/self-hosted.git"
+INSTALL_DIR="${KINECT_INSTALL_DIR:-$(pwd)}"  # Use current directory by default
 COMPOSE_FILE="docker-compose.selfhosted.yml"
+
+# Note: This script is designed to run from within the Kinect repository
+if [ ! -f "$COMPOSE_FILE" ]; then
+    echo "❌ Error: This script must be run from the Kinect repository root"
+    echo "Make sure $COMPOSE_FILE exists in the current directory"
+    exit 1
+fi
 
 # Functions
 print_header() {
@@ -86,26 +92,16 @@ check_requirements() {
     echo ""
 }
 
-download_kinect() {
-    echo "Downloading Kinect..."
+setup_kinect() {
+    echo "Setting up Kinect from local source..."
     
-    # Create installation directory
-    mkdir -p "$INSTALL_DIR"
-    cd "$INSTALL_DIR"
-    
-    if [ "$USE_GIT" = true ]; then
-        if [ -d ".git" ]; then
-            print_warning "Existing installation found, updating..."
-            git pull origin main
-        else
-            git clone "$REPO_URL" .
-        fi
-    else
-        # Download as archive
-        curl -L https://github.com/kinect/self-hosted/archive/main.tar.gz | tar xz --strip-components=1
+    # We're already in the correct directory (repository root)
+    if [ ! -f "package.json" ]; then
+        print_error "package.json not found. Are you in the Kinect repository root?"
+        exit 1
     fi
     
-    print_success "Kinect downloaded to $INSTALL_DIR"
+    print_success "Kinect source verified in $INSTALL_DIR"
     echo ""
 }
 
@@ -334,7 +330,7 @@ print_completion() {
     echo "Import contacts:"
     echo "  ./scripts/import-contacts.sh <your-contacts.csv>"
     echo ""
-    echo "Documentation: https://github.com/kinect/self-hosted/wiki"
+    echo "Documentation: See SELFHOSTED-DEPLOYMENT.md and QUICKSTART.md"
     echo ""
 }
 
@@ -342,7 +338,7 @@ print_completion() {
 main() {
     print_header
     check_requirements
-    download_kinect
+    setup_kinect
     generate_secrets
     create_directories
     create_helper_scripts
