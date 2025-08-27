@@ -13,7 +13,8 @@ COPY frontend-web/package*.json ./frontend-web/
 ENV HUSKY=0
 RUN npm install
 
-# Copy all source code
+# Copy TypeScript config and source code
+COPY tsconfig.base.json ./
 COPY shared ./shared/
 COPY backend ./backend/
 
@@ -37,12 +38,17 @@ RUN addgroup -g 1001 -S nodejs && \
 
 # Copy files directly preserving structure  
 COPY --from=builder --chown=nodejs:nodejs /app/backend/dist/ /app/
-COPY --from=builder --chown=nodejs:nodejs /app/shared/dist ./shared/
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules/
 COPY --from=builder --chown=nodejs:nodejs /app/backend/package*.json ./
 
-# Create necessary directories (don't create config - it's copied above)
-RUN mkdir -p imports exports backups && \
+# Copy shared module to correct location in node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/shared/package.json ./node_modules/@kinect/shared/package.json
+COPY --from=builder --chown=nodejs:nodejs /app/shared/dist/ ./node_modules/@kinect/shared/dist/
+# Create the main entry point that the package.json expects
+COPY --from=builder --chown=nodejs:nodejs /app/shared/dist/cjs/index.js ./node_modules/@kinect/shared/index.js
+
+# Create necessary directories
+RUN mkdir -p imports exports backups config && \
     chown -R nodejs:nodejs /app
 
 # Switch to non-root user
@@ -58,5 +64,5 @@ EXPOSE 3001
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 
-# Quick debug then start
-CMD ["sh", "-c", "echo 'Config check:' && ls -la /app/config/ && echo 'Starting app...' && node app.js"]
+# Start the application  
+CMD ["node", "backend/src/app.js"]

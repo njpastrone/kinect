@@ -3,12 +3,15 @@
   "compilerOptions": {
     "module": "esnext",
     "moduleResolution": "bundler",
-    "outDir": "./dist",
+    "outDir": "./dist/esm",
     "rootDir": "./src",
     "strict": true,
     "noEmit": false,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {},
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
