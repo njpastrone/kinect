@@ -12,7 +12,8 @@
     "clean": "rimraf dist",
     "seed": "ts-node src/scripts/seed.ts",
     "reset": "ts-node src/scripts/reset.ts reset",
-    "reset-and-seed": "ts-node src/scripts/reset.ts reset-and-seed"
+    "reset-and-seed": "ts-node src/scripts/reset.ts reset-and-seed",
+    "migrate:categories": "ts-node src/scripts/migrate-categories-to-lists.ts"
   },
   "dependencies": {
     "@kinect/shared": "^1.0.0",

@@ -116,7 +116,7 @@ test.describe('Contact Management', () => {
     // Contact cards should show essential info
     const firstContact = page.locator('[data-testid="contact-card"]').first();
     await expect(firstContact.locator('[data-testid="contact-name"]')).toBeVisible();
-    await expect(firstContact.locator('[data-testid="contact-category"]')).toBeVisible();
+    await expect(firstContact.locator('[data-testid="contact-list"]')).toBeVisible();
     await expect(firstContact.locator('[data-testid="reminder-badge"]')).toBeVisible();
   });
 
@@ -129,7 +129,7 @@ test.describe('Contact Management', () => {
     await page.fill('[data-testid="last-name-input"]', 'Doe');
     await page.fill('[data-testid="phone-input"]', '+1-555-TEST');
     await page.fill('[data-testid="email-input"]', 'john.doe@test.com');
-    await page.selectOption('[data-testid="category-select"]', 'FRIEND');
+    await page.selectOption('[data-testid="list-select"]', 'Friends');
     await page.fill('[data-testid="notes-input"]', 'Test contact from E2E test');
 
     // Save contact
@@ -252,18 +252,18 @@ test.describe('Search and Filtering', () => {
     );
   });
 
-  test('should filter by contact category', async ({ page }) => {
-    // Select category filter
-    await page.selectOption('[data-testid="category-filter"]', 'BEST_FRIEND');
+  test('should filter by contact list', async ({ page }) => {
+    // Select list filter
+    await page.selectOption('[data-testid="list-filter"]', 'Best Friends');
 
-    // Should only show best friends
+    // Should only show contacts from Best Friends list
     const visibleContacts = page.locator('[data-testid="contact-card"]:visible');
-    const categoryBadges = visibleContacts.locator('[data-testid="contact-category"]');
+    const listBadges = visibleContacts.locator('[data-testid="contact-list"]');
 
-    // All visible contacts should be best friends
-    const count = await categoryBadges.count();
+    // All visible contacts should be in Best Friends list
+    const count = await listBadges.count();
     for (let i = 0; i < count; i++) {
-      await expect(categoryBadges.nth(i)).toContainText('Best Friend');
+      await expect(listBadges.nth(i)).toContainText('Best Friends');
     }
   });
 });

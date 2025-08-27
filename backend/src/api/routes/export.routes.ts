@@ -239,9 +239,14 @@ router.post('/preview', authenticate, async (req: AuthRequest, res) => {
 
     const contactsWithNotes = contacts.filter((c: any) => c.notes && c.notes.trim());
     const contactsWithHistory = contacts.filter((c: any) => c.communicationLog && c.communicationLog.length > 0);
-    const categoryCounts = contacts.reduce((acc: any, contact: any) => {
-      const category = contact.category || 'Uncategorized';
-      acc[category] = (acc[category] || 0) + 1;
+    const listCounts = contacts.reduce((acc: any, contact: any) => {
+      if (contact.listId) {
+        const list = lists.find((l: any) => l._id?.toString() === contact.listId);
+        const listName = list?.name || 'Unknown List';
+        acc[listName] = (acc[listName] || 0) + 1;
+      } else {
+        acc['No List'] = (acc['No List'] || 0) + 1;
+      }
       return acc;
     }, {});
 
@@ -251,7 +256,7 @@ router.post('/preview', authenticate, async (req: AuthRequest, res) => {
         totalLists: lists.length,
         contactsWithNotes: contactsWithNotes.length,
         contactsWithHistory: contactsWithHistory.length,
-        categoryCounts,
+        listCounts,
         estimatedFileSize: estimateFileSize(contacts, lists, options),
         dataIncluded: {
           personalNotes: options.includePersonalNotes ? contactsWithNotes.length : 0,
@@ -264,7 +269,13 @@ router.post('/preview', authenticate, async (req: AuthRequest, res) => {
           emailCount: (contact.emails || []).length,
           hasNotes: !!(contact.notes && contact.notes.trim()),
           hasHistory: !!(contact.communicationLog && contact.communicationLog.length > 0),
-          category: contact.category,
+          listName: (() => {
+            if (contact.listId) {
+              const list = lists.find((l: any) => l._id?.toString() === contact.listId);
+              return list?.name || 'Unknown List';
+            }
+            return 'No List';
+          })(),
         })),
       },
     });

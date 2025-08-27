@@ -58,7 +58,7 @@ export const DEMO_NOTIFICATIONS = [
   {
     title: 'Contact Added',
     message:
-      "Great! You've added a new contact. Kinect will remind you to stay in touch based on their category.",
+      "Great! You've added a new contact. Kinect will remind you to stay in touch based on their list settings.",
     type: 'success' as const,
   },
   {

@@ -2,7 +2,6 @@ import cron from 'node-cron';
 import { User } from '../models/User.model';
 import { Contact } from '../models/Contact.model';
 import { emailService } from './email.service';
-import { ContactCategory } from '@kinect/shared';
 
 interface OverdueContact {
   name: string;
@@ -174,17 +173,8 @@ class NotificationService {
       return (contact.listId as any).reminderDays;
     }
 
-    // Default based on category
-    switch (contact.category) {
-      case ContactCategory.BEST_FRIEND:
-        return 30;
-      case ContactCategory.FRIEND:
-        return 90;
-      case ContactCategory.ACQUAINTANCE:
-        return 180;
-      default:
-        return 90;
-    }
+    // Default fallback
+    return 90;
   }
 
   private getUserPreferences(_user: any): UserNotificationPreferences {

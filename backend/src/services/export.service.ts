@@ -134,7 +134,6 @@ export class ExportService {
         phones: contact.phones || [],
         emails: contact.emails || [],
         birthday: contact.birthday,
-        category: contact.category,
         lastContactDate: contact.lastContactDate,
         notes: options.includePersonalNotes ? contact.notes : undefined,
         lists: contact.lists || [],
@@ -155,7 +154,7 @@ export class ExportService {
       statistics: {
         totalContacts: contacts.length,
         totalLists: lists.length,
-        contactsByCategory: this.getContactsByCategory(contacts),
+        contactsByList: this.getContactsByList(contacts, lists),
         recentActivity: this.getRecentActivity(contacts),
       },
     };
@@ -184,7 +183,6 @@ export class ExportService {
       'Primary Email',
       'Secondary Email',
       'Birthday',
-      'Category',
       'Last Contact Date',
       'Days Since Contact',
       'Notes',
@@ -206,7 +204,6 @@ export class ExportService {
         this.escapeCsvField(emails[0] || ''),
         this.escapeCsvField(emails[1] || ''),
         contact.birthday ? contact.birthday.toISOString().split('T')[0] : '',
-        this.escapeCsvField(contact.category || ''),
         contact.lastContactDate ? contact.lastContactDate.toISOString().split('T')[0] : '',
         daysSinceContact,
         options.includePersonalNotes ? this.escapeCsvField(contact.notes || '') : '',
@@ -275,8 +272,9 @@ export class ExportService {
       }
 
       // Categories
-      if (contact.category) {
-        lines.push(`CATEGORIES:${contact.category}`);
+      // Add list information if available
+      if (contact.lists && contact.lists.length > 0) {
+        lines.push(`CATEGORIES:${contact.lists.join(',')}`);
       }
 
       lines.push('END:VCARD');
@@ -439,13 +437,27 @@ For help importing this data, see: https://github.com/kinect/self-hosted/wiki/da
     return value;
   }
 
-  private getContactsByCategory(contacts: any[]): Record<string, number> {
-    const categories: Record<string, number> = {};
-    contacts.forEach(contact => {
-      const category = contact.category || 'Uncategorized';
-      categories[category] = (categories[category] || 0) + 1;
+  private getContactsByList(contacts: any[], lists: any[]): Record<string, number> {
+    const listCounts: Record<string, number> = {};
+    
+    // Initialize with all list names
+    lists.forEach(list => {
+      listCounts[list.name] = 0;
     });
-    return categories;
+    
+    // Count contacts per list
+    contacts.forEach(contact => {
+      if (contact.listId) {
+        const list = lists.find(l => l._id?.toString() === contact.listId);
+        if (list && list.name) {
+          listCounts[list.name] = (listCounts[list.name] || 0) + 1;
+        }
+      } else {
+        listCounts['No List'] = (listCounts['No List'] || 0) + 1;
+      }
+    });
+    
+    return listCounts;
   }
 
   private getRecentActivity(contacts: any[]): any[] {

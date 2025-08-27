@@ -270,7 +270,7 @@ export class MockPhoneLogService {
 
     // Create communication patterns for each contact
     contacts.forEach((contact) => {
-      const baseFrequency = this.getContactFrequency(contact.category);
+      const baseFrequency = this.getContactFrequency(contact);
       const eventsForContact = Math.floor((days / baseFrequency) * (0.5 + Math.random()));
 
       for (let i = 0; i < eventsForContact; i++) {
@@ -306,19 +306,21 @@ export class MockPhoneLogService {
   }
 
   /**
-   * Gets expected communication frequency based on contact category
+   * Gets expected communication frequency based on contact's reminder interval
    */
-  private getContactFrequency(category: string): number {
-    switch (category) {
-      case 'BEST_FRIEND':
-        return 7; // Weekly
-      case 'FRIEND':
-        return 14; // Bi-weekly
-      case 'ACQUAINTANCE':
-        return 30; // Monthly
-      default:
-        return 21; // Default ~3 weeks
+  private getContactFrequency(contact: any): number {
+    // Use custom reminder days if available
+    if (contact.customReminderDays) {
+      return Math.max(contact.customReminderDays / 3, 3); // Communicate 3x more frequently than reminder
     }
+    
+    // Use list reminder days if available (would need to be populated)
+    if (contact.listReminderDays) {
+      return Math.max(contact.listReminderDays / 3, 3);
+    }
+    
+    // Default frequency based on typical reminder intervals
+    return 14; // Default bi-weekly communication
   }
 
   /**

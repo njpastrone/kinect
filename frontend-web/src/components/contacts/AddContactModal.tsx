@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { IContact, ContactCategory } from '@kinect/shared';
+import { IContact } from '@kinect/shared';
 import { useContacts } from '../../hooks/useContacts';
 import { FormError, FormField, FormErrorSummary } from '../common/FormError';
 import { LoadingButton } from '../common/LoadingButton';
@@ -101,33 +101,38 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
             <FormError error={errors.phoneNumber?.message} />
           </FormField>
 
-          <FormField label="Category" required>
-            <select
-              {...register('category', { required: 'Category is required' })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="">Select category</option>
-              <option value={ContactCategory.BEST_FRIEND}>Best Friend</option>
-              <option value={ContactCategory.FRIEND}>Friend</option>
-              <option value={ContactCategory.ACQUAINTANCE}>Acquaintance</option>
-              <option value={ContactCategory.CUSTOM}>Custom</option>
-            </select>
-            <FormError error={errors.category?.message} />
-          </FormField>
-
-          <FormField label="List (Optional)">
+          <FormField label="List">
             <select
               {...register('listId')}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
-              <option value="">No list</option>
+              <option value="">No list (use default reminders)</option>
               {lists.map((list) => (
                 <option key={list._id} value={list._id}>
-                  {list.name}
+                  {list.name} {list.reminderDays ? `(${list.reminderDays} days)` : ''}
                 </option>
               ))}
             </select>
             <FormError error={errors.listId?.message} />
+          </FormField>
+
+          <FormField label="Custom Reminder Days (Optional)">
+            <input
+              {...register('customReminderDays', { 
+                valueAsNumber: true,
+                min: { value: 1, message: 'Must be at least 1 day' },
+                max: { value: 365, message: 'Must be less than 365 days' }
+              })}
+              type="number"
+              min="1"
+              max="365"
+              placeholder="Override reminder interval (days)"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+            <FormError error={errors.customReminderDays?.message} />
+            <p className="mt-1 text-sm text-gray-500">
+              Leave empty to use list's reminder interval, or 90 days if no list selected
+            </p>
           </FormField>
 
           <FormField label="Notes">

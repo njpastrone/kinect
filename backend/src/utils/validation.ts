@@ -1,6 +1,5 @@
 import Joi from 'joi';
 import { Request, Response, NextFunction } from 'express';
-import { ContactCategory } from '@kinect/shared';
 
 export const authValidation = {
   register: Joi.object({
@@ -36,9 +35,6 @@ export const contactValidation = {
     phoneNumber: Joi.string().allow(''),
     email: Joi.string().email().allow(''),
     birthday: Joi.date().allow(null),
-    category: Joi.string()
-      .valid(...Object.values(ContactCategory))
-      .required(),
     customReminderDays: Joi.number().min(1).max(365),
     listId: Joi.string().allow(null),
     notes: Joi.string().max(1000).allow(''),
@@ -50,7 +46,6 @@ export const contactValidation = {
     phoneNumber: Joi.string().allow(''),
     email: Joi.string().email().allow(''),
     birthday: Joi.date().allow(null),
-    category: Joi.string().valid(...Object.values(ContactCategory)),
     customReminderDays: Joi.number().min(1).max(365),
     listId: Joi.string().allow(null),
     notes: Joi.string().max(1000).allow(''),

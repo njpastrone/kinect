@@ -1,9 +1,8 @@
-export const DEFAULT_REMINDER_INTERVALS = {
-  BEST_FRIEND: 30,
-  FRIEND: 90,
-  ACQUAINTANCE: 180,
-  CUSTOM: 60,
-} as const;
+export const DEFAULT_LISTS = [
+  { name: "Best Friends", reminderDays: 30, color: "#EF4444", description: "Your closest friends" },
+  { name: "Friends", reminderDays: 90, color: "#3B82F6", description: "Regular friends" },
+  { name: "Acquaintances", reminderDays: 180, color: "#6B7280", description: "People you know casually" },
+] as const;
 
 export const API_ENDPOINTS = {
   AUTH: {

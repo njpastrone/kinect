@@ -7,6 +7,7 @@ import { asyncHandler } from '../middleware/error.middleware';
 import { AppError } from '../middleware/error.middleware';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware';
 import { emailService } from '../../services/email.service';
+import { DefaultListsService } from '../../services/defaultLists.service';
 
 const router = Router();
 
@@ -28,7 +29,13 @@ router.post(
       lastName,
     });
 
-    const tokens = AuthService.generateTokens(user._id?.toString() || '');
+    const userId = user._id?.toString() || '';
+    const tokens = AuthService.generateTokens(userId);
+
+    // Create default lists for the new user (don't wait for it to complete)
+    DefaultListsService.createDefaultListsForUser(userId).catch((error) => {
+      console.error('Failed to create default lists:', error);
+    });
 
     // Send welcome email (don't wait for it to complete)
     emailService.sendWelcomeEmail(user.toJSON() as any).catch((error) => {

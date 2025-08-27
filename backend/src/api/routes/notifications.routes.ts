@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import { Contact } from '../../models/Contact.model';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/error.middleware';
-import { DEFAULT_REMINDER_INTERVALS } from '@kinect/shared';
+import { ContactList } from '../../models/ContactList.model';
 import { notificationService } from '../../services/notification.service.simple';
 
 const router = Router();
@@ -12,7 +12,10 @@ router.use(authenticate);
 router.get(
   '/upcoming',
   asyncHandler(async (req: AuthRequest, res: Response) => {
+    // Get contacts with their associated lists
     const contacts = await Contact.find({ userId: req.userId });
+    const lists = await ContactList.find({ userId: req.userId });
+    const listMap = new Map(lists.map(list => [list._id!.toString(), list]));
 
     const now = new Date();
     const upcomingReminders = contacts
@@ -22,20 +25,14 @@ router.get(
           (now.getTime() - new Date(lastContact).getTime()) / (1000 * 60 * 60 * 24)
         );
 
-        let reminderDays: number = DEFAULT_REMINDER_INTERVALS.FRIEND;
-        switch (contact.category) {
-          case 'BEST_FRIEND':
-            reminderDays = DEFAULT_REMINDER_INTERVALS.BEST_FRIEND;
-            break;
-          case 'FRIEND':
-            reminderDays = DEFAULT_REMINDER_INTERVALS.FRIEND;
-            break;
-          case 'ACQUAINTANCE':
-            reminderDays = DEFAULT_REMINDER_INTERVALS.ACQUAINTANCE;
-            break;
-          case 'CUSTOM':
-            reminderDays = contact.customReminderDays || DEFAULT_REMINDER_INTERVALS.CUSTOM;
-            break;
+        // Determine reminder interval: custom > list > default (90 days)
+        let reminderDays = contact.customReminderDays;
+        if (!reminderDays && contact.listId) {
+          const contactList = listMap.get(contact.listId);
+          reminderDays = contactList?.reminderDays;
+        }
+        if (!reminderDays) {
+          reminderDays = 90; // Default reminder interval
         }
 
         const daysOverdue = daysSinceContact - reminderDays;
@@ -61,15 +58,20 @@ router.get(
 router.get(
   '/settings',
   asyncHandler(async (req: AuthRequest, res: Response) => {
+    // Get user's lists for notification settings
+    const lists = await ContactList.find({ userId: req.userId });
+    
     res.json({
       success: true,
       data: {
         userId: req.userId,
-        bestFriendDays: DEFAULT_REMINDER_INTERVALS.BEST_FRIEND,
-        friendDays: DEFAULT_REMINDER_INTERVALS.FRIEND,
-        acquaintanceDays: DEFAULT_REMINDER_INTERVALS.ACQUAINTANCE,
+        lists: lists.map(list => ({
+          _id: list._id,
+          name: list.name,
+          reminderDays: list.reminderDays || 90,
+        })),
         enablePushNotifications: true,
-        enableEmailNotifications: true, // Default to enabled
+        enableEmailNotifications: true,
       },
     });
   })

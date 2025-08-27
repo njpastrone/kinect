@@ -3,7 +3,6 @@ import { User } from '../models/User.model';
 import { Contact } from '../models/Contact.model';
 import { ContactList } from '../models/ContactList.model';
 import { CommunicationLog } from '../models/CommunicationLog.model';
-import { ContactCategory } from '@kinect/shared';
 import connectDB from '../config/database';
 
 interface SeedUser {
@@ -26,7 +25,6 @@ interface SeedContact {
   phoneNumber: string;
   email?: string;
   birthday?: Date;
-  category: ContactCategory;
   listName: string;
   lastContactDaysAgo: number;
   notes?: string;
@@ -73,8 +71,7 @@ const DEMO_CONTACTS: SeedContact[] = [
     lastName: 'Thompson',
     phoneNumber: '+1-555-0101',
     email: 'emma.t@email.com',
-    category: ContactCategory.BEST_FRIEND,
-    listName: 'Best Friends',
+        listName: 'Best Friends',
     lastContactDaysAgo: 15,
     birthday: new Date('1995-03-15'),
     notes: 'Met in college, loves hiking',
@@ -84,8 +81,7 @@ const DEMO_CONTACTS: SeedContact[] = [
     lastName: 'Wilson',
     phoneNumber: '+1-555-0102',
     email: 'j.wilson@email.com',
-    category: ContactCategory.BEST_FRIEND,
-    listName: 'Best Friends',
+        listName: 'Best Friends',
     lastContactDaysAgo: 45, // OVERDUE
     birthday: new Date('1993-08-22'),
     notes: 'Best friend since high school',
@@ -95,8 +91,7 @@ const DEMO_CONTACTS: SeedContact[] = [
     lastName: 'Garcia',
     phoneNumber: '+1-555-0103',
     email: 'lisa.garcia@email.com',
-    category: ContactCategory.BEST_FRIEND,
-    listName: 'Best Friends',
+        listName: 'Best Friends',
     lastContactDaysAgo: 5,
     birthday: new Date('1996-12-03'),
     notes: 'Travel buddy, speaks Spanish',
@@ -108,7 +103,6 @@ const DEMO_CONTACTS: SeedContact[] = [
     lastName: 'Johnson',
     phoneNumber: '+1-555-0201',
     email: 'mom@email.com',
-    category: ContactCategory.FRIEND,
     listName: 'Family',
     lastContactDaysAgo: 3,
     birthday: new Date('1965-05-12'),
@@ -119,7 +113,6 @@ const DEMO_CONTACTS: SeedContact[] = [
     lastName: 'Johnson',
     phoneNumber: '+1-555-0202',
     email: 'dad@email.com',
-    category: ContactCategory.FRIEND,
     listName: 'Family',
     lastContactDaysAgo: 7,
     birthday: new Date('1963-09-28'),
@@ -130,7 +123,6 @@ const DEMO_CONTACTS: SeedContact[] = [
     lastName: 'Johnson',
     phoneNumber: '+1-555-0203',
     email: 'rachel.j@email.com',
-    category: ContactCategory.FRIEND,
     listName: 'Family',
     lastContactDaysAgo: 120, // OVERDUE for friends
     birthday: new Date('1998-01-17'),
@@ -140,7 +132,6 @@ const DEMO_CONTACTS: SeedContact[] = [
     firstName: 'Uncle',
     lastName: 'Bob',
     phoneNumber: '+1-555-0204',
-    category: ContactCategory.ACQUAINTANCE,
     listName: 'Family',
     lastContactDaysAgo: 200, // OVERDUE for acquaintance
     birthday: new Date('1960-07-04'),
@@ -153,7 +144,6 @@ const DEMO_CONTACTS: SeedContact[] = [
     lastName: 'Kumar',
     phoneNumber: '+1-555-0301',
     email: 'dkumar@company.com',
-    category: ContactCategory.FRIEND,
     listName: 'Work',
     lastContactDaysAgo: 30,
     notes: 'Team lead, great mentor',
@@ -164,7 +154,6 @@ const DEMO_CONTACTS: SeedContact[] = [
     lastName: 'Lee',
     phoneNumber: '+1-555-0302',
     email: 'jlee@company.com',
-    category: ContactCategory.ACQUAINTANCE,
     listName: 'Work',
     lastContactDaysAgo: 90,
     notes: 'Project manager, very organized',
@@ -174,7 +163,6 @@ const DEMO_CONTACTS: SeedContact[] = [
     lastName: 'Stevens',
     phoneNumber: '+1-555-0303',
     email: 'mstevens@company.com',
-    category: ContactCategory.ACQUAINTANCE,
     listName: 'Work',
     lastContactDaysAgo: 250, // OVERDUE
     notes: 'Former colleague, now at different company',
@@ -186,7 +174,6 @@ const DEMO_CONTACTS: SeedContact[] = [
     lastName: 'Miller',
     phoneNumber: '+1-555-0401',
     email: 'sophie.m@email.com',
-    category: ContactCategory.FRIEND,
     listName: 'College Friends',
     lastContactDaysAgo: 60,
     birthday: new Date('1994-11-25'),
@@ -197,7 +184,6 @@ const DEMO_CONTACTS: SeedContact[] = [
     lastName: 'Brown',
     phoneNumber: '+1-555-0402',
     email: 'alex.brown@email.com',
-    category: ContactCategory.FRIEND,
     listName: 'College Friends',
     lastContactDaysAgo: 150, // OVERDUE
     birthday: new Date('1995-06-30'),
@@ -208,7 +194,6 @@ const DEMO_CONTACTS: SeedContact[] = [
     lastName: 'Davis',
     phoneNumber: '+1-555-0403',
     email: 'tyler.d@email.com',
-    category: ContactCategory.ACQUAINTANCE,
     listName: 'College Friends',
     lastContactDaysAgo: 365, // Way overdue
     notes: 'Fraternity brother, lives in Seattle',
@@ -219,7 +204,6 @@ const DEMO_CONTACTS: SeedContact[] = [
     firstName: 'Nancy',
     lastName: 'Wong',
     phoneNumber: '+1-555-0501',
-    category: ContactCategory.ACQUAINTANCE,
     listName: 'Neighbors',
     lastContactDaysAgo: 45,
     notes: 'Next door, has two dogs',
@@ -228,7 +212,6 @@ const DEMO_CONTACTS: SeedContact[] = [
     firstName: 'Bill',
     lastName: 'Thompson',
     phoneNumber: '+1-555-0502',
-    category: ContactCategory.ACQUAINTANCE,
     listName: 'Neighbors',
     lastContactDaysAgo: 90,
     notes: 'Across the street, retired teacher',
@@ -240,7 +223,6 @@ const DEMO_CONTACTS: SeedContact[] = [
     lastName: 'Mendez',
     phoneNumber: '+1-555-0601',
     email: 'carlos.m@email.com',
-    category: ContactCategory.FRIEND,
     listName: 'Gym Buddies',
     lastContactDaysAgo: 10,
     notes: 'Workout partner, morning routine',
@@ -250,7 +232,6 @@ const DEMO_CONTACTS: SeedContact[] = [
     lastName: 'Park',
     phoneNumber: '+1-555-0602',
     email: 'jess.park@email.com',
-    category: ContactCategory.FRIEND,
     listName: 'Gym Buddies',
     lastContactDaysAgo: 100, // OVERDUE
     notes: 'Yoga class friend, very zen',

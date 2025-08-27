@@ -1,8 +1,8 @@
 import cron from 'node-cron';
 import { User } from '../models/User.model';
 import { Contact } from '../models/Contact.model';
+import { ContactList } from '../models/ContactList.model';
 import { emailService } from './email.service';
-import { ContactCategory } from '@kinect/shared';
 
 interface OverdueContact {
   name: string;
@@ -77,11 +77,20 @@ class NotificationService {
   private async getOverdueContacts(userId: string): Promise<OverdueContact[]> {
     try {
       const contacts = await Contact.find({ userId });
+      const lists = await ContactList.find({ userId });
       const overdueContacts: OverdueContact[] = [];
+
+      // Create a map of list IDs to reminder days
+      const listReminderMap = new Map<string, number>();
+      lists.forEach(list => {
+        if (list.reminderDays !== undefined) {
+          listReminderMap.set(list._id!.toString(), list.reminderDays);
+        }
+      });
 
       for (const contact of contacts) {
         const daysSinceLastContact = this.getDaysSinceLastContact(contact.lastContactDate);
-        const reminderThreshold = this.getReminderThreshold(contact);
+        const reminderThreshold = await this.getReminderThreshold(contact, listReminderMap);
 
         if (daysSinceLastContact > reminderThreshold) {
           overdueContacts.push({
@@ -111,22 +120,21 @@ class NotificationService {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
-  private getReminderThreshold(contact: any): number {
+  private async getReminderThreshold(contact: any, listReminderMap?: Map<string, number>): Promise<number> {
     if (contact.customReminderDays) {
       return contact.customReminderDays;
     }
 
-    // Default based on category
-    switch (contact.category) {
-      case ContactCategory.BEST_FRIEND:
-        return 30;
-      case ContactCategory.FRIEND:
-        return 90;
-      case ContactCategory.ACQUAINTANCE:
-        return 180;
-      default:
-        return 90;
+    // Use list reminder days if available
+    if (contact.listId && listReminderMap) {
+      const listReminderDays = listReminderMap.get(contact.listId);
+      if (listReminderDays !== undefined) {
+        return listReminderDays;
+      }
     }
+
+    // Default fallback
+    return 90;
   }
 
   private delay(ms: number): Promise<void> {
@@ -166,12 +174,21 @@ class NotificationService {
   }> {
     try {
       const contacts = await Contact.find({ userId });
+      const lists = await ContactList.find({ userId });
       let overdueCount = 0;
       let upcomingCount = 0;
 
+      // Create a map of list IDs to reminder days
+      const listReminderMap = new Map<string, number>();
+      lists.forEach(list => {
+        if (list.reminderDays !== undefined) {
+          listReminderMap.set(list._id!.toString(), list.reminderDays);
+        }
+      });
+
       for (const contact of contacts) {
         const daysSince = this.getDaysSinceLastContact(contact.lastContactDate);
-        const threshold = this.getReminderThreshold(contact);
+        const threshold = await this.getReminderThreshold(contact, listReminderMap);
 
         if (daysSince > threshold) {
           overdueCount++;

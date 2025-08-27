@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import * as cron from 'node-cron';
 import { Contact } from '../models/Contact.model';
+import { ContactList } from '../models/ContactList.model';
 import { User } from '../models/User.model';
 import selfHostedConfig from '../config/selfhosted.config';
 
@@ -73,6 +74,15 @@ export class LocalNotificationService extends EventEmitter {
   private async getOverdueContactsForUser(userId: string): Promise<any[]> {
     const now = new Date();
     const contacts = await Contact.find({ userId });
+    const lists = await ContactList.find({ userId });
+    
+    // Create a map of list IDs to reminder days
+    const listReminderMap = new Map<string, number>();
+    lists.forEach(list => {
+      if (list.reminderDays !== undefined) {
+        listReminderMap.set(list._id!.toString(), list.reminderDays);
+      }
+    });
     
     return contacts.filter(contact => {
       if (!contact.lastContactDate) return false;
@@ -81,29 +91,19 @@ export class LocalNotificationService extends EventEmitter {
         (now.getTime() - contact.lastContactDate.getTime()) / (1000 * 60 * 60 * 24)
       );
       
-      const reminderInterval = this.getReminderInterval(contact.category);
+      // Determine reminder interval: custom > list > default (90 days)
+      let reminderInterval = contact.customReminderDays;
+      if (!reminderInterval && contact.listId) {
+        reminderInterval = listReminderMap.get(contact.listId) || 90;
+      }
+      if (!reminderInterval) {
+        reminderInterval = 90; // Default
+      }
+      
       return daysSinceContact >= reminderInterval;
     });
   }
 
-  /**
-   * Get reminder interval for contact category
-   */
-  private getReminderInterval(category: string): number {
-    const intervals = selfHostedConfig.notifications.defaultIntervals;
-    
-    switch (category.toLowerCase()) {
-      case 'best friend':
-      case 'bestfriend':
-        return intervals[0] || 30; // 30 days
-      case 'friend':
-        return intervals[1] || 90; // 90 days
-      case 'acquaintance':
-        return intervals[2] || 180; // 180 days
-      default:
-        return intervals[1] || 90; // Default to friend interval
-    }
-  }
 
   /**
    * Send a local notification

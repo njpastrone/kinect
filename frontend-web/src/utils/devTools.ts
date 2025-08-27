@@ -1,5 +1,6 @@
 // Developer tools and utilities for testing and debugging
 import React from 'react';
+import { useContacts } from '../hooks/useContacts';
 
 export interface DevToolsState {
   isEnabled: boolean;
@@ -171,21 +172,27 @@ class DevToolsManager {
       'Anderson',
       'Thomas',
     ];
-    const categories = ['BEST_FRIEND', 'FRIEND', 'ACQUAINTANCE'];
+    // Get available lists from the store to assign contacts to
+    const { lists } = useContacts.getState();
+    const availableLists = lists.length > 0 ? lists : [
+      { _id: 'temp1', name: 'Friends' },
+      { _id: 'temp2', name: 'Best Friends' },
+      { _id: 'temp3', name: 'Acquaintances' }
+    ];
 
     const contacts = [];
 
     for (let i = 0; i < count; i++) {
       const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
       const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-      const category = categories[Math.floor(Math.random() * categories.length)];
+      const randomList = availableLists[Math.floor(Math.random() * availableLists.length)];
 
       contacts.push({
         firstName,
         lastName,
         phoneNumber: `+1-555-${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`,
         email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
-        category,
+        listId: randomList._id,
         notes: `Bulk generated contact ${i + 1}`,
       });
     }

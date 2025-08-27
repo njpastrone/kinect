@@ -55,16 +55,24 @@ export const ContactCard: React.FC<ContactCardProps> = ({
     ? Math.floor((Date.now() - new Date(contact.lastContactDate).getTime()) / (1000 * 60 * 60 * 24))
     : null;
 
-  const getCategoryColor = () => {
-    switch (contact.category) {
-      case 'BEST_FRIEND':
-        return 'bg-green-100 text-green-800';
-      case 'FRIEND':
-        return 'bg-blue-100 text-blue-800';
-      case 'ACQUAINTANCE':
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-purple-100 text-purple-800';
+  const getListInfo = () => {
+    const list = lists.find(l => l._id === contact.listId);
+    return list || { name: 'No List', color: '#6B7280' }; // Gray fallback
+  };
+
+  const getListColorClasses = (color?: string) => {
+    // Convert hex color to Tailwind classes or use a mapping
+    if (!color) return 'bg-gray-100 text-gray-800';
+    
+    // Simple color mapping - could be enhanced with a more sophisticated system
+    switch (color.toLowerCase()) {
+      case '#ef4444': return 'bg-red-100 text-red-800';
+      case '#f59e0b': return 'bg-yellow-100 text-yellow-800';
+      case '#3b82f6': return 'bg-blue-100 text-blue-800';
+      case '#10b981': return 'bg-green-100 text-green-800';
+      case '#8b5cf6': return 'bg-purple-100 text-purple-800';
+      case '#f97316': return 'bg-orange-100 text-orange-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -82,9 +90,9 @@ export const ContactCard: React.FC<ContactCardProps> = ({
                       {contact.firstName} {contact.lastName}
                     </h3>
                     <span
-                      className={`inline-block px-2 py-1 text-xs rounded-full ${getCategoryColor()}`}
+                      className={`inline-block px-2 py-1 text-xs rounded-full ${getListColorClasses(getListInfo().color)}`}
                     >
-                      {contact.category.replace('_', ' ')}
+                      {getListInfo().name}
                     </span>
                   </div>
                   <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
@@ -159,9 +167,9 @@ export const ContactCard: React.FC<ContactCardProps> = ({
               {contact.firstName} {contact.lastName}
             </h3>
             <span
-              className={`inline-block px-2 py-1 text-xs rounded-full ${getCategoryColor()} mt-1`}
+              className={`inline-block px-2 py-1 text-xs rounded-full ${getListColorClasses(getListInfo().color)} mt-1`}
             >
-              {contact.category.replace('_', ' ')}
+              {getListInfo().name}
             </span>
           </div>
           <div className="flex flex-col space-y-1">

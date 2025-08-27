@@ -14,10 +14,9 @@ router.use(authenticate);
 router.get(
   '/',
   asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { page = 1, limit = 20, category, listId } = req.query;
+    const { page = 1, limit = 20, listId } = req.query;
 
     const query: Record<string, any> = { userId: req.userId };
-    if (category) query.category = category;
     if (listId) query.listId = listId;
 
     const contacts = await Contact.find(query)

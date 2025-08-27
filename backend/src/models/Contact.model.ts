@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import { IContact, ContactCategory } from '@kinect/shared';
+import { IContact } from '@kinect/shared';
 
 export interface IContactDocument extends Omit<IContact, '_id'>, Document {}
 
@@ -35,12 +35,6 @@ const contactSchema = new Schema<IContactDocument>(
     },
     birthday: {
       type: Date,
-    },
-    category: {
-      type: String,
-      enum: Object.values(ContactCategory),
-      default: ContactCategory.FRIEND,
-      required: true,
     },
     customReminderDays: {
       type: Number,

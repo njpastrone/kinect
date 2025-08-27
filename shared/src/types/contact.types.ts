@@ -1,10 +1,3 @@
-export enum ContactCategory {
-  BEST_FRIEND = 'BEST_FRIEND',
-  FRIEND = 'FRIEND',
-  ACQUAINTANCE = 'ACQUAINTANCE',
-  CUSTOM = 'CUSTOM',
-}
-
 export interface IContact {
   _id?: string;
   userId: string;
@@ -14,7 +7,6 @@ export interface IContact {
   phoneNumber?: string;
   email?: string;
   birthday?: Date;
-  category: ContactCategory;
   customReminderDays?: number;
   lastContactDate?: Date;
   notes?: string;

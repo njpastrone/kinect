@@ -145,21 +145,9 @@ export const isContactOverdue = (contact: IContact, lists: IContactList[]): bool
       reminderDays = contactList?.reminderDays;
     }
 
-    // Fallback to category-based defaults
+    // Default to 90 days if no other interval is set
     if (!reminderDays) {
-      switch (contact.category) {
-        case 'BEST_FRIEND':
-          reminderDays = 30;
-          break;
-        case 'FRIEND':
-          reminderDays = 90;
-          break;
-        case 'ACQUAINTANCE':
-          reminderDays = 180;
-          break;
-        default:
-          reminderDays = 90;
-      }
+      reminderDays = 90;
     }
   }
 
