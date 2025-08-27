@@ -63,12 +63,14 @@ export const listValidation = {
     name: Joi.string().required(),
     description: Joi.string().max(500).allow(''),
     color: Joi.string().pattern(/^#[0-9A-F]{6}$/i),
+    reminderDays: Joi.number().min(1).max(365).optional(),
   }),
 
   update: Joi.object({
     name: Joi.string(),
     description: Joi.string().max(500).allow(''),
     color: Joi.string().pattern(/^#[0-9A-F]{6}$/i),
+    reminderDays: Joi.number().min(1).max(365).optional(),
     contactIds: Joi.array().items(Joi.string()),
   }),
 };

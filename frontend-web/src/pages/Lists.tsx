@@ -1,12 +1,16 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { IContactList } from '@kinect/shared';
 import { ListCard } from '../components/lists/ListCard';
+import { ListForm } from '../components/lists/ListForm';
 import { Layout } from '../components/layout/Layout';
+import { ListsErrorBoundary, FormErrorBoundary } from '../components/common/FeatureErrorBoundary';
 import { ControlBar } from '../components/common/ControlBar';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { EmptyState } from '../components/common/EmptyState';
 import { usePagePreferences } from '../hooks/usePreferences';
+import { useErrorHandler } from '../hooks/useErrorHandler';
 import { routes } from '../utils/navigation';
 import api from '../services/api';
 
@@ -48,6 +52,7 @@ export const Lists: React.FC = () => {
     color: '#3B82F6',
   });
   const [customReminderDays, setCustomReminderDays] = useState<number | null>(null);
+  const handleError = useErrorHandler();
 
   useEffect(() => {
     fetchLists();
@@ -85,10 +90,13 @@ export const Lists: React.FC = () => {
       };
       await api.createList(listData);
       await fetchLists();
+      toast.success('List created successfully');
       setShowCreateModal(false);
       resetForm();
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to create list');
+      const errorMsg = err.response?.data?.error || 'Failed to create list';
+      setError(errorMsg);
+      handleError(err, 'Failed to create list');
     }
   };
 
@@ -103,10 +111,13 @@ export const Lists: React.FC = () => {
       };
       await api.updateList(editingList._id!, listData);
       await fetchLists();
+      toast.success('List updated successfully');
       setShowEditModal(false);
       resetForm();
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to update list');
+      const errorMsg = err.response?.data?.error || 'Failed to update list';
+      setError(errorMsg);
+      handleError(err, 'Failed to update list');
     }
   };
 
@@ -120,8 +131,11 @@ export const Lists: React.FC = () => {
     try {
       await api.deleteList(listId);
       await fetchLists();
+      toast.success('List deleted successfully');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to delete list');
+      const errorMsg = err.response?.data?.error || 'Failed to delete list';
+      setError(errorMsg);
+      handleError(err, 'Failed to delete list');
     }
   };
 
@@ -197,121 +211,25 @@ export const Lists: React.FC = () => {
     updateView(view);
   };
 
-  const ListForm = ({ isEdit = false }: { isEdit?: boolean }) => (
-    <form onSubmit={isEdit ? handleEditList : handleCreateList} className="space-y-4">
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-          List Name *
-        </label>
-        <input
-          type="text"
-          id="name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter list name"
-          required
-        />
-      </div>
+  // Memoized handlers to prevent unnecessary re-renders
+  const handleFormDataChange = useCallback((newFormData: ListFormData) => {
+    setFormData(newFormData);
+  }, []);
 
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-          Description
-        </label>
-        <textarea
-          id="description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Optional description"
-          rows={3}
-        />
-      </div>
+  const handleCustomReminderDaysChange = useCallback((days: number | null) => {
+    setCustomReminderDays(days);
+  }, []);
 
-      <div>
-        <label htmlFor="reminderDays" className="block text-sm font-medium text-gray-700 mb-1">
-          Reminder Interval
-        </label>
-        <select
-          id="reminderDays"
-          value={customReminderDays ? 'custom' : formData.reminderDays}
-          onChange={(e) => {
-            if (e.target.value === 'custom') {
-              setCustomReminderDays(formData.reminderDays);
-            } else {
-              setCustomReminderDays(null);
-              setFormData({ ...formData, reminderDays: Number(e.target.value) });
-            }
-          }}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          {REMINDER_PRESETS.map((preset) => (
-            <option key={preset.value} value={preset.value}>
-              {preset.label} ({preset.value} days)
-            </option>
-          ))}
-          <option value="custom">Custom</option>
-        </select>
-      </div>
+  const handleCreateCancel = useCallback(() => {
+    setShowCreateModal(false);
+    resetForm();
+  }, []);
 
-      {customReminderDays !== null && (
-        <div>
-          <label htmlFor="customDays" className="block text-sm font-medium text-gray-700 mb-1">
-            Custom Days
-          </label>
-          <input
-            type="number"
-            id="customDays"
-            value={customReminderDays}
-            onChange={(e) => setCustomReminderDays(Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            min="1"
-            max="365"
-            required
-          />
-        </div>
-      )}
+  const handleEditCancel = useCallback(() => {
+    setShowEditModal(false);
+    resetForm();
+  }, []);
 
-      <div>
-        <label htmlFor="color" className="block text-sm font-medium text-gray-700 mb-1">
-          Color
-        </label>
-        <div className="flex items-center gap-2">
-          <input
-            type="color"
-            id="color"
-            value={formData.color}
-            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-            className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
-          />
-          <span className="text-sm text-gray-600">{formData.color}</span>
-        </div>
-      </div>
-
-      <div className="flex justify-end gap-3 pt-4">
-        <button
-          type="button"
-          onClick={() => {
-            if (isEdit) {
-              setShowEditModal(false);
-            } else {
-              setShowCreateModal(false);
-            }
-            resetForm();
-          }}
-          className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          {isEdit ? 'Update List' : 'Create List'}
-        </button>
-      </div>
-    </form>
-  );
 
   if (loading) {
     return (
@@ -395,44 +313,66 @@ export const Lists: React.FC = () => {
             onAction={openCreateModal}
           />
         ) : (
-          <div
-            className={
-              viewPreferences.view === 'grid'
-                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-                : 'space-y-4'
-            }
-          >
-            {sortedLists.map((list) => (
-              <ListCard
-                key={list._id}
-                list={list}
-                onEdit={handleEdit}
-                onDelete={handleDeleteList}
-                onViewContacts={handleViewContacts}
-                viewMode={viewPreferences.view}
-              />
-            ))}
-          </div>
+          <ListsErrorBoundary onRetry={() => fetchLists()}>
+            <div
+              className={
+                viewPreferences.view === 'grid'
+                  ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+                  : 'space-y-4'
+              }
+            >
+              {sortedLists.map((list) => (
+                <ListCard
+                  key={list._id}
+                  list={list}
+                  onEdit={handleEdit}
+                  onDelete={handleDeleteList}
+                  onViewContacts={handleViewContacts}
+                  viewMode={viewPreferences.view}
+                />
+              ))}
+            </div>
+          </ListsErrorBoundary>
         )}
 
         {/* Create Modal */}
         {showCreateModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Create New List</h2>
-              <ListForm />
+          <FormErrorBoundary>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Create New List</h2>
+                <ListForm 
+                  isEdit={false}
+                  formData={formData}
+                  setFormData={handleFormDataChange}
+                  customReminderDays={customReminderDays}
+                  setCustomReminderDays={handleCustomReminderDaysChange}
+                  onSubmit={handleCreateList}
+                  onCancel={handleCreateCancel}
+                />
+              </div>
             </div>
-          </div>
+          </FormErrorBoundary>
         )}
 
         {/* Edit Modal */}
         {showEditModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Edit List</h2>
-              <ListForm isEdit />
+          <FormErrorBoundary>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Edit List</h2>
+                <ListForm 
+                  isEdit={true}
+                  formData={formData}
+                  setFormData={handleFormDataChange}
+                  customReminderDays={customReminderDays}
+                  setCustomReminderDays={handleCustomReminderDaysChange}
+                  onSubmit={handleEditList}
+                  onCancel={handleEditCancel}
+                />
+              </div>
             </div>
-          </div>
+          </FormErrorBoundary>
         )}
       </div>
     </Layout>
