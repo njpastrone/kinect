@@ -60,3 +60,24 @@ xcuserdata
 # Docker
 mongodb_data/
 redis_data/
+# Temporary files
+data/
+cookies.txt
+*.log
+debug-*.js
+simple-fix.js
+fix-deployment.sh
+frontend-fix.js
+
+# Generated documentation
+IMMEDIATE_FIX.md
+JAVASCRIPT_ERRORS_SOLUTION.md
+UI_FIX_PLAN.md
+
+# Build artifacts
+shared/src/**/*.js
+shared/src/**/*.js.map
+shared/src/**/*.d.ts
+shared/src/**/*.d.ts.map
+!shared/src/index.js
+!shared/src/index.d.ts
