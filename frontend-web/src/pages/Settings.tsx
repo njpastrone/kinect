@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Layout } from '../components/layout/Layout';
+import { useErrorHandler } from '../hooks/useErrorHandler';
 import api from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 
@@ -7,6 +8,7 @@ export const Settings: React.FC = () => {
   const { user } = useAuth();
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const handleError = useErrorHandler();
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -14,7 +16,7 @@ export const Settings: React.FC = () => {
         const data = await api.getNotificationSettings();
         setSettings(data);
       } catch (error) {
-        console.error('Failed to load settings:', error);
+        handleError(error, 'Failed to load settings');
       } finally {
         setLoading(false);
       }

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { useAuth } from './hooks/useAuth';
 import { Login } from './pages/Login';
 import { RegisterForm } from './components/auth/RegisterForm';
@@ -14,6 +15,7 @@ import { GuidedTour } from './features/demo/GuidedTour';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ToastContainer, useToast } from './components/common/Toast';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
+import './utils/errorReporting'; // Initialize error reporting
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -91,6 +93,26 @@ function App() {
           </Routes>
           <GuidedTour />
           <ToastContainer toasts={toasts} onClose={removeToast} />
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#363636',
+                color: '#fff',
+              },
+              error: {
+                style: {
+                  background: '#ef4444',
+                },
+              },
+              success: {
+                style: {
+                  background: '#10b981',
+                },
+              },
+            }}
+          />
         </Router>
       </DemoModeProvider>
     </ErrorBoundary>

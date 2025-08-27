@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { Layout } from '../components/layout/Layout';
+import { ContactsErrorBoundary, FormErrorBoundary } from '../components/common/FeatureErrorBoundary';
 import { ContactList } from '../components/contacts/ContactList';
 import { GroupedContactList } from '../components/contacts/GroupedContactList';
 import { AddContactModal } from '../components/contacts/AddContactModal';
@@ -16,6 +18,7 @@ import {
   createSortFunction,
   isContactOverdue,
 } from '../utils/grouping';
+import { useErrorHandler } from '../hooks/useErrorHandler';
 import api from '../services/api';
 
 export const Contacts: React.FC = () => {
@@ -26,6 +29,7 @@ export const Contacts: React.FC = () => {
   const [selectedContact, setSelectedContact] = useState<IContact | null>(null);
   const [lists, setLists] = useState<IContactList[]>([]);
   const { preferences, updateView, updateSort, updateGrouping } = usePagePreferences('contacts');
+  const handleError = useErrorHandler();
 
   useEffect(() => {
     fetchContacts();
@@ -37,7 +41,7 @@ export const Contacts: React.FC = () => {
       const listsData = await api.getLists();
       setLists(listsData);
     } catch (error) {
-      console.error('Failed to load lists:', error);
+      handleError(error, 'Failed to load contact lists');
     }
   };
 
@@ -60,9 +64,10 @@ export const Contacts: React.FC = () => {
   const handleDeleteContact = async (contactId: string) => {
     try {
       await api.deleteContact(contactId);
+      toast.success('Contact deleted successfully');
       fetchContacts(); // Refresh the contacts list
     } catch (error) {
-      console.error('Failed to delete contact:', error);
+      handleError(error, 'Failed to delete contact');
       throw error; // Re-throw so the modal can handle the error
     }
   };
@@ -70,9 +75,10 @@ export const Contacts: React.FC = () => {
   const handleUpdateContact = async (contactId: string, updates: Partial<IContact>) => {
     try {
       await api.updateContact(contactId, updates);
+      toast.success('Contact updated successfully');
       fetchContacts(); // Refresh the contacts list
     } catch (error) {
-      console.error('Failed to update contact:', error);
+      handleError(error, 'Failed to update contact');
       throw error; // Re-throw so the modal can handle the error
     }
   };
@@ -226,30 +232,36 @@ export const Contacts: React.FC = () => {
             onAction={searchParams.get('filter') === 'overdue' ? undefined : handleAddContact}
           />
         ) : preferences.groupByList ? (
-          <GroupedContactList
-            groupedContacts={processedContacts as any}
-            lists={lists}
-            onEditContact={handleEditContact}
-            onDeleteContact={handleDeleteContact}
-            onUpdateContact={handleUpdateContact}
-            viewMode={preferences.view}
-          />
+          <ContactsErrorBoundary onRetry={() => fetchContacts()}>
+            <GroupedContactList
+              groupedContacts={processedContacts as any}
+              lists={lists}
+              onEditContact={handleEditContact}
+              onDeleteContact={handleDeleteContact}
+              onUpdateContact={handleUpdateContact}
+              viewMode={preferences.view}
+            />
+          </ContactsErrorBoundary>
         ) : (
-          <ContactList
-            contacts={processedContacts as IContact[]}
-            lists={lists}
-            onEditContact={handleEditContact}
-            onDeleteContact={handleDeleteContact}
-            onUpdateContact={handleUpdateContact}
-            viewMode={preferences.view}
-          />
+          <ContactsErrorBoundary onRetry={() => fetchContacts()}>
+            <ContactList
+              contacts={processedContacts as IContact[]}
+              lists={lists}
+              onEditContact={handleEditContact}
+              onDeleteContact={handleDeleteContact}
+              onUpdateContact={handleUpdateContact}
+              viewMode={preferences.view}
+            />
+          </ContactsErrorBoundary>
         )}
 
-        <AddContactModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          contact={selectedContact}
-        />
+        <FormErrorBoundary>
+          <AddContactModal
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+            contact={selectedContact}
+          />
+        </FormErrorBoundary>
       </div>
     </Layout>
   );

@@ -1,12 +1,15 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { Layout } from '../components/layout/Layout';
+import { DashboardErrorBoundary, FormErrorBoundary } from '../components/common/FeatureErrorBoundary';
 import { ControlBar } from '../components/common/ControlBar';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { EmptyState } from '../components/common/EmptyState';
 import { IContact, IContactList } from '@kinect/shared';
 import { LogContactModal } from '../components/contacts/LogContactModal';
 import { usePagePreferences } from '../hooks/usePreferences';
+import { useErrorHandler } from '../hooks/useErrorHandler';
 import { routes } from '../utils/navigation';
 import api from '../services/api';
 
@@ -151,15 +154,17 @@ const ContactNowModal: React.FC<ContactNowModalProps> = ({ contact, onClose, onC
   const [loading, setLoading] = useState(false);
   const [reminderDate, setReminderDate] = useState('');
   const [notes, setNotes] = useState('');
+  const handleError = useErrorHandler();
 
   const handleMarkAsContacted = async () => {
     try {
       setLoading(true);
       await api.markContactAsContacted(contact._id!);
+      toast.success('Contact marked as contacted');
       onContactMarked();
       onClose();
     } catch (error) {
-      console.error('Failed to mark as contacted:', error);
+      handleError(error, 'Failed to mark contact as contacted');
     } finally {
       setLoading(false);
     }
@@ -171,10 +176,11 @@ const ContactNowModal: React.FC<ContactNowModalProps> = ({ contact, onClose, onC
     try {
       setLoading(true);
       await api.scheduleContactReminder(contact._id!, reminderDate, notes);
+      toast.success('Reminder scheduled successfully');
       onContactMarked();
       onClose();
     } catch (error) {
-      console.error('Failed to schedule reminder:', error);
+      handleError(error, 'Failed to schedule reminder');
     } finally {
       setLoading(false);
     }
@@ -319,6 +325,7 @@ export const Dashboard: React.FC = () => {
   const [selectedContact, setSelectedContact] = useState<OverdueContact | null>(null);
   const [logContactModal, setLogContactModal] = useState<OverdueContact | null>(null);
   const { preferences, updateView, updateSort, updateGrouping } = usePagePreferences('dashboard');
+  const handleError = useErrorHandler();
 
   useEffect(() => {
     loadDashboardData();
@@ -340,7 +347,7 @@ export const Dashboard: React.FC = () => {
       const contactsResponse = await api.getContacts({ limit: 1 });
       setTotalContacts(contactsResponse.totalItems);
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
+      handleError(error, 'Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
@@ -517,33 +524,35 @@ export const Dashboard: React.FC = () => {
               />
             </div>
             <div className="p-6">
-              {preferences.groupByList ? (
-                <GroupedOverdueContacts
-                  overdueContacts={sortedOverdueContacts}
-                  onLogContact={setLogContactModal}
-                  onContactNow={setSelectedContact}
-                  getDaysOverdueColor={getDaysOverdueColor}
-                />
-              ) : (
-                <div
-                  className={
-                    preferences.view === 'grid'
-                      ? 'grid grid-cols-1 md:grid-cols-2 gap-4'
-                      : 'space-y-4'
-                  }
-                >
-                  {sortedOverdueContacts.map((contact) => (
-                    <OverdueContactItem
-                      key={contact._id}
-                      contact={contact}
-                      onLogContact={setLogContactModal}
-                      onContactNow={setSelectedContact}
-                      getDaysOverdueColor={getDaysOverdueColor}
-                      showListName={true}
-                    />
-                  ))}
-                </div>
-              )}
+              <DashboardErrorBoundary onRetry={() => loadDashboardData()}>
+                {preferences.groupByList ? (
+                  <GroupedOverdueContacts
+                    overdueContacts={sortedOverdueContacts}
+                    onLogContact={setLogContactModal}
+                    onContactNow={setSelectedContact}
+                    getDaysOverdueColor={getDaysOverdueColor}
+                  />
+                ) : (
+                  <div
+                    className={
+                      preferences.view === 'grid'
+                        ? 'grid grid-cols-1 md:grid-cols-2 gap-4'
+                        : 'space-y-4'
+                    }
+                  >
+                    {sortedOverdueContacts.map((contact) => (
+                      <OverdueContactItem
+                        key={contact._id}
+                        contact={contact}
+                        onLogContact={setLogContactModal}
+                        onContactNow={setSelectedContact}
+                        getDaysOverdueColor={getDaysOverdueColor}
+                        showListName={true}
+                      />
+                    ))}
+                  </div>
+                )}
+              </DashboardErrorBoundary>
             </div>
           </div>
         ) : (
@@ -559,52 +568,58 @@ export const Dashboard: React.FC = () => {
 
         {/* Lists Overview */}
         {lists.length > 0 && (
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">Your Lists</h2>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {lists.map((list) => (
-                  <div
-                    key={list._id}
-                    onClick={() => navigate(routes.lists.view(list._id!))}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium text-gray-900">{list.name}</h3>
-                      {list.overdueCount > 0 && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                          {list.overdueCount} overdue
-                        </span>
-                      )}
+          <DashboardErrorBoundary onRetry={() => loadDashboardData()}>
+            <div className="bg-white rounded-lg shadow">
+              <div className="p-6 border-b border-gray-200">
+                <h2 className="text-xl font-semibold text-gray-900">Your Lists</h2>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {lists.map((list) => (
+                    <div
+                      key={list._id}
+                      onClick={() => navigate(routes.lists.view(list._id!))}
+                      className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-medium text-gray-900">{list.name}</h3>
+                        {list.overdueCount > 0 && (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            {list.overdueCount} overdue
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        {list.contactCount} contact{list.contactCount !== 1 ? 's' : ''}
+                      </p>
                     </div>
-                    <p className="text-sm text-gray-600">
-                      {list.contactCount} contact{list.contactCount !== 1 ? 's' : ''}
-                    </p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          </DashboardErrorBoundary>
         )}
 
         {/* Contact Now Modal */}
         {selectedContact && (
-          <ContactNowModal
-            contact={selectedContact}
-            onClose={() => setSelectedContact(null)}
-            onContactMarked={handleContactMarked}
-          />
+          <FormErrorBoundary>
+            <ContactNowModal
+              contact={selectedContact}
+              onClose={() => setSelectedContact(null)}
+              onContactMarked={handleContactMarked}
+            />
+          </FormErrorBoundary>
         )}
 
         {/* Log Contact Modal */}
         {logContactModal && (
-          <LogContactModal
-            contact={logContactModal}
-            onClose={() => setLogContactModal(null)}
-            onContactLogged={handleContactMarked}
-          />
+          <FormErrorBoundary>
+            <LogContactModal
+              contact={logContactModal}
+              onClose={() => setLogContactModal(null)}
+              onContactLogged={handleContactMarked}
+            />
+          </FormErrorBoundary>
         )}
       </div>
     </Layout>
