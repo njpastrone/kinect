@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { User, Settings, Users, Download, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, Settings, Download, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 
-interface SetupWizardProps {
-  onComplete: () => void;
-}
+interface SetupWizardProps {}
 
 interface SetupStep {
   id: string;
@@ -15,8 +12,7 @@ interface SetupStep {
   isOptional?: boolean;
 }
 
-export const SetupWizard: React.FC<SetupWizardProps> = ({ onComplete }) => {
-  const navigate = useNavigate();
+export const SetupWizard: React.FC<SetupWizardProps> = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
   const [setupData, setSetupData] = useState({
@@ -92,7 +88,7 @@ export const SetupWizard: React.FC<SetupWizardProps> = ({ onComplete }) => {
       title: 'Setup Complete!',
       description: 'You\'re ready to start using Kinect',
       icon: <CheckCircle className="w-8 h-8 text-green-500" />,
-      component: <CompleteStep onComplete={onComplete} />,
+      component: <CompleteStep />,
     },
   ];
 
@@ -490,11 +486,7 @@ const ImportStep: React.FC<ImportStepProps> = ({ data, onChange }) => (
 );
 
 // Complete Step Component
-interface CompleteStepProps {
-  onComplete: () => void;
-}
-
-const CompleteStep: React.FC<CompleteStepProps> = ({ onComplete }) => (
+const CompleteStep: React.FC = () => (
   <div className="text-center space-y-6">
     <div className="text-6xl mb-4">🎉</div>
     <div className="space-y-4">

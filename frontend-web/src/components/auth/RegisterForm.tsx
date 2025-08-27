@@ -1,8 +1,10 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { IRegisterRequest } from '@kinect/shared';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
+import { useErrorHandler } from '../../hooks/useErrorHandler';
 
 export const RegisterForm: React.FC = () => {
   const {
@@ -12,13 +14,15 @@ export const RegisterForm: React.FC = () => {
   } = useForm<IRegisterRequest>();
   const { register: registerUser, error } = useAuth();
   const navigate = useNavigate();
+  const handleError = useErrorHandler();
 
   const onSubmit = async (data: IRegisterRequest) => {
     try {
       await registerUser(data);
+      toast.success('Account created successfully! Welcome to Kinect.');
       navigate('/dashboard');
     } catch (error) {
-      console.error('Registration failed:', error);
+      handleError(error, 'Failed to create account. Please try again.');
     }
   };
 

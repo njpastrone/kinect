@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { IContact } from '@kinect/shared';
 import api from '../../services/api';
+import { FormError, FormField } from '../common/FormError';
+import { LoadingButton } from '../common/LoadingButton';
+import { useErrorHandler } from '../../hooks/useErrorHandler';
+import toast from 'react-hot-toast';
 
 interface LogContactModalProps {
   contact: IContact;
@@ -26,9 +30,12 @@ export const LogContactModal: React.FC<LogContactModalProps> = ({
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState(new Date().toTimeString().split(' ')[0].slice(0, 5));
   const [notes, setNotes] = useState('');
+  const [apiError, setApiError] = useState<string | null>(null);
+  const handleError = useErrorHandler();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setApiError(null);
 
     try {
       setLoading(true);
@@ -43,11 +50,12 @@ export const LogContactModal: React.FC<LogContactModalProps> = ({
         notes: notes.trim() || undefined,
       });
 
+      toast.success('Contact logged successfully');
       onContactLogged();
       onClose();
-    } catch (error) {
-      console.error('Failed to log contact:', error);
-      alert('Failed to log contact. Please try again.');
+    } catch (error: any) {
+      const message = handleError(error, 'Failed to log contact');
+      setApiError(message);
     } finally {
       setLoading(false);
     }
@@ -73,6 +81,7 @@ export const LogContactModal: React.FC<LogContactModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {apiError && <FormError error={apiError} className="mb-4" />}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Contact Method</label>
             <div className="grid grid-cols-2 gap-2">
@@ -95,10 +104,7 @@ export const LogContactModal: React.FC<LogContactModalProps> = ({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
-                Date
-              </label>
+            <FormField label="Date" required>
               <input
                 type="date"
                 id="date"
@@ -108,11 +114,8 @@ export const LogContactModal: React.FC<LogContactModalProps> = ({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
-            </div>
-            <div>
-              <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-1">
-                Time
-              </label>
+            </FormField>
+            <FormField label="Time" required>
               <input
                 type="time"
                 id="time"
@@ -121,13 +124,10 @@ export const LogContactModal: React.FC<LogContactModalProps> = ({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
-            </div>
+            </FormField>
           </div>
 
-          <div>
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
-              Notes (optional)
-            </label>
+          <FormField label="Notes (optional)">
             <textarea
               id="notes"
               value={notes}
@@ -136,7 +136,7 @@ export const LogContactModal: React.FC<LogContactModalProps> = ({
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
+          </FormField>
 
           <div className="flex justify-end gap-3 pt-4">
             <button
@@ -147,13 +147,14 @@ export const LogContactModal: React.FC<LogContactModalProps> = ({
             >
               Cancel
             </button>
-            <button
+            <LoadingButton
               type="submit"
-              disabled={loading}
+              loading={loading}
+              loadingText="Logging..."
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
             >
-              {loading ? 'Logging...' : 'Log Contact'}
-            </button>
+              Log Contact
+            </LoadingButton>
           </div>
         </form>
       </div>

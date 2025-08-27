@@ -1,8 +1,10 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { ILoginRequest } from '@kinect/shared';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
+import { useErrorHandler } from '../../hooks/useErrorHandler';
 
 export const LoginForm: React.FC = () => {
   const {
@@ -12,13 +14,15 @@ export const LoginForm: React.FC = () => {
   } = useForm<ILoginRequest>();
   const { login, error } = useAuth();
   const navigate = useNavigate();
+  const handleError = useErrorHandler();
 
   const onSubmit = async (data: ILoginRequest) => {
     try {
       await login(data);
+      toast.success('Login successful! Welcome back.');
       navigate('/dashboard');
     } catch (error) {
-      console.error('Login failed:', error);
+      handleError(error, 'Failed to sign in. Please check your credentials.');
     }
   };
 

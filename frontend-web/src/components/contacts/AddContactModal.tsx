@@ -1,7 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { IContact, ContactCategory } from '@kinect/shared';
 import { useContacts } from '../../hooks/useContacts';
+import { FormError, FormField, FormErrorSummary } from '../common/FormError';
+import { LoadingButton } from '../common/LoadingButton';
+import { useErrorHandler, extractErrorMessage } from '../../hooks/useErrorHandler';
 
 interface AddContactModalProps {
   isOpen: boolean;
@@ -16,7 +19,9 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
     reset,
     formState: { errors },
   } = useForm<Partial<IContact>>();
-  const { createContact, updateContact, lists, fetchLists } = useContacts();
+  const { createContact, updateContact, lists, fetchLists, isCreating, isUpdating } = useContacts();
+  const [apiError, setApiError] = useState<string | null>(null);
+  const handleError = useErrorHandler();
 
   useEffect(() => {
     if (contact) {
@@ -33,6 +38,7 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
   }, [isOpen, lists.length, fetchLists]);
 
   const onSubmit = async (data: Partial<IContact>) => {
+    setApiError(null);
     try {
       if (contact?._id) {
         await updateContact(contact._id, data);
@@ -43,7 +49,9 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
       onClose();
       reset();
     } catch (error) {
-      console.error('Failed to save contact:', error);
+      const message = extractErrorMessage(error);
+      setApiError(message);
+      handleError(error, contact?._id ? 'Failed to update contact' : 'Failed to create contact');
     }
   };
 
@@ -55,50 +63,45 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
         <h2 className="text-2xl font-bold mb-4">{contact ? 'Edit Contact' : 'Add New Contact'}</h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <FormErrorSummary errors={Object.values(errors).filter(Boolean).map(err => err?.message).filter(Boolean) as string[]} />
+          {apiError && <FormError error={apiError} className="mb-4" />}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">First Name</label>
+            <FormField label="First Name" required>
               <input
                 {...register('firstName', { required: 'First name is required' })}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
-              {errors.firstName && (
-                <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>
-              )}
-            </div>
+              <FormError error={errors.firstName?.message} />
+            </FormField>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Last Name</label>
+            <FormField label="Last Name" required>
               <input
                 {...register('lastName', { required: 'Last name is required' })}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
-              {errors.lastName && (
-                <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>
-              )}
-            </div>
+              <FormError error={errors.lastName?.message} />
+            </FormField>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+          <FormField label="Email">
             <input
               {...register('email')}
               type="email"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
-          </div>
+            <FormError error={errors.email?.message} />
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+          <FormField label="Phone Number">
             <input
               {...register('phoneNumber')}
               type="tel"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
-          </div>
+            <FormError error={errors.phoneNumber?.message} />
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Category</label>
+          <FormField label="Category" required>
             <select
               {...register('category', { required: 'Category is required' })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -109,13 +112,10 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
               <option value={ContactCategory.ACQUAINTANCE}>Acquaintance</option>
               <option value={ContactCategory.CUSTOM}>Custom</option>
             </select>
-            {errors.category && (
-              <p className="text-red-500 text-xs mt-1">{errors.category.message}</p>
-            )}
-          </div>
+            <FormError error={errors.category?.message} />
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">List (Optional)</label>
+          <FormField label="List (Optional)">
             <select
               {...register('listId')}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -127,16 +127,17 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
                 </option>
               ))}
             </select>
-          </div>
+            <FormError error={errors.listId?.message} />
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Notes</label>
+          <FormField label="Notes">
             <textarea
               {...register('notes')}
               rows={3}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
-          </div>
+            <FormError error={errors.notes?.message} />
+          </FormField>
 
           <div className="flex justify-end space-x-2 pt-4">
             <button
@@ -146,12 +147,14 @@ export const AddContactModal: React.FC<AddContactModalProps> = ({ isOpen, onClos
             >
               Cancel
             </button>
-            <button
+            <LoadingButton
               type="submit"
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+              loading={isCreating || isUpdating}
+              loadingText={contact ? 'Updating...' : 'Creating...'}
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
             >
               {contact ? 'Update' : 'Create'}
-            </button>
+            </LoadingButton>
           </div>
         </form>
       </div>

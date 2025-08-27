@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { IContact, IContactList } from '@kinect/shared';
 import { subDays } from 'date-fns';
+import { FormError, FormField } from '../common/FormError';
+import { LoadingButton } from '../common/LoadingButton';
+import { useErrorHandler } from '../../hooks/useErrorHandler';
+import toast from 'react-hot-toast';
 
 interface StatusUpdateModalProps {
   contact: IContact;
@@ -36,6 +40,8 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
   const [notes, setNotes] = useState('');
   const [selectedListId, setSelectedListId] = useState(contact.listId || '');
   const [useCustomDate, setUseCustomDate] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const handleError = useErrorHandler();
 
   const handleQuickAction = async (actionDate: Date) => {
     await handleUpdate(actionDate);
@@ -47,6 +53,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
   };
 
   const handleUpdate = async (lastContactDate: Date) => {
+    setApiError(null);
     try {
       setLoading(true);
 
@@ -68,10 +75,11 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
         });
       }
 
+      toast.success('Contact status updated successfully');
       onClose();
-    } catch (error) {
-      console.error('Failed to update contact status:', error);
-      alert('Failed to update contact. Please try again.');
+    } catch (error: any) {
+      const message = handleError(error, 'Failed to update contact status');
+      setApiError(message);
     } finally {
       setLoading(false);
     }
@@ -96,6 +104,8 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
           </button>
         </div>
 
+        {apiError && <FormError error={apiError} className="mb-4" />}
+        
         <div className="space-y-6">
           {/* Quick Actions */}
           <div>
@@ -133,13 +143,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
             {useCustomDate && (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="customDate"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Date
-                    </label>
+                  <FormField label="Date" required>
                     <input
                       type="date"
                       id="customDate"
@@ -148,14 +152,8 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
                       max={new Date().toISOString().split('T')[0]}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="customTime"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Time
-                    </label>
+                  </FormField>
+                  <FormField label="Time" required>
                     <input
                       type="time"
                       id="customTime"
@@ -163,16 +161,17 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
                       onChange={(e) => setCustomTime(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                  </div>
+                  </FormField>
                 </div>
 
-                <button
+                <LoadingButton
                   onClick={handleCustomUpdate}
-                  disabled={loading}
+                  loading={loading}
+                  loadingText="Updating..."
                   className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
                 >
-                  {loading ? 'Updating...' : 'Update with Custom Date'}
-                </button>
+                  Update with Custom Date
+                </LoadingButton>
               </div>
             )}
           </div>
@@ -201,10 +200,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
 
           {/* List Assignment */}
           {lists.length > 0 && (
-            <div>
-              <label htmlFor="listSelect" className="block text-sm font-medium text-gray-700 mb-2">
-                Assign to List
-              </label>
+            <FormField label="Assign to List">
               <select
                 id="listSelect"
                 value={selectedListId}
@@ -218,14 +214,11 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
                   </option>
                 ))}
               </select>
-            </div>
+            </FormField>
           )}
 
           {/* Notes */}
-          <div>
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-              Notes (optional)
-            </label>
+          <FormField label="Notes (optional)">
             <textarea
               id="notes"
               value={notes}
@@ -234,7 +227,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
+          </FormField>
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
