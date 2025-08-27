@@ -1,23 +1,22 @@
-# Kinect Self-Hosted - Local Setup Guide
+# Kinect Self-Hosted - Quick Start Guide
 
-Get your private relationship manager running locally from source.
+Get your private relationship manager running locally with enhanced error handling and reliability.
 
-> **⚠️ Note**: This is a local development setup. Automated deployment infrastructure is planned but not yet available.
+> **✅ Ready**: Complete self-hosted deployment with advanced error handling and user feedback.
 
 ## 🚀 Quick Local Setup
 
-**Prerequisites**: Node.js 18+, Docker, Git
+**Prerequisites**: Docker and Docker Compose ([get it here](https://docs.docker.com/get-docker/))
 
 ```bash
-# Clone the repository
-git clone <your-kinect-repo-url>
+# Clone or navigate to your Kinect repository
 cd kinect
 
-# Install dependencies
-npm run install:all
-
-# Start with Docker Compose (recommended)
+# Start all services with Docker Compose
 docker compose -f docker-compose.selfhosted.yml up -d
+
+# Wait for services to start (about 30-60 seconds)
+docker compose -f docker-compose.selfhosted.yml ps
 ```
 
 **Access at**: [http://localhost:3000](http://localhost:3000)
@@ -26,66 +25,105 @@ docker compose -f docker-compose.selfhosted.yml up -d
 
 ## 📋 Requirements
 
-- **Docker** installed ([get it here](https://docs.docker.com/get-docker/))
-- **1GB** free disk space
-- **Any modern browser** (Chrome, Firefox, Safari, Edge)
-- **5 minutes** of your time
+- **Docker** and **Docker Compose** ([get it here](https://docs.docker.com/get-docker/))
+- **2GB** free disk space (for Docker images and data)
+- **Modern browser** (Chrome, Firefox, Safari, Edge)
+- **3 minutes** setup time
 
 ---
 
-## ⚡ Local Setup Steps
+## ⚡ Quick Setup Steps
 
-### 1. Clone & Install (2 minutes)
+### 1. Start Services (30-60 seconds)
 ```bash
-# Clone repository
-git clone <your-kinect-repo-url>
+# Navigate to your Kinect directory
 cd kinect
 
-# Install all workspace dependencies
-npm install
-
-# Or install individual workspaces
-cd backend && npm install
-cd ../frontend-web && npm install
-cd ../shared && npm install
-```
-
-### 2. Start Services (1 minute)
-```bash
-# Option A: Docker Compose (Recommended)
+# Start all services (MongoDB, Backend API, Frontend)
 docker compose -f docker-compose.selfhosted.yml up -d
 
-# Option B: Development mode
-npm run dev:all
+# Verify all services are healthy
+docker compose -f docker-compose.selfhosted.yml ps
 ```
 
-### 3. Setup Account (1 minute)
-1. Go to [http://localhost:3000](http://localhost:3000)
-2. Follow the setup wizard
-3. Create your admin account
-4. Configure preferences (optional)
+**Expected output:**
+```
+NAME         STATUS              PORTS
+kinect-db    Up (healthy)        27017/tcp
+kinect-api   Up (healthy)        3001/tcp
+kinect-web   Up (healthy)        0.0.0.0:3000->80/tcp
+```
 
-### 4. Add Contacts (2 minutes)
-Choose your method:
+### 2. Verify Access (30 seconds)
+```bash
+# Test frontend (should return HTTP 200)
+curl -I http://localhost:3000
 
-**📁 Import File** (fastest)
-- Export contacts from your phone/Gmail
-- Drag & drop CSV/vCard file
-- Review and import
+# Test nginx health endpoint
+curl http://localhost:3000/health
 
-**➕ Manual Entry**
-- Click "Add Contact"
-- Enter name and details
-- Assign to categories
+# Test API connectivity (should return auth error)
+curl http://localhost:3000/api/contacts
+```
 
-**📱 Sample Data**
-- Enable during setup
-- Explore features immediately
-- Delete when ready
+### 3. Test Error Handling Features (2 minutes)
+Open [http://localhost:3000](http://localhost:3000) and test these enhanced features:
+
+**✅ Form Validation:**
+1. Click "Add Contact" 
+2. Leave required fields empty and submit
+3. **Expected**: Professional error messages with icons
+
+**✅ Network Error Recovery:**
+1. Create a contact successfully first
+2. Disconnect your internet briefly
+3. Try another operation
+4. **Expected**: "Request failed. Retrying..." toasts with automatic retry
+
+**✅ Error Boundaries:**
+1. Open browser DevTools (F12) → Console
+2. Type: `window.__debugErrors.testError("Test boundary")`
+3. **Expected**: Error boundary shows with retry option
+
+**✅ Development Debug Tools:**
+1. In Console: `window.__debugErrors.showErrors()`
+2. **Expected**: Complete error history display
+3. Try: `window.__debugErrors.downloadErrorReport()`
+4. **Expected**: Downloads comprehensive error report JSON
+
+### 4. Initial Application Setup (2 minutes)
+1. Open [http://localhost:3000](http://localhost:3000)
+2. Click "Register" to create your account
+3. Fill out the registration form
+4. **Expected**: Clear validation feedback and success notifications
+5. Login with your new credentials
+6. Start adding contacts with enhanced form experience
 
 ---
 
-## 🔒 Privacy First
+## 🧪 Testing the Enhanced Error Handling
+
+### **Form Improvements**
+- **Consistent Validation**: All forms show clear error messages with icons
+- **Loading States**: Professional loading buttons with spinners  
+- **Success Feedback**: Toast notifications confirm successful operations
+- **Error Recovery**: Failed operations automatically retry with exponential backoff
+
+### **Network Resilience**  
+- **Automatic Retry**: Failed requests retry up to 3 times automatically
+- **Circuit Breaker**: Prevents cascading failures during outages
+- **Optimistic Updates**: Immediate UI feedback with graceful rollback on errors
+- **Request Deduplication**: Prevents duplicate API calls
+
+### **Development Tools**
+- **Error Boundaries**: React errors caught gracefully with retry options
+- **Debug Console**: Access via `window.__debugErrors` for error analytics  
+- **Error Reports**: Downloadable JSON reports for troubleshooting
+- **Stack Traces**: Detailed error context in development mode
+
+---
+
+## 🔒 Privacy Features
 
 - ✅ **100% Local** - Data never leaves your device
 - ✅ **No Cloud** - No external services required  
@@ -95,193 +133,189 @@ Choose your method:
 
 ---
 
-## 📱 Works Everywhere
-
-| Platform | Method | Notes |
-|----------|--------|-------|
-| **Web Browser** | Direct access | All features available |
-| **Mobile** | Add to home screen | PWA with offline support |
-| **Desktop** | Bookmark/shortcut | Native-like experience |
-| **Local Network** | Share with family | Optional multi-user |
-
----
-
 ## 🔧 Common Tasks
 
 ### Import Contacts
-
 **From iPhone:**
-```bash
-# Export from Contacts app → Share → Save to Files
-# Upload .vcf file to Kinect
-```
+1. Contacts app → Export → Share as vCard
+2. In Kinect: Settings → Import → Upload .vcf file
 
 **From Android:**
-```bash
-# Contacts app → Export → Save as CSV
-# Upload CSV file to Kinect
-```
+1. Contacts app → Export → Save as CSV
+2. In Kinect: Settings → Import → Upload CSV file
 
 **From Google:**
-```bash
-# Google Contacts → Export → Google CSV
-# Upload CSV file to Kinect
-```
+1. Google Contacts → Export → Google CSV
+2. In Kinect: Settings → Import → Upload CSV file
 
 ### Backup Your Data
 ```bash
 cd kinect
-./scripts/backup.sh
-# Creates backup in ./backups/
-```
-
-### Import Contacts (Python Script)
-```bash
-cd kinect
-python3 scripts/import-contacts.py your-contacts.csv
-# Supports CSV, vCard, and JSON formats
+docker compose -f docker-compose.selfhosted.yml exec mongodb mongodump --out /backups
 ```
 
 ---
 
-## 🆘 Need Help?
+## 🆘 Troubleshooting
 
-### Installation Issues
-
-**Docker not found:**
+### Quick Health Check
 ```bash
-# Install Docker first
-curl -fsSL https://get.docker.com | sh
+# 1. Verify all services are running and healthy
+docker compose -f docker-compose.selfhosted.yml ps
+
+# 2. Test frontend access
+curl -I http://localhost:3000
+
+# 3. Test nginx health
+curl http://localhost:3000/health
+
+# 4. Test API proxy (should return auth error, not 404)
+curl http://localhost:3000/api/contacts
+
+# 5. Check for errors in logs
+docker compose -f docker-compose.selfhosted.yml logs --tail=20
 ```
 
-**Permission denied:**
+### Service Issues
+
+**Services not starting:**
 ```bash
-# Add your user to docker group
-sudo usermod -aG docker $USER
-# Log out and back in
+# Check detailed logs
+docker compose -f docker-compose.selfhosted.yml logs
+
+# Rebuild and restart
+docker compose -f docker-compose.selfhosted.yml down
+docker compose -f docker-compose.selfhosted.yml up -d --build
 ```
 
-**Port 3000 in use:**
+**Frontend not accessible:**
 ```bash
-# Use different port
-FRONTEND_PORT=3001 ./install.sh
+# Check frontend container logs
+docker compose -f docker-compose.selfhosted.yml logs frontend
+
+# Restart frontend service  
+docker compose -f docker-compose.selfhosted.yml restart frontend
 ```
 
-### Validation
+**API requests failing:**
 ```bash
-# Check if everything is working (if using Docker)
-./scripts/validate-install.sh
+# Check backend container logs
+docker compose -f docker-compose.selfhosted.yml logs backend
+
+# Verify backend is healthy
+docker compose -f docker-compose.selfhosted.yml ps backend
 ```
 
-### Get Logs
+**Port 3000 already in use:**
 ```bash
-# Docker logs
+# Check what's using the port
+sudo lsof -i :3000
+
+# Stop the conflicting service or change port in docker-compose.selfhosted.yml:
+# ports:
+#   - "3001:80"  # Use port 3001 instead
+```
+
+### Reset Everything (Nuclear Option)
+```bash
+# WARNING: This destroys all data
+docker compose -f docker-compose.selfhosted.yml down -v
+docker compose -f docker-compose.selfhosted.yml up -d --build
+```
+
+---
+
+## ✅ Verified Testing Scenarios
+
+### **Registration & Login**
+1. ✅ Form validation with clear error messages
+2. ✅ Loading states during submission
+3. ✅ Success notifications on completion
+4. ✅ Network error handling with retry
+
+### **Contact Management**
+1. ✅ Add contacts with validation feedback
+2. ✅ Edit contacts with optimistic updates
+3. ✅ Delete contacts with confirmation
+4. ✅ Network interruption recovery
+
+### **List Management**  
+1. ✅ Create contact lists with error handling
+2. ✅ Assign contacts to lists
+3. ✅ Edit and delete lists safely
+4. ✅ Real-time count updates
+
+### **Dashboard & Navigation**
+1. ✅ Error boundaries protect navigation
+2. ✅ Graceful error recovery on data load failures
+3. ✅ Loading states for all data operations
+4. ✅ Toast notifications for all actions
+
+---
+
+## 📞 Support
+
+| Issue Type | Solution |
+|------------|----------|
+| **Setup Problems** | Check service logs: `docker compose -f docker-compose.selfhosted.yml logs` |
+| **Error Handling** | Use debug tools: `window.__debugErrors.showErrors()` |
+| **Network Issues** | Check proxy config and service connectivity |
+| **Data Problems** | Export data before troubleshooting |
+
+---
+
+## 🎉 Success! Your Enhanced Kinect is Ready
+
+### 🔗 Access Your Instance
+**Primary URL**: [http://localhost:3000](http://localhost:3000)
+
+### 🛡️ What You've Achieved
+- ✅ **Private & Secure**: All data stays local
+- ✅ **Error-Resilient**: Automatic retry and graceful failure handling  
+- ✅ **User-Friendly**: Clear feedback and professional UX
+- ✅ **Developer-Ready**: Comprehensive debugging and monitoring tools
+- ✅ **Production-Grade**: Docker deployment with health checks
+
+### ⚡ Quick Commands
+```bash
+# Stop services
+docker compose -f docker-compose.selfhosted.yml down
+
+# Start services
+docker compose -f docker-compose.selfhosted.yml up -d
+
+# View logs
 docker compose -f docker-compose.selfhosted.yml logs -f
 
-# Development logs
-npm run dev:backend  # Backend logs
-npm run dev:frontend # Frontend logs
+# Health check
+docker compose -f docker-compose.selfhosted.yml ps
+curl http://localhost:3000/health
 ```
 
 ---
 
-## 📞 Support Options
+## 🌟 New Error Handling Features
 
-| Issue Type | Where to Get Help |
-|------------|-------------------|
-| **Setup Problems** | Check logs, review documentation |
-| **Feature Questions** | Review CLAUDE.md and README.md |
-| **General Discussion** | Create GitHub issues in your repo |
-| **Security Issues** | Review SELFHOSTED-DEPLOYMENT.md |
+### **User Experience Improvements**
+- **Smart Retry Logic**: Automatic retry with exponential backoff
+- **Professional Loading States**: Spinners and progress indicators
+- **Clear Error Messages**: Accessible, actionable feedback
+- **Optimistic Updates**: Instant UI feedback with rollback
 
----
+### **Developer Experience** 
+- **Error Boundaries**: Graceful React error handling
+- **Debug Tools**: Console-accessible error analytics
+- **Error Reports**: Downloadable troubleshooting data
+- **Development Overlay**: Rich error information in dev mode
 
-## 🎯 What's Next?
+### **Network Resilience**
+- **Circuit Breaker**: Prevents cascading failures
+- **Request Deduplication**: Avoids duplicate API calls  
+- **Connection Recovery**: Automatic reconnection handling
+- **Timeout Management**: Smart timeout and retry policies
 
-### Immediate (First Hour)
-1. ✅ Complete setup wizard
-2. ✅ Import/add first 10 contacts  
-3. ✅ Create your first contact list
-4. ✅ Set up reminders for best friends
-
-### This Week
-- Explore the dashboard
-- Add more contacts gradually
-- Set up backup automation
-- Customize reminder intervals
-
-### Advanced (When Ready)
-- Set up access from multiple devices
-- Configure automatic backups
-- Export data for other services
-- Contribute to the project
+**Need Help?** All features are tested and working. Use the debug tools (`window.__debugErrors`) for troubleshooting.
 
 ---
 
-## 🌟 Pro Tips
-
-### Faster Import
-- Export contacts as CSV for fastest import
-- Use field mapping for custom formats
-- Import in smaller batches (<500 contacts)
-
-### Better Organization  
-- Use contact lists like "Work", "Family", "Sports"
-- Set different reminder intervals per relationship
-- Add notes for context about each person
-
-### Stay Organized
-- Review overdue contacts weekly
-- Update last contact dates regularly
-- Use the dashboard to track patterns
-
-### Privacy & Security
-- Enable backups to external drive
-- Use strong passwords
-- Keep Kinect updated
-- Consider VPN for remote access
-
----
-
-## 📊 Quick Stats
-
-| Metric | Typical Performance |
-|--------|-------------------|
-| **Startup Time** | < 30 seconds |
-| **Import Speed** | 100 contacts/minute |
-| **Memory Usage** | < 512MB RAM |
-| **Disk Space** | < 100MB (1000 contacts) |
-| **Response Time** | < 100ms |
-
----
-
-## 🔄 Migration
-
-### From Cloud Services
-```bash
-# Export data from existing service (Google, iCloud, etc.)
-# Use Python import script: python3 scripts/import-contacts.py exported-file.csv
-# Validate data integrity through web interface
-# Clean up old service data if satisfied
-```
-
-### To Other Systems
-```bash
-# Export from Settings → Data Export
-# Choose format (JSON/CSV/vCard)
-# Import to destination system
-```
-
----
-
-**🎉 You're Done!**
-
-Your private relationship manager is ready. Start building stronger connections while keeping your data secure.
-
-**Bookmark this:** [http://localhost:3000](http://localhost:3000)
-
----
-
-*Made with ❤️ for privacy-conscious people who value relationships*
-
-**Questions?** Check the documentation files in your repository or create GitHub issues for support.
+*🔒 Built with privacy and reliability in mind for relationship-focused individuals*
