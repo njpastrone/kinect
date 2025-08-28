@@ -43,7 +43,7 @@ RUN npm run build
 FROM node:20-alpine
 
 # Install runtime dependencies
-RUN apk add --no-cache curl nginx
+RUN apk add --no-cache curl nginx gettext
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S kinect -u 1001

@@ -15,7 +15,17 @@ export NODE_ENV=production
 echo "📋 Environment Configuration:"
 echo "  - Port: $PORT"
 echo "  - Node Environment: $NODE_ENV"
-echo "  - Database: ${DATABASE_URL:-MongoDB URL not set}"
+
+# Handle both DATABASE_URL (Railway MongoDB) and MONGODB_URI (manual config)
+if [ -n "$DATABASE_URL" ]; then
+    export MONGODB_URI=$DATABASE_URL
+    echo "  - Database: $DATABASE_URL (Railway MongoDB)"
+elif [ -n "$MONGODB_URI" ]; then
+    echo "  - Database: $MONGODB_URI (Manual config)"
+else
+    echo "  - Database: ❌ Not configured - add MongoDB service in Railway"
+    echo "  - Note: The app will start but won't work without a database"
+fi
 
 # Substitute PORT in nginx config (Railway provides dynamic port)
 envsubst '${PORT}' < /etc/nginx/nginx.conf > /tmp/nginx.conf

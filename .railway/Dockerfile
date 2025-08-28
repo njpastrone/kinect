@@ -37,7 +37,7 @@ RUN cd frontend-web && npm run build
 FROM node:20-alpine AS production
 
 # Install production system dependencies
-RUN apk add --no-cache curl nginx
+RUN apk add --no-cache curl nginx gettext
 
 # Disable husky git hooks in production
 ENV HUSKY=0
