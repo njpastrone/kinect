@@ -1,5 +1,6 @@
 # Multi-stage Railway Dockerfile for Kinect
-# Optimized for Railway's build system and networking
+# Optimized for Railway's build system and networking  
+# Updated: Node 20 + Husky disabled
 
 FROM node:20-alpine AS base
 WORKDIR /app
