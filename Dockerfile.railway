@@ -21,7 +21,13 @@ RUN cd shared && npm ci --ignore-scripts && npm run build
 
 # Build backend
 COPY backend/ ./backend/
-RUN cd backend && npm ci --ignore-scripts && npm run build
+# Install backend dependencies and link to built shared package
+RUN cd backend && npm ci --ignore-scripts
+# Create symlink to shared package for TypeScript compilation
+RUN mkdir -p /app/backend/node_modules/@kinect && \
+    ln -s /app/shared /app/backend/node_modules/@kinect/shared
+# Now build the backend with shared package available
+RUN cd backend && npm run build
 
 # Build frontend
 COPY frontend-web/ ./frontend-web/

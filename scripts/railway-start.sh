@@ -42,7 +42,16 @@ sleep 2
 # Start backend API
 echo "🔧 Starting backend API..."
 cd /app/backend
-node dist/app.js &
+# Handle both possible locations of compiled app.js
+if [ -f "dist/app.js" ]; then
+    node dist/app.js &
+elif [ -f "dist/backend/src/app.js" ]; then
+    node dist/backend/src/app.js &
+else
+    echo "❌ Could not find compiled app.js"
+    find dist -name "app.js" -type f
+    exit 1
+fi
 BACKEND_PID=$!
 
 # Wait for backend to start

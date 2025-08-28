@@ -23,6 +23,9 @@ WORKDIR /app/backend
 COPY backend/package*.json ./
 RUN npm ci --ignore-scripts
 COPY backend/ ./
+# Create symlink to shared package for TypeScript compilation
+RUN mkdir -p /app/backend/node_modules/@kinect && \
+    ln -s /app/shared /app/backend/node_modules/@kinect/shared
 RUN npm run build
 
 # Build frontend
