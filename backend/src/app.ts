@@ -61,6 +61,11 @@ if (process.env.NODE_ENV !== 'production') {
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.warn(`Server running on port ${PORT}`);
-});
+// Only start server if this file is run directly (not imported)
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.warn(`Server running on port ${PORT}`);
+  });
+}
+
+export default app;
