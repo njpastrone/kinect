@@ -58,8 +58,8 @@ COPY --from=base --chown=kinect:nodejs /app/backend ./backend
 # Copy built frontend
 COPY --from=base --chown=kinect:nodejs /app/frontend-web/dist ./frontend-web/dist
 
-# Copy Railway-specific nginx configuration
-COPY nginx.railway.conf /etc/nginx/nginx.conf
+# Copy nginx config template to app directory (user-writable)
+COPY --chown=kinect:nodejs nginx.railway.conf ./nginx.conf.template
 
 # Copy startup script
 COPY scripts/railway-start.sh ./start.sh

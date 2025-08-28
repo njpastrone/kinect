@@ -28,12 +28,12 @@ else
 fi
 
 # Substitute PORT in nginx config (Railway provides dynamic port)
-envsubst '${PORT}' < /etc/nginx/nginx.conf > /tmp/nginx.conf
-mv /tmp/nginx.conf /etc/nginx/nginx.conf
+# Create nginx config in user-writable location using our template
+envsubst '${PORT}' < /app/nginx.conf.template > /tmp/nginx.conf
 
-# Start nginx in background
+# Start nginx in background with custom config
 echo "🌐 Starting nginx..."
-nginx &
+nginx -c /tmp/nginx.conf &
 NGINX_PID=$!
 
 # Wait for nginx to start
