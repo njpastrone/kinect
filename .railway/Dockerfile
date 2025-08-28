@@ -15,15 +15,15 @@ COPY package*.json ./
 
 # Copy and build shared package first
 COPY shared/ ./shared/
-RUN cd shared && npm ci && npm run build
+RUN cd shared && npm ci --ignore-scripts && npm run build
 
 # Build backend
 COPY backend/ ./backend/
-RUN cd backend && npm ci && npm run build
+RUN cd backend && npm ci --ignore-scripts && npm run build
 
 # Build frontend
 COPY frontend-web/ ./frontend-web/
-RUN cd frontend-web && npm ci
+RUN cd frontend-web && npm ci --ignore-scripts
 
 # Set build-time environment variables for frontend build
 ARG VITE_API_URL=/api
