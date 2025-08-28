@@ -10,7 +10,10 @@ import {
   PaginatedResponse,
 } from '@kinect/shared';
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 
+  (process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:3001/api' 
+    : '/api');
 
 class ApiService {
   private api: AxiosInstance;
