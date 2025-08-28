@@ -8,6 +8,9 @@ RUN apk add --no-cache python3 make g++ curl git
 
 WORKDIR /app
 
+# Copy root TypeScript config that shared package needs
+COPY tsconfig.base.json ./
+
 # Build shared package
 COPY shared/package*.json ./shared/
 WORKDIR /app/shared
@@ -51,10 +54,8 @@ WORKDIR /app
 COPY --from=builder --chown=kinect:nodejs /app/shared/dist ./shared/dist
 COPY --from=builder --chown=kinect:nodejs /app/shared/package.json ./shared/
 
-# Copy backend
-COPY --from=builder --chown=kinect:nodejs /app/backend/dist ./backend/dist
-COPY --from=builder --chown=kinect:nodejs /app/backend/node_modules ./backend/node_modules
-COPY --from=builder --chown=kinect:nodejs /app/backend/package.json ./backend/
+# Copy backend with dependencies  
+COPY --from=builder --chown=kinect:nodejs /app/backend ./backend
 
 # Copy frontend build
 COPY --from=builder --chown=kinect:nodejs /app/frontend-web/dist ./frontend-web/dist

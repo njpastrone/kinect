@@ -11,8 +11,9 @@ RUN apk add --no-cache git python3 make g++ curl
 # Disable husky git hooks in Docker environment
 ENV HUSKY=0
 
-# Copy root package files
+# Copy root package files and TypeScript config
 COPY package*.json ./
+COPY tsconfig.base.json ./
 
 # Copy and build shared package first
 COPY shared/ ./shared/
@@ -52,10 +53,8 @@ WORKDIR /app
 COPY --from=base --chown=kinect:nodejs /app/shared/dist ./shared/dist
 COPY --from=base --chown=kinect:nodejs /app/shared/package.json ./shared/
 
-# Copy built backend
-COPY --from=base --chown=kinect:nodejs /app/backend/dist ./backend/dist
-COPY --from=base --chown=kinect:nodejs /app/backend/node_modules ./backend/node_modules
-COPY --from=base --chown=kinect:nodejs /app/backend/package.json ./backend/
+# Copy built backend with dependencies
+COPY --from=base --chown=kinect:nodejs /app/backend ./backend
 
 # Copy built frontend
 COPY --from=base --chown=kinect:nodejs /app/frontend-web/dist ./frontend-web/dist
