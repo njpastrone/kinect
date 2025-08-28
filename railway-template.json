@@ -1,0 +1,90 @@
+{
+  "name": "Kinect - Privacy-First Relationship Manager",
+  "description": "Self-hosted relationship management app with email reminders to stay connected with friends and family. Privacy-first with tested reminder system.",
+  "icon": "🤝",
+  "tags": ["productivity", "relationships", "reminders", "self-hosted", "privacy"],
+  "repository": "https://github.com/your-username/kinect",
+  "services": [
+    {
+      "name": "kinect-app",
+      "source": {
+        "repo": "your-username/kinect",
+        "ref": "main"
+      },
+      "build": {
+        "builder": "DOCKERFILE",
+        "dockerfilePath": "Dockerfile.railway"
+      },
+      "deploy": {
+        "numReplicas": 1,
+        "sleepApplication": false,
+        "restartPolicyType": "ON_FAILURE"
+      },
+      "env": {
+        "NODE_ENV": "production",
+        "SELF_HOSTED": "true",
+        "ENABLE_TELEMETRY": "false",
+        "ENABLE_ANALYTICS": "false",
+        "ALLOW_REGISTRATION": "true",
+        "REMINDER_CRON_ENABLED": "true",
+        "REMINDER_CHECK_INTERVAL": "0 9 * * *",
+        "ENABLE_EMAIL_REMINDERS": "true",
+        "RAILWAY_DEPLOYMENT": "true"
+      },
+      "variables": {
+        "SMTP_HOST": {
+          "description": "SMTP server hostname (e.g., smtp.gmail.com)",
+          "default": "smtp.gmail.com"
+        },
+        "SMTP_PORT": {
+          "description": "SMTP server port",
+          "default": "587"
+        },
+        "SMTP_USER": {
+          "description": "Your email address for sending reminders",
+          "required": true
+        },
+        "SMTP_PASS": {
+          "description": "Email password or app-specific password",
+          "required": true
+        },
+        "SMTP_FROM": {
+          "description": "From address for reminder emails",
+          "default": "Kinect Reminders <noreply@kinect.app>"
+        },
+        "APP_NAME": {
+          "description": "Custom name for your app instance",
+          "default": "Kinect"
+        },
+        "ALLOW_REGISTRATION": {
+          "description": "Allow new user registrations",
+          "default": "true"
+        }
+      }
+    },
+    {
+      "name": "mongodb",
+      "image": "mongo:7.0",
+      "env": {
+        "MONGO_INITDB_DATABASE": "kinect"
+      },
+      "volumes": [
+        {
+          "mountPath": "/data/db",
+          "name": "mongodb-data"
+        }
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "name": "mongodb-data",
+      "size": "1Gi"
+    }
+  ],
+  "networking": {
+    "ingress": {
+      "main": "kinect-app"
+    }
+  }
+}
