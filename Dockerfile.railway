@@ -79,8 +79,8 @@ RUN mkdir -p /app/uploads /app/backups /app/logs && \
 # Switch to non-root user
 USER kinect
 
-# Expose Railway's dynamic port
-EXPOSE $PORT
+# Expose the port Railway will assign (Railway defaults to 3000 if not specified)
+EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \

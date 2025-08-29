@@ -81,8 +81,8 @@ USER kinect
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Expose port
-EXPOSE $PORT
+# Expose the port Railway will assign (Railway defaults to 3000 if not specified)
+EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
