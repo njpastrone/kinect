@@ -57,8 +57,15 @@ WORKDIR /app
 COPY --from=builder --chown=kinect:nodejs /app/shared/dist ./shared/dist
 COPY --from=builder --chown=kinect:nodejs /app/shared/package.json ./shared/
 
-# Copy backend with dependencies  
-COPY --from=builder --chown=kinect:nodejs /app/backend ./backend
+# Copy backend package.json and install production dependencies
+COPY --from=builder --chown=kinect:nodejs /app/backend/package*.json ./backend/
+WORKDIR /app/backend
+RUN npm ci --only=production --ignore-scripts
+
+# Copy built backend code
+WORKDIR /app
+COPY --from=builder --chown=kinect:nodejs /app/backend/dist ./backend/dist
+COPY --from=builder --chown=kinect:nodejs /app/backend/src ./backend/src
 
 # Copy frontend build
 COPY --from=builder --chown=kinect:nodejs /app/frontend-web/dist ./frontend-web/dist

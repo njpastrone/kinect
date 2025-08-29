@@ -33,6 +33,8 @@ envsubst '${PORT}' < /app/nginx.conf.template > /tmp/nginx.conf
 
 # Start nginx in background with custom config
 echo "🌐 Starting nginx..."
+# Create nginx directories if they don't exist to avoid permission errors
+mkdir -p /tmp/nginx /var/lib/nginx/logs /tmp/client_temp /tmp/proxy_temp_path /tmp/fastcgi_temp /tmp/uwsgi_temp /tmp/scgi_temp 2>/dev/null || true
 nginx -c /tmp/nginx.conf &
 NGINX_PID=$!
 
