@@ -25,7 +25,7 @@
     "lint": "npm run lint --workspaces",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "clean": "npm run clean --workspaces --if-present",
-    "prepare": "[ -n \"$CI\" ] || husky",
+    "prepare": "husky",
     "seed": "cd backend && npm run seed",
     "reset-db": "cd backend && npm run reset",
     "demo": "concurrently \"npm run dev:backend\" \"npm run dev:web\" --names \"API,WEB\" --prefix-colors \"blue,green\"",

@@ -6,8 +6,8 @@ services:
     region: oregon
     plan: starter # $7/month
     buildCommand: |
-      cd shared && npm ci && npm run build &&
-      cd ../backend && npm ci && npm run build
+      cd shared && npm ci --ignore-scripts && npm run build &&
+      cd ../backend && npm ci --ignore-scripts && npm run build
     startCommand: cd backend && node dist/backend/src/app.js
     healthCheckPath: /health
     envVars:
@@ -39,8 +39,8 @@ services:
     name: kinect-web
     runtime: static
     buildCommand: |
-      cd shared && npm ci && npm run build &&
-      cd ../frontend-web && npm ci && npm run build
+      cd shared && npm ci --ignore-scripts && npm run build &&
+      cd ../frontend-web && npm ci --ignore-scripts && npm run build
     staticPublishPath: ./frontend-web/dist
     headers:
       - path: /*
@@ -62,7 +62,7 @@ services:
     name: kinect-reminders
     runtime: node
     schedule: "0 9 * * 1" # Monday 9 AM UTC
-    buildCommand: cd backend && npm ci && npm run build
+    buildCommand: cd backend && npm ci --ignore-scripts && npm run build
     startCommand: cd backend && node scripts/send-reminders.js
     envVars:
       - key: NODE_ENV
