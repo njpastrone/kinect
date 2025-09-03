@@ -1,0 +1,84 @@
+services:
+  # Backend API Service
+  - type: web
+    name: kinect-api
+    runtime: node
+    region: oregon
+    plan: starter # $7/month
+    buildCommand: |
+      cd shared && npm ci && npm run build &&
+      cd ../backend && npm ci && npm run build
+    startCommand: cd backend && node dist/app.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: MONGODB_URI
+        sync: false # Set manually in dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: https://kinect-web.onrender.com
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: FROM_EMAIL
+        value: noreply@kinect.app
+
+  # Frontend Static Site
+  - type: static
+    name: kinect-web
+    buildCommand: |
+      cd shared && npm ci && npm run build &&
+      cd ../frontend-web && npm ci && npm run build
+    staticPublishPath: ./frontend-web/dist
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://kinect-api.onrender.com/api/*
+    envVars:
+      - key: VITE_API_URL
+        value: https://kinect-api.onrender.com/api
+
+  # Weekly Reminder Cron Job
+  - type: cron
+    name: kinect-reminders
+    runtime: node
+    schedule: "0 9 * * 1" # Monday 9 AM UTC
+    buildCommand: cd backend && npm ci && npm run build
+    startCommand: cd backend && node scripts/send-reminders.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: FROM_EMAIL
+        value: noreply@kinect.app
+
+databases:
+  # MongoDB Atlas (external)
+  # Configure connection string in environment variables

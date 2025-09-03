@@ -12,6 +12,8 @@
     "test:coverage": "jest --coverage --coverageDirectory=coverage/reminders",
     "lint": "eslint src",
     "clean": "rimraf dist",
+    "test:atlas": "node ../scripts/test-atlas-connection.js",
+    "export:railway": "bash ../scripts/export-railway-data.sh",
     "seed": "ts-node src/scripts/seed.ts",
     "reset": "ts-node src/scripts/reset.ts reset",
     "reset-and-seed": "ts-node src/scripts/reset.ts reset-and-seed",
