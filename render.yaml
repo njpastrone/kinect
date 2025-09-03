@@ -3,7 +3,7 @@ services:
   - type: web
     name: kinect-api
     runtime: node
-    region: oregon
+    region: virginia
     plan: starter # $7/month
     buildCommand: |
       cd shared && npm ci --ignore-scripts && npm run build &&
@@ -61,6 +61,7 @@ services:
   - type: cron
     name: kinect-reminders
     runtime: node
+    region: virginia
     schedule: "0 9 * * 1" # Monday 9 AM UTC
     buildCommand: cd backend && npm ci --ignore-scripts && npm run build
     startCommand: cd backend && node scripts/send-reminders.js
