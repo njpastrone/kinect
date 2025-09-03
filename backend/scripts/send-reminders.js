@@ -1,6 +1,6 @@
-require('dotenv').config();
+require('dotenv').config({ path: __dirname + '/../.env' });
 const mongoose = require('mongoose');
-const { notificationService } = require('../dist/services/notification.service');
+const { notificationService } = require('../dist/backend/src/services/notification.service');
 
 async function sendReminders() {
   try {

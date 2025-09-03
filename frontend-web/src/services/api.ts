@@ -9,6 +9,7 @@ import {
   ApiResponse,
   PaginatedResponse,
 } from '@kinect/shared';
+import getApiUrl from '../config/api';
 
 class ApiService {
   private api: AxiosInstance;
@@ -16,7 +17,7 @@ class ApiService {
 
   constructor() {
     this.api = axios.create({
-      baseURL: '/api',
+      baseURL: getApiUrl(),
       headers: {
         'Content-Type': 'application/json',
       },
