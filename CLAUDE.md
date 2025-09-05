@@ -2,11 +2,12 @@
 
 ## Project Overview
 
-Kinect is a privacy-first, self-hosted relationship management application designed to help users maintain meaningful connections with friends and loved ones. It tracks communication patterns and sends timely reminders to encourage regular contact.
+Kinect is a privacy-first relationship management application designed to help users maintain meaningful connections with friends and loved ones. It tracks communication patterns and sends timely reminders to encourage regular contact.
 
-**🔒 Privacy-First**: 100% local deployment with no cloud dependencies
+**🔒 Privacy-First**: Data stored in your own MongoDB instance
 **🛡️ Error-Resilient**: Enterprise-grade error handling with automatic retry mechanisms
-**🏠 Self-Hosted**: Complete Docker-based deployment for personal use
+**☁️ Cloud Deployment**: Production deployment on Render with MongoDB Atlas
+**🏠 Self-Hosted Option**: Local development with Docker Compose available
 
 ## Key Concepts
 
@@ -18,13 +19,19 @@ Kinect is a privacy-first, self-hosted relationship management application desig
 
 ## Architecture
 
-The project follows a containerized multi-tier architecture:
+The project follows a multi-tier architecture optimized for cloud deployment:
 
-- **Backend API**: Node.js/Express with TypeScript
-- **Database**: MongoDB with health checks and backup capabilities
-- **Frontend**: React with Vite, TypeScript, and Tailwind CSS
-- **Proxy Layer**: Nginx for static serving and API proxying
-- **Shared Module**: Common TypeScript types and utilities
+### Production (Render + MongoDB Atlas)
+- **Backend API**: Node.js/Express with TypeScript on Render Web Service (Virginia region)
+- **Database**: MongoDB Atlas cluster (N. Virginia us-east-1)
+- **Frontend**: React with Vite on Render Static Site (Global CDN)
+- **Cron Jobs**: Render Cron Service for scheduled reminders (Virginia region)
+- **Shared Module**: Common TypeScript types and utilities (built for both CommonJS and ESM)
+
+### Local Development
+- **Backend API**: Node.js/Express with TypeScript (port 3001)
+- **Database**: Local MongoDB or MongoDB Atlas connection
+- **Frontend**: Vite dev server with hot reload (port 5173)
 - **Error Handling**: Comprehensive error boundaries, retry mechanisms, and monitoring
 
 ## Development Guidelines
@@ -110,29 +117,36 @@ Key entities to implement:
 ## Development Commands
 
 ```bash
-# Self-Hosted Deployment (Recommended)
-docker compose -f docker-compose.selfhosted.yml up -d      # Start all services
-docker compose -f docker-compose.selfhosted.yml down       # Stop all services
-docker compose -f docker-compose.selfhosted.yml ps         # Check service status
-docker compose -f docker-compose.selfhosted.yml logs -f    # View logs
+# Production Deployment (Render)
+git push origin main              # Triggers automatic deployment to Render
+# Manual deploy available in Render dashboard
 
-# Development (Local)
-# Backend
-npm run dev        # Start development server
-npm run test       # Run tests (currently no tests configured)
-npm run lint       # Lint code
-npm run build      # TypeScript compilation and build
-npm run seed       # Seed database with sample data
-npm run reset      # Reset database
+# Local Development
+npm run dev:all                   # Start both backend and frontend concurrently
+npm run dev:backend               # Start backend only (port 3001)
+npm run dev:web                   # Start frontend only (port 5173)
 
-# Frontend
-npm run dev        # Start development server (Vite)
-npm run build      # TypeScript check and production build
-npm run test       # Run tests (currently no tests configured)
-npm run lint       # Lint code
+# Backend Commands
+cd backend
+npm run dev                       # Start development server with nodemon
+npm run build                     # TypeScript compilation (rm -rf dist && tsc)
+npm run test                      # Run tests (currently no tests configured)
+npm run lint                      # Lint code
+npm run seed                      # Seed database with sample data
+npm run reset                     # Reset database
+npm run test:atlas                # Test MongoDB Atlas connection
+
+# Frontend Commands
+cd frontend-web
+npm run dev                       # Start Vite dev server
+npm run build                     # Production build (tsc && vite build)
+npm run preview                   # Preview production build
+npm run lint                      # Lint code
 
 # Shared Package
-npm run build      # Build both CommonJS and ESM versions
+cd shared
+npm run build                     # Build both CommonJS and ESM versions
+npm run build:clean               # Clean dist directory (rm -rf dist)
 ```
 
 ## Important Notes
@@ -151,6 +165,41 @@ npm run build      # Build both CommonJS and ESM versions
 4. Simple notification system with default intervals
 5. Clean, responsive UI for web
 6. Basic iOS app with core functionality
+
+## Deployment Configuration
+
+### Production (Render + MongoDB Atlas)
+
+**Services:**
+- **Frontend**: https://kinect-web.onrender.com (Global CDN)
+- **Backend API**: https://kinect-api.onrender.com (Virginia region)
+- **Database**: MongoDB Atlas cluster in N. Virginia (us-east-1)
+- **Cron Jobs**: Weekly reminders scheduled for Monday 9 AM UTC
+
+**Key Configuration Files:**
+- `render.yaml`: Render blueprint defining all services and environment variables
+- `.env.atlas`: MongoDB Atlas connection string (not committed to git)
+- `frontend-web/src/config/api.ts`: Dynamic API URL configuration
+
+**Environment Variables (Backend):**
+- `NODE_ENV`: production
+- `PORT`: 3001
+- `MONGODB_URI`: MongoDB Atlas connection string
+- `JWT_SECRET`: Auto-generated by Render
+- `JWT_REFRESH_SECRET`: Auto-generated by Render
+- `CORS_ORIGIN`: https://kinect-web.onrender.com
+- `SMTP_*`: Email service configuration
+
+**Build Commands:**
+- Backend/Cron: `npm ci --ignore-scripts && npm run build`
+- Frontend: `npm ci --ignore-scripts && npm run build`
+- Note: `--ignore-scripts` prevents Husky git hooks from running in CI
+
+**Important Notes:**
+- All services deployed in Virginia region for optimal MongoDB Atlas latency (~5ms)
+- Frontend uses Global CDN for worldwide performance
+- Automatic deploys triggered on push to main branch
+- Health check endpoint: `/health` for backend monitoring
 
 ## Current Implementation Status
 

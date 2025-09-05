@@ -1,0 +1,326 @@
+# Deployment Guide
+
+This guide covers deploying Kinect to production using Render and MongoDB Atlas.
+
+## Table of Contents
+- [Architecture Overview](#architecture-overview)
+- [Prerequisites](#prerequisites)
+- [MongoDB Atlas Setup](#mongodb-atlas-setup)
+- [Render Deployment](#render-deployment)
+- [Environment Variables](#environment-variables)
+- [Post-Deployment](#post-deployment)
+- [Troubleshooting](#troubleshooting)
+- [Migration from Other Platforms](#migration-from-other-platforms)
+
+## Architecture Overview
+
+Kinect uses a modern cloud architecture optimized for performance and reliability:
+
+```
+┌─────────────────────────────────────────────────────┐
+│                   Global CDN                        │
+│            kinect-web.onrender.com                  │
+│              (React Frontend)                       │
+└────────────────────┬────────────────────────────────┘
+                     │ HTTPS
+                     ↓
+┌─────────────────────────────────────────────────────┐
+│              Virginia Region (us-east-1)            │
+│  ┌──────────────────────────────────────────────┐  │
+│  │       kinect-api.onrender.com               │  │
+│  │         (Node.js Backend API)               │  │
+│  └────────────────┬─────────────────────────────┘  │
+│                   │                                 │
+│                   │ ~5ms latency                    │
+│                   ↓                                 │
+│  ┌──────────────────────────────────────────────┐  │
+│  │         MongoDB Atlas Cluster                │  │
+│  │        N. Virginia (us-east-1)              │  │
+│  └──────────────────────────────────────────────┘  │
+│                                                     │
+│  ┌──────────────────────────────────────────────┐  │
+│  │        Render Cron Service                   │  │
+│  │     (Weekly Reminder Emails)                 │  │
+│  └──────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────┘
+```
+
+## Prerequisites
+
+1. **GitHub Account** - Your code repository
+2. **Render Account** - Sign up at [render.com](https://render.com)
+3. **MongoDB Atlas Account** - Free tier at [mongodb.com/atlas](https://mongodb.com/atlas)
+4. **SMTP Credentials** (optional) - For email reminders (Gmail, SendGrid, etc.)
+
+## MongoDB Atlas Setup
+
+### Step 1: Create Cluster
+
+1. Sign up/login to [MongoDB Atlas](https://mongodb.com/atlas)
+2. Create a new project called "kinect-production"
+3. Build a cluster:
+   - Choose **Free Tier (M0)**
+   - Provider: AWS
+   - Region: **N. Virginia (us-east-1)** - Important for latency!
+   - Cluster name: "kinect-production"
+
+### Step 2: Configure Access
+
+1. **Database Access:**
+   - Create database user: `kinect-admin`
+   - Generate secure password
+   - Grant "Read and write to any database" permission
+
+2. **Network Access:**
+   - Add IP Address: `0.0.0.0/0` (allows access from anywhere)
+   - Note: Render uses dynamic IPs, so we need this open access
+
+### Step 3: Get Connection String
+
+1. Click "Connect" on your cluster
+2. Choose "Connect your application"
+3. Copy the connection string:
+   ```
+   mongodb+srv://kinect-admin:<password>@kinect-production.xxxxx.mongodb.net/?retryWrites=true&w=majority
+   ```
+4. Replace `<password>` with your actual password
+
+## Render Deployment
+
+### Step 1: Prepare Repository
+
+Ensure your repository has:
+- `render.yaml` in the root directory
+- All changes pushed to the `main` branch
+- No sensitive data committed (use environment variables)
+
+### Step 2: Deploy from Blueprint
+
+1. Go to [Render Dashboard](https://dashboard.render.com)
+2. Click **New +** → **Blueprint**
+3. Connect your GitHub repository
+4. Render will detect `render.yaml` automatically
+5. Review the services to be created:
+   - `kinect-api` (Web Service) - $7/month
+   - `kinect-web` (Static Site) - Free
+   - `kinect-reminders` (Cron Job) - Free
+
+### Step 3: Configure Environment Variables
+
+When prompted, enter these required variables:
+
+**For kinect-api:**
+```
+MONGODB_URI: mongodb+srv://kinect-admin:YOUR_PASSWORD@kinect-production.xxxxx.mongodb.net/?retryWrites=true&w=majority
+SMTP_HOST: smtp.gmail.com (or your provider)
+SMTP_USER: your-email@gmail.com
+SMTP_PASS: your-app-password
+```
+
+**For kinect-reminders:**
+```
+MONGODB_URI: (same as above)
+SMTP_HOST: (same as above)
+SMTP_USER: (same as above)
+SMTP_PASS: (same as above)
+```
+
+### Step 4: Deploy
+
+1. Click **Apply** to start deployment
+2. Wait for all services to build (~5-10 minutes)
+3. Services will show "Live" when ready
+
+## Environment Variables
+
+### Backend API (kinect-api)
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| NODE_ENV | Environment mode | `production` |
+| PORT | Server port | `3001` |
+| MONGODB_URI | MongoDB connection string | `mongodb+srv://...` |
+| JWT_SECRET | JWT signing secret | Auto-generated by Render |
+| JWT_REFRESH_SECRET | Refresh token secret | Auto-generated by Render |
+| CORS_ORIGIN | Frontend URL | `https://kinect-web.onrender.com` |
+| SMTP_HOST | Email server | `smtp.gmail.com` |
+| SMTP_PORT | Email port | `587` |
+| SMTP_USER | Email username | `your-email@gmail.com` |
+| SMTP_PASS | Email password | App-specific password |
+| FROM_EMAIL | Sender email | `noreply@kinect.app` |
+
+### Frontend (kinect-web)
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| VITE_API_URL | Backend API URL | `https://kinect-api.onrender.com/api` |
+
+### Cron Service (kinect-reminders)
+
+Uses same MongoDB and SMTP variables as backend.
+
+## Post-Deployment
+
+### 1. Verify Services
+
+Test each service:
+
+```bash
+# Test backend health
+curl https://kinect-api.onrender.com/health
+
+# Should return:
+# {"status":"OK","timestamp":"..."}
+```
+
+### 2. Test Frontend
+
+1. Visit https://kinect-web.onrender.com
+2. Register a new account
+3. Add a contact
+4. Verify all features work
+
+### 3. Test Cron Job
+
+1. In Render dashboard, go to kinect-reminders service
+2. Click "Trigger Run" to test manually
+3. Check logs for successful execution
+
+### 4. Configure Custom Domain (Optional)
+
+1. In Render dashboard, go to service settings
+2. Add custom domain
+3. Follow DNS configuration instructions
+
+## Troubleshooting
+
+### Build Failures
+
+**Issue:** `husky: not found`
+- **Solution:** Already fixed with `npm ci --ignore-scripts` in build commands
+
+**Issue:** `rimraf: not found`
+- **Solution:** Already fixed by using `rm -rf` instead of rimraf
+
+### CORS Errors
+
+**Issue:** Frontend can't connect to backend
+- **Solution:** Ensure `CORS_ORIGIN` environment variable matches frontend URL
+
+### MongoDB Connection
+
+**Issue:** Cannot connect to MongoDB Atlas
+- **Solution:** 
+  1. Check connection string format
+  2. Verify network access allows `0.0.0.0/0`
+  3. Confirm username and password are correct
+
+### Region Latency
+
+**Issue:** Slow database queries
+- **Solution:** Ensure all services are in same region (Virginia/us-east-1)
+
+## Migration from Other Platforms
+
+### From Railway
+
+1. Export data using provided scripts:
+   ```bash
+   cd backend
+   npm run export:railway
+   ```
+
+2. Import to MongoDB Atlas:
+   ```bash
+   mongoimport --uri "YOUR_ATLAS_URI" --collection users --file users.json
+   mongoimport --uri "YOUR_ATLAS_URI" --collection contacts --file contacts.json
+   ```
+
+3. Update environment variables in Render
+
+4. Test thoroughly before shutting down Railway
+
+### From Heroku
+
+Similar process:
+1. Export MongoDB data
+2. Import to Atlas
+3. Deploy to Render
+4. Update DNS/URLs
+5. Migrate users
+
+## Monitoring
+
+### Health Checks
+
+- Backend: `https://kinect-api.onrender.com/health`
+- Frontend: Check for 200 status on homepage
+- Database: Monitor in MongoDB Atlas dashboard
+
+### Logs
+
+View logs in Render dashboard:
+- Each service has real-time logs
+- Filter by timestamp or search
+- Download logs for analysis
+
+### Alerts
+
+Set up alerts in Render:
+1. Go to service settings
+2. Configure notifications for:
+   - Service failures
+   - High response times
+   - Failed deployments
+
+## Cost Optimization
+
+### Current Costs (Production)
+
+- **Render Backend**: $7/month (Starter plan)
+- **Render Frontend**: Free (Static site)
+- **Render Cron**: Free
+- **MongoDB Atlas**: Free tier (512MB storage)
+- **Total**: ~$7/month
+
+### Scaling Options
+
+When you need more:
+- **Backend**: Upgrade to Standard ($25/month) for more CPU/RAM
+- **Database**: Upgrade to M10 ($57/month) for dedicated resources
+- **Add Redis**: For caching ($10/month)
+
+## Security Best Practices
+
+1. **Never commit secrets** - Use environment variables
+2. **Enable 2FA** on all accounts (GitHub, Render, MongoDB)
+3. **Rotate secrets regularly** - JWT secrets, API keys
+4. **Monitor access logs** - Check for unauthorized access
+5. **Keep dependencies updated** - Regular npm updates
+6. **Use HTTPS everywhere** - Render provides SSL automatically
+
+## Backup Strategy
+
+### Database Backups
+
+1. **Automatic**: MongoDB Atlas takes daily snapshots (paid tiers)
+2. **Manual**: Export data periodically:
+   ```bash
+   mongodump --uri "YOUR_ATLAS_URI" --out ./backup-$(date +%Y%m%d)
+   ```
+
+### Code Backups
+
+- Git repository serves as code backup
+- Tag releases for easy rollback:
+  ```bash
+  git tag -a v1.0.0 -m "Production release"
+  git push origin v1.0.0
+  ```
+
+## Support
+
+For deployment issues:
+- **Render**: [render.com/docs](https://render.com/docs)
+- **MongoDB Atlas**: [docs.atlas.mongodb.com](https://docs.atlas.mongodb.com)
+- **Project Issues**: [GitHub Issues](https://github.com/njpastrone/kinect/issues)

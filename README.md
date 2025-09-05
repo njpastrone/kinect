@@ -4,18 +4,18 @@
 
 Kinect helps you maintain meaningful relationships by tracking communication patterns and sending gentle reminders when it's been too long since you last contacted someone.
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/kinect-self-hosted)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/njpastrone/kinect)
 
 ---
 
 ## ✨ **Why Kinect?**
 
-- **🔒 Privacy-First**: All data stays on your server - no cloud dependencies
+- **🔒 Privacy-First**: Your data stays in your MongoDB instance (Atlas or self-hosted)
 - **⏰ Smart Reminders**: Customizable intervals based on relationship importance  
 - **📧 Email Notifications**: Get reminded via email when it's time to reach out
 - **📱 Mobile-Friendly**: Works perfectly on phones and tablets
-- **🚀 Easy Deploy**: One-click deployment for sharing with friends
-- **💰 Zero Cost**: Free hosting options available
+- **🚀 Easy Deploy**: One-click deployment with Render blueprint
+- **💰 Low Cost**: ~$7/month for production hosting on Render
 
 ---
 
@@ -30,43 +30,52 @@ Kinect helps you maintain meaningful relationships by tracking communication pat
 
 ## 🚀 **Quick Start Options**
 
-### Option 1: Deploy Your Own (2 minutes)
-Perfect if you want to share with friends or have full control:
+### Option 1: Deploy to Render (5 minutes)
+Perfect for production deployment with automatic scaling:
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/kinect-self-hosted)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/njpastrone/kinect)
 
-1. Click "Deploy on Railway" 
-2. Set your email credentials
-3. Share the URL with friends
-4. Everyone creates their own account
+1. Click "Deploy to Render"
+2. Connect your GitHub account
+3. Set MongoDB Atlas connection string
+4. Configure email credentials (SMTP)
+5. Deploy and share with friends
+
+**Requirements:**
+- MongoDB Atlas account (free tier available)
+- SMTP credentials for email reminders
+- ~$7/month for Render hosting
 
 ### Option 2: Local Development (5 minutes)
 For developers who want to customize or contribute:
 
 ```bash
 # Clone and install
-git clone https://github.com/your-username/kinect.git
+git clone https://github.com/njpastrone/kinect.git
 cd kinect
 npm install
 
 # Configure environment  
-cp backend/.env.example backend/.env
-# Edit backend/.env with your settings
+cp .env.atlas.example .env
+# Edit .env with your MongoDB Atlas connection string
 
 # Start all services
 npm run dev:all
+
+# Access at:
+# Frontend: http://localhost:5173
+# Backend: http://localhost:3001
 ```
 
-### Option 3: Self-Hosted Production (10 minutes)
-For complete privacy and control:
+### Option 3: Production Deployment (Manual)
+For full control over deployment:
 
 ```bash
-# Copy environment template
-cp .env.production.example .env.production
-# Edit with your settings
-
-# Deploy with Docker
-./scripts/deploy-production.sh
+# 1. Set up MongoDB Atlas cluster
+# 2. Configure render.yaml with your settings
+# 3. Push to GitHub
+# 4. Connect GitHub repo to Render
+# 5. Deploy from Blueprint (render.yaml)
 ```
 
 ---
