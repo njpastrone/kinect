@@ -12,6 +12,8 @@ import { Lists } from './pages/Lists';
 import { Settings } from './pages/Settings';
 import { DemoModeProvider, DemoBanner } from './features/demo/DemoMode';
 import { GuidedTour } from './features/demo/GuidedTour';
+import { WelcomeDemoProvider } from './features/demo/WelcomeDemoContext';
+import { WelcomeDemoAutoStart } from './features/demo/WelcomeDemo';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ToastContainer, useToast } from './components/common/Toast';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
@@ -42,78 +44,85 @@ function App() {
   return (
     <ErrorBoundary>
       <DemoModeProvider>
-        <Router>
-          <DemoBanner />
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<RegisterForm />} />
-            <Route path="/forgot-password" element={<ForgotPasswordForm />} />
-            <Route path="/reset-password" element={<ResetPasswordForm />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/contacts"
-              element={
-                <ProtectedRoute>
-                  <Contacts />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/lists"
-              element={
-                <ProtectedRoute>
-                  <Lists />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/lists/:listId"
-              element={
-                <ProtectedRoute>
-                  <Contacts />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <Settings />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/" element={<Navigate to="/dashboard" />} />
-          </Routes>
-          <GuidedTour />
-          <ToastContainer toasts={toasts} onClose={removeToast} />
-          <Toaster 
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: '#363636',
-                color: '#fff',
-              },
-              error: {
+        <WelcomeDemoProvider>
+          <Router>
+            <DemoBanner />
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<RegisterForm />} />
+              <Route path="/forgot-password" element={<ForgotPasswordForm />} />
+              <Route path="/reset-password" element={<ResetPasswordForm />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/contacts"
+                element={
+                  <ProtectedRoute>
+                    <Contacts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/lists"
+                element={
+                  <ProtectedRoute>
+                    <Lists />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/lists/:listId"
+                element={
+                  <ProtectedRoute>
+                    <Contacts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/" element={<Navigate to="/dashboard" />} />
+            </Routes>
+            
+            {/* Tour and Demo Components */}
+            <WelcomeDemoAutoStart />
+            <GuidedTour />
+            
+            {/* Toast Notifications */}
+            <ToastContainer toasts={toasts} onClose={removeToast} />
+            <Toaster 
+              position="top-right"
+              toastOptions={{
+                duration: 4000,
                 style: {
-                  background: '#ef4444',
+                  background: '#363636',
+                  color: '#fff',
                 },
-              },
-              success: {
-                style: {
-                  background: '#10b981',
+                error: {
+                  style: {
+                    background: '#ef4444',
+                  },
                 },
-              },
-            }}
-          />
-        </Router>
+                success: {
+                  style: {
+                    background: '#10b981',
+                  },
+                },
+              }}
+            />
+          </Router>
+        </WelcomeDemoProvider>
       </DemoModeProvider>
     </ErrorBoundary>
   );

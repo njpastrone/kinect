@@ -80,7 +80,7 @@ export const ContactCard: React.FC<ContactCardProps> = ({
   if (viewMode === 'list') {
     return (
       <>
-        <div className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200">
+        <div className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200" data-tour="contact-item">
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <div className="flex items-center space-x-4">
@@ -99,7 +99,7 @@ export const ContactCard: React.FC<ContactCardProps> = ({
                     {contact.email && <span>📧 {contact.email}</span>}
                     {contact.phoneNumber && <span>📞 {contact.phoneNumber}</span>}
                     {daysSinceContact !== null && (
-                      <span className={daysSinceContact > 30 ? 'text-red-600 font-medium' : ''}>
+                      <span className={daysSinceContact > 30 ? 'text-red-600 font-medium' : ''} data-tour="reminder-badges">
                         Last contact: {daysSinceContact} days ago
                       </span>
                     )}
@@ -112,6 +112,7 @@ export const ContactCard: React.FC<ContactCardProps> = ({
               <button
                 onClick={handleLogContact}
                 className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                data-tour="mark-contacted"
               >
                 Log Contact
               </button>
@@ -160,7 +161,7 @@ export const ContactCard: React.FC<ContactCardProps> = ({
   // Grid view (original card layout)
   return (
     <>
-      <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+      <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow" data-tour="contact-item">
         <div className="flex justify-between items-start mb-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
@@ -200,7 +201,7 @@ export const ContactCard: React.FC<ContactCardProps> = ({
           {contact.email && <p>Email: {contact.email}</p>}
           {contact.phoneNumber && <p>Phone: {contact.phoneNumber}</p>}
           {daysSinceContact !== null && (
-            <p className={daysSinceContact > 30 ? 'text-red-600 font-medium' : ''}>
+            <p className={daysSinceContact > 30 ? 'text-red-600 font-medium' : ''} data-tour="reminder-badges">
               Last contact: {daysSinceContact} days ago
             </p>
           )}
@@ -209,6 +210,7 @@ export const ContactCard: React.FC<ContactCardProps> = ({
         <button
           onClick={handleLogContact}
           className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+          data-tour="mark-contacted"
         >
           Log Contact
         </button>

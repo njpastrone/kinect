@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { HelpMenu } from '../common/HelpMenu';
 
 export const Header: React.FC = () => {
   const { user, logout } = useAuth();
@@ -15,22 +16,23 @@ export const Header: React.FC = () => {
             </Link>
           </div>
 
-          <nav className="flex items-center space-x-8">
+          <nav className="flex items-center space-x-8" data-tour="main-nav">
             <Link to="/dashboard" className="text-gray-700 hover:text-blue-600">
               Dashboard
             </Link>
-            <Link to="/contacts" className="text-gray-700 hover:text-blue-600">
+            <Link to="/contacts" className="text-gray-700 hover:text-blue-600" data-tour="contacts-nav">
               Contacts
             </Link>
             <Link to="/lists" className="text-gray-700 hover:text-blue-600">
               Lists
             </Link>
-            <Link to="/settings" className="text-gray-700 hover:text-blue-600">
+            <Link to="/settings" className="text-gray-700 hover:text-blue-600" data-tour="settings-nav">
               Settings
             </Link>
           </nav>
 
           <div className="flex items-center space-x-4">
+            <HelpMenu />
             {user && (
               <span className="text-gray-700">
                 {user.firstName} {user.lastName}

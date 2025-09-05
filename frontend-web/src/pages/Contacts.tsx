@@ -178,7 +178,7 @@ export const Contacts: React.FC = () => {
 
   return (
     <Layout listName={currentList?.name}>
-      <div className="space-y-6">
+      <div className="space-y-6" data-tour="contacts-list">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{pageTitle}</h1>
@@ -187,6 +187,8 @@ export const Contacts: React.FC = () => {
           <button
             onClick={handleAddContact}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            data-tour="add-contact-button"
+            title="Add a new contact to your relationship network"
           >
             Add Contact
           </button>

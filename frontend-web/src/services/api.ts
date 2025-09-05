@@ -272,6 +272,30 @@ class ApiService {
     });
     return response.data.data!;
   }
+
+  // Onboarding API methods
+  async getOnboardingStatus(): Promise<{ onboarding: any }> {
+    const response = await this.api.get<ApiResponse<{ onboarding: any }>>('/auth/onboarding/status');
+    return response.data.data!;
+  }
+
+  async markWelcomeDemoCompleted(): Promise<{ onboarding: any }> {
+    const response = await this.api.put<ApiResponse<{ onboarding: any }>>('/auth/onboarding/welcome-demo');
+    return response.data.data!;
+  }
+
+  async updateOnboardingPreferences(preferences: {
+    showTipsAndTricks?: boolean;
+    autoStartTours?: boolean;
+  }): Promise<{ onboarding: any }> {
+    const response = await this.api.put<ApiResponse<{ onboarding: any }>>('/auth/onboarding/preferences', preferences);
+    return response.data.data!;
+  }
+
+  async resetOnboarding(): Promise<{ onboarding: any }> {
+    const response = await this.api.post<ApiResponse<{ onboarding: any }>>('/auth/reset-onboarding');
+    return response.data.data!;
+  }
 }
 
 export default new ApiService();

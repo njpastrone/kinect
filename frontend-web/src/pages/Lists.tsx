@@ -243,7 +243,7 @@ export const Lists: React.FC = () => {
 
   return (
     <Layout>
-      <div className="space-y-8">
+      <div className="space-y-8" data-tour="contact-lists">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -255,6 +255,7 @@ export const Lists: React.FC = () => {
           <button
             onClick={openCreateModal}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            data-tour="add-list-button"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
