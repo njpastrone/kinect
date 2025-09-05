@@ -38,6 +38,32 @@ const userSchema = new Schema<IUserDocument>(
     resetPasswordExpires: {
       type: Date,
     },
+    onboarding: {
+      welcomeDemoCompleted: {
+        type: Boolean,
+        default: false,
+      },
+      welcomeDemoCompletedAt: {
+        type: Date,
+      },
+      setupWizardCompleted: {
+        type: Boolean,
+        default: false,
+      },
+      setupWizardCompletedAt: {
+        type: Date,
+      },
+      tourPreferences: {
+        showTipsAndTricks: {
+          type: Boolean,
+          default: true,
+        },
+        autoStartTours: {
+          type: Boolean,
+          default: true,
+        },
+      },
+    },
   },
   {
     timestamps: true,
@@ -45,6 +71,18 @@ const userSchema = new Schema<IUserDocument>(
 );
 
 userSchema.pre('save', async function (next) {
+  // Initialize onboarding field if it doesn't exist
+  if (!this.onboarding) {
+    this.onboarding = {
+      welcomeDemoCompleted: false,
+      setupWizardCompleted: false,
+      tourPreferences: {
+        showTipsAndTricks: true,
+        autoStartTours: true,
+      },
+    };
+  }
+
   if (!this.isModified('password')) return next();
 
   try {

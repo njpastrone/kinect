@@ -3,6 +3,16 @@ export interface IUser {
   email: string;
   firstName: string;
   lastName: string;
+  onboarding?: {
+    welcomeDemoCompleted: boolean;
+    welcomeDemoCompletedAt?: Date;
+    setupWizardCompleted: boolean;
+    setupWizardCompletedAt?: Date;
+    tourPreferences: {
+      showTipsAndTricks: boolean;
+      autoStartTours: boolean;
+    };
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -31,4 +41,24 @@ export interface IRegisterRequest {
 export interface IAuthResponse {
   user: IUser;
   tokens: IAuthTokens;
+}
+
+export interface IOnboardingStatus {
+  welcomeDemoCompleted: boolean;
+  welcomeDemoCompletedAt?: Date;
+  setupWizardCompleted: boolean;
+  setupWizardCompletedAt?: Date;
+  tourPreferences: {
+    showTipsAndTricks: boolean;
+    autoStartTours: boolean;
+  };
+}
+
+export interface IUpdateOnboardingRequest {
+  welcomeDemoCompleted?: boolean;
+  setupWizardCompleted?: boolean;
+  tourPreferences?: {
+    showTipsAndTricks?: boolean;
+    autoStartTours?: boolean;
+  };
 }

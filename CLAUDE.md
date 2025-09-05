@@ -456,3 +456,5 @@ docker compose -f docker-compose.selfhosted.yml restart [service-name]
 4. **Concurrent Actions**: Perform multiple actions simultaneously
 
 All testing scenarios are documented and verified in `QUICKSTART.md` with step-by-step instructions.
+
+- to memorize

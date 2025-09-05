@@ -212,4 +212,141 @@ router.post(
   })
 );
 
+// Get user onboarding status
+router.get(
+  '/onboarding/status',
+  authenticate,
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    res.json({
+      success: true,
+      data: {
+        onboarding: user.onboarding || {
+          welcomeDemoCompleted: false,
+          setupWizardCompleted: false,
+          tourPreferences: {
+            showTipsAndTricks: true,
+            autoStartTours: true,
+          },
+        },
+      },
+    });
+  })
+);
+
+// Update welcome demo completion status
+router.put(
+  '/onboarding/welcome-demo',
+  authenticate,
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    // Initialize onboarding if it doesn't exist
+    if (!user.onboarding) {
+      user.onboarding = {
+        welcomeDemoCompleted: false,
+        setupWizardCompleted: false,
+        tourPreferences: {
+          showTipsAndTricks: true,
+          autoStartTours: true,
+        },
+      };
+    }
+
+    user.onboarding.welcomeDemoCompleted = true;
+    user.onboarding.welcomeDemoCompletedAt = new Date();
+    await user.save();
+
+    res.json({
+      success: true,
+      data: {
+        onboarding: user.onboarding,
+      },
+      message: 'Welcome demo marked as completed',
+    });
+  })
+);
+
+// Update onboarding preferences
+router.put(
+  '/onboarding/preferences',
+  authenticate,
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { showTipsAndTricks, autoStartTours } = req.body;
+    
+    const user = await User.findById(req.userId);
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    // Initialize onboarding if it doesn't exist
+    if (!user.onboarding) {
+      user.onboarding = {
+        welcomeDemoCompleted: false,
+        setupWizardCompleted: false,
+        tourPreferences: {
+          showTipsAndTricks: true,
+          autoStartTours: true,
+        },
+      };
+    }
+
+    // Update preferences
+    if (typeof showTipsAndTricks === 'boolean') {
+      user.onboarding.tourPreferences.showTipsAndTricks = showTipsAndTricks;
+    }
+    if (typeof autoStartTours === 'boolean') {
+      user.onboarding.tourPreferences.autoStartTours = autoStartTours;
+    }
+
+    await user.save();
+
+    res.json({
+      success: true,
+      data: {
+        onboarding: user.onboarding,
+      },
+      message: 'Onboarding preferences updated',
+    });
+  })
+);
+
+// Reset onboarding (dev/admin only)
+router.post(
+  '/reset-onboarding',
+  authenticate,
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    user.onboarding = {
+      welcomeDemoCompleted: false,
+      setupWizardCompleted: false,
+      tourPreferences: {
+        showTipsAndTricks: true,
+        autoStartTours: true,
+      },
+    };
+
+    await user.save();
+
+    res.json({
+      success: true,
+      data: {
+        onboarding: user.onboarding,
+      },
+      message: 'Onboarding status reset',
+    });
+  })
+);
+
 export default router;

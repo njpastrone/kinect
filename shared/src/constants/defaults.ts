@@ -1,6 +1,8 @@
 export const DEFAULT_LISTS = [
   { name: "Best Friends", reminderDays: 30, color: "#EF4444", description: "Your closest friends" },
+  { name: "Family", reminderDays: 60, color: "#10B981", description: "Family members" },
   { name: "Friends", reminderDays: 90, color: "#3B82F6", description: "Regular friends" },
+  { name: "Work", reminderDays: 120, color: "#F59E0B", description: "Colleagues and work contacts" },
   { name: "Acquaintances", reminderDays: 180, color: "#6B7280", description: "People you know casually" },
 ] as const;
 
