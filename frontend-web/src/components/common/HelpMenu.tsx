@@ -22,7 +22,7 @@ export const HelpMenu: React.FC<HelpMenuProps> = ({ className = '' }) => {
 
   // Keyboard shortcuts handler
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
       // F1, ?, Ctrl+? to open help
       if (
         e.key === 'F1' || 
@@ -87,7 +87,7 @@ export const HelpMenu: React.FC<HelpMenuProps> = ({ className = '' }) => {
             message: 'Your onboarding progress has been reset. The welcome tour will start on your next visit.',
             type: 'success',
           });
-        } catch (error) {
+        } catch {
           showNotification({
             title: 'Reset Failed',
             message: 'Failed to reset onboarding. Please try again.',
