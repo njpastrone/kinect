@@ -181,8 +181,7 @@ This project showcases modern full-stack development practices:
 
 ## 🤝 Contact & Connect
 
-**Portfolio**: [Portfolio](https://njpastrone.github.io/)
-
+**Portfolio**: [Portfolio](https://njpastrone.github.io/)  
 **LinkedIn**: [LinkedIn](https://www.linkedin.com/in/nicolo-pastrone-345120208/)  
 **GitHub**: [@njpastrone](https://github.com/njpastrone)  
 **Email**: [njpastrone@gmail.com]
