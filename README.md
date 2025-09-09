@@ -4,7 +4,7 @@
 
 A privacy-first relationship management application that helps you maintain meaningful connections through smart reminders and intelligent contact organization.
 
-![Live Demo](https://kinect-web.onrender.com) • [View Source Code](https://github.com/njpastrone/kinect)
+[Live Demo](https://kinect-web.onrender.com) • [View Source Code](https://github.com/njpastrone/kinect)
 
 ---
 
@@ -181,10 +181,10 @@ This project showcases modern full-stack development practices:
 
 ## 🤝 Contact & Connect
 
-**Portfolio**: [Your Portfolio URL]  
-**LinkedIn**: [Your LinkedIn Profile]  
+**Portfolio**: [Portfolio](https://njpastrone.github.io/)
+**LinkedIn**: [LinkedIn](https://www.linkedin.com/in/nicolo-pastrone-345120208/)  
 **GitHub**: [@njpastrone](https://github.com/njpastrone)  
-**Email**: [Your Professional Email]
+**Email**: [njpastrone@gmail.com]
 
 ---
 
@@ -197,4 +197,4 @@ This project showcases modern full-stack development practices:
 
 ---
 
-*Built with ❤️ by Nicolo Pastrone • Open to new opportunities*
+*Built by Nicolo Pastrone
