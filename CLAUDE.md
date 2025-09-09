@@ -4,26 +4,87 @@
 
 Kinect is a privacy-first relationship management application designed to help users maintain meaningful connections with friends and loved ones. It tracks communication patterns and sends timely reminders to encourage regular contact.
 
-**🔒 Privacy-First**: Data stored in your own MongoDB instance
-**🛡️ Error-Resilient**: Enterprise-grade error handling with automatic retry mechanisms
-**☁️ Cloud Deployment**: Production deployment on Render with MongoDB Atlas
-**🏠 Self-Hosted Option**: Local development with Docker Compose available
+**🔒 Privacy-First**: Data stored in your own MongoDB instance  
+**🛡️ Error-Resilient**: Enterprise-grade error handling with automatic retry mechanisms  
+**☁️ Production Ready**: Fully deployed on Render with MongoDB Atlas  
+**🏠 Self-Hosted Option**: Local development with Docker Compose available  
 
-## Key Concepts
+## Current State (Updated: September 7, 2025)
 
-- **Relationship Categories**: Best Friends (30-day reminder), Friends (90-day reminder), Acquaintances (180-day reminder), Custom
-- **Communication Tracking**: Manual logging with automated reminders based on last contact dates
-- **Multi-platform**: Web application with PWA support, containerized backend
-- **Error Handling**: Comprehensive error boundaries, retry logic, and user feedback systems
-- **Self-Hosted**: Docker Compose deployment with MongoDB, Node.js backend, React frontend
+### ✅ Completed & Production Ready
+
+**Core Application:**
+- ✅ User authentication (register, login, logout, password reset)
+- ✅ Contact management with CRUD operations
+- ✅ Contact list creation and management with bidirectional references
+- ✅ Dashboard with overdue contacts and statistics
+- ✅ Modal-based UI for contact/list creation and editing
+- ✅ Professional UI/UX with Tailwind CSS
+- ✅ TypeScript implementation across frontend and backend
+- ✅ MongoDB integration with Mongoose
+- ✅ JWT-based authentication
+- ✅ State management with Zustand
+- ✅ Real-time contact-to-list synchronization
+
+**Error Handling & Reliability:**
+- ✅ Comprehensive error boundaries with retry mechanisms
+- ✅ Form validation with FormError, FormField, and FormErrorSummary components
+- ✅ Exponential backoff retry logic for failed operations
+- ✅ Request deduplication to prevent duplicate API calls
+- ✅ Circuit breaker pattern for network resilience
+- ✅ Toast notifications for all user actions
+- ✅ Optimistic UI updates with graceful rollback
+- ✅ Development error reporting and debugging tools
+- ✅ Global error handlers for unhandled errors and promise rejections
+
+**Production Deployment (Render):**
+- ✅ Frontend: https://kinect-web.onrender.com (Global CDN)
+- ✅ Backend API: https://kinect-api.onrender.com (Virginia region)
+- ✅ Database: MongoDB Atlas cluster (N. Virginia us-east-1)
+- ✅ Cron Jobs: Weekly reminders scheduled for Monday 9 AM UTC
+- ✅ Automated deployments from GitHub main branch
+- ✅ Health monitoring and error alerts
+- ✅ SSL/TLS encryption and security headers
+
+**Self-Hosted Deployment:**
+- ✅ Docker Compose configuration with health checks
+- ✅ Multi-stage Docker builds for optimized containers
+- ✅ Nginx proxy configuration for API routing
+- ✅ MongoDB with automatic backup capabilities
+- ✅ Security headers and CORS configuration
+- ✅ Non-root container execution for security
+
+### 🔄 Recently Updated (September 2025)
+
+**Project Cleanup & Documentation:**
+- ✅ Removed Welcome Demo system that was causing React hooks violations
+- ✅ Cleaned up Railway deployment artifacts and references
+- ✅ Restructured documentation for portfolio presentation
+- ✅ Created professional README for external stakeholders
+- ✅ Organized technical docs in `/docs` directory structure
+- ✅ Updated CLAUDE.md with current project state
+
+**Repository Structure:**
+```
+kinect/
+├── README.md                 # Professional portfolio presentation
+├── CLAUDE.md                 # AI assistant context (this file)
+├── docs/
+│   ├── README_DEVELOPERS.md  # Developer setup and contribution guide
+│   ├── README_DEPLOYMENT.md  # Production deployment instructions
+│   ├── development/          # Testing strategies and development docs
+│   └── deployment/           # Deployment configurations and guides
+├── backend/                  # Node.js/Express API
+├── frontend-web/             # React/TypeScript web application
+├── shared/                   # Shared TypeScript types and utilities
+└── [other directories...]
+```
 
 ## Architecture
 
-The project follows a multi-tier architecture optimized for cloud deployment:
-
 ### Production (Render + MongoDB Atlas)
 - **Backend API**: Node.js/Express with TypeScript on Render Web Service (Virginia region)
-- **Database**: MongoDB Atlas cluster (N. Virginia us-east-1)
+- **Database**: MongoDB Atlas cluster (N. Virginia us-east-1) with ~5ms latency
 - **Frontend**: React with Vite on Render Static Site (Global CDN)
 - **Cron Jobs**: Render Cron Service for scheduled reminders (Virginia region)
 - **Shared Module**: Common TypeScript types and utilities (built for both CommonJS and ESM)
@@ -34,234 +95,160 @@ The project follows a multi-tier architecture optimized for cloud deployment:
 - **Frontend**: Vite dev server with hot reload (port 5173)
 - **Error Handling**: Comprehensive error boundaries, retry mechanisms, and monitoring
 
-## Development Guidelines
+### Technology Stack
+```typescript
+// Frontend
+- React 18 with TypeScript
+- Tailwind CSS for styling
+- Vite for development and building
+- Zustand for state management
+- React Router for navigation
+- React Hook Form for forms
+- React Hot Toast for notifications
 
-### Code Organization
+// Backend
+- Node.js/Express with TypeScript
+- MongoDB with Mongoose ODM
+- JWT authentication with refresh tokens
+- bcryptjs for password hashing
+- nodemailer for email notifications
+- express-rate-limit for API protection
 
-- Backend code goes in `/backend/` with subdirectories for api, models, services, and config
-- Web frontend code goes in `/frontend-web/`
-- Shared types and interfaces go in `/shared/` (built for both CommonJS and ESM)
-- Error handling components in `/frontend-web/src/components/common/`
-- Utility functions for retry logic and error reporting in `/frontend-web/src/utils/`
-- Docker configurations for self-hosted deployment
-
-### API Design
-
-- RESTful API design patterns with comprehensive error responses
-- JWT-based authentication with refresh token support
-- Request deduplication to prevent duplicate operations
-- Exponential backoff retry logic for network failures
-- Circuit breaker patterns for fault tolerance
-- Proper HTTP status codes and error message standardization
-
-### Database Schema
-
-Key entities to implement:
-
-- Users (authentication, profile)
-- Contacts (name, birthday, category, last_contact_date)
-- Contact Lists (user's organized groups)
-- Notification Settings (per-category intervals)
-- Communication Logs (phone call records)
-
-### Security Considerations
-
-- Encrypt sensitive data at rest
-- Implement proper authentication and authorization
-- Request minimal permissions for phone log access
-- Follow GDPR/CCPA compliance guidelines
-- Never store raw phone numbers or call content
-
-### Testing Requirements
-
-- Unit tests for business logic
-- Integration tests for API endpoints
-- UI tests for critical user flows
-- Error handling and boundary testing
-- Retry mechanism validation
-- Docker health check verification
-- Manual testing scenarios documented in QUICKSTART.md
-
-### Performance Considerations
-
-- Optimize database queries for contact list retrieval
-- Implement pagination for large contact lists
-- Cache frequently accessed data
-- Efficient notification scheduling (batch processing)
-
-## Common Tasks
-
-### Adding a New Feature
-
-1. Update the database schema if needed
-2. Implement backend API endpoints
-3. Add frontend components and views
-4. Update iOS app if applicable
-5. Write tests for new functionality
-6. Update documentation
-
-### Working with Notifications
-
-- Use Firebase Cloud Messaging or OneSignal
-- Implement batch scheduling to avoid overwhelming users
-- Allow users to customize notification preferences
-- Include unsubscribe/snooze options
-
-### Integrating Phone Logs
-
-- Request appropriate permissions on iOS
-- Use CallKit framework for iOS
-- Implement privacy-preserving sync mechanism
-- Only store necessary metadata (timestamp, contact identifier)
-
-## Development Commands
-
-```bash
-# Production Deployment (Render)
-git push origin main              # Triggers automatic deployment to Render
-# Manual deploy available in Render dashboard
-
-# Local Development
-npm run dev:all                   # Start both backend and frontend concurrently
-npm run dev:backend               # Start backend only (port 3001)
-npm run dev:web                   # Start frontend only (port 5173)
-
-# Backend Commands
-cd backend
-npm run dev                       # Start development server with nodemon
-npm run build                     # TypeScript compilation (rm -rf dist && tsc)
-npm run test                      # Run tests (currently no tests configured)
-npm run lint                      # Lint code
-npm run seed                      # Seed database with sample data
-npm run reset                     # Reset database
-npm run test:atlas                # Test MongoDB Atlas connection
-
-# Frontend Commands
-cd frontend-web
-npm run dev                       # Start Vite dev server
-npm run build                     # Production build (tsc && vite build)
-npm run preview                   # Preview production build
-npm run lint                      # Lint code
-
-# Shared Package
-cd shared
-npm run build                     # Build both CommonJS and ESM versions
-npm run build:clean               # Clean dist directory (rm -rf dist)
+// Infrastructure
+- Render for production hosting
+- MongoDB Atlas for database
+- Docker for self-hosted deployments
+- GitHub for version control
+- ESLint/Prettier for code quality
 ```
 
-## Important Notes
+## API Design
 
-- Privacy is paramount - collect only necessary data
-- User experience should be simple and intuitive
-- Focus on helping users maintain meaningful connections
-- Regular contact reminders should feel helpful, not intrusive
-- Consider different cultural norms around communication frequency
+### RESTful API Endpoints
+```typescript
+// Authentication
+POST   /api/auth/register
+POST   /api/auth/login
+POST   /api/auth/refresh
+GET    /api/auth/me
+POST   /api/auth/forgot-password
+POST   /api/auth/reset-password
 
-## MVP Priorities
+// Contacts
+GET    /api/contacts           # with pagination, filtering
+GET    /api/contacts/overdue
+GET    /api/contacts/:id
+POST   /api/contacts
+PUT    /api/contacts/:id
+DELETE /api/contacts/:id
+POST   /api/contacts/:id/log-contact
+PATCH  /api/contacts/:id/mark-contacted
 
-1. User authentication and account creation
-2. Basic contact list CRUD operations
-3. Phone log integration (read-only)
-4. Simple notification system with default intervals
-5. Clean, responsive UI for web
-6. Basic iOS app with core functionality
+// Lists
+GET    /api/lists             # with stats
+GET    /api/lists/:id
+GET    /api/lists/:id/contacts
+POST   /api/lists
+PUT    /api/lists/:id
+DELETE /api/lists/:id
+POST   /api/lists/:id/contacts/:contactId
+DELETE /api/lists/:id/contacts/:contactId
 
-## Deployment Configuration
+// Health & Monitoring
+GET    /health
+```
 
-### Production (Render + MongoDB Atlas)
+### Database Schema
+```typescript
+// Core entities with optimized relationships
+interface User {
+  _id: ObjectId;
+  email: string;
+  password: string; // bcrypt hashed
+  firstName: string;
+  lastName: string;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
+  timestamps: true;
+}
 
-**Services:**
-- **Frontend**: https://kinect-web.onrender.com (Global CDN)
-- **Backend API**: https://kinect-api.onrender.com (Virginia region)
-- **Database**: MongoDB Atlas cluster in N. Virginia (us-east-1)
-- **Cron Jobs**: Weekly reminders scheduled for Monday 9 AM UTC
+interface Contact {
+  _id: ObjectId;
+  userId: ObjectId;
+  name: string;
+  email?: string;
+  phone?: string;
+  notes?: string;
+  category: 'bestfriend' | 'friend' | 'acquaintance';
+  reminderDays: number;
+  lastContactDate?: Date;
+  lists: ObjectId[]; // Bidirectional reference
+  timestamps: true;
+}
 
-**Key Configuration Files:**
-- `render.yaml`: Render blueprint defining all services and environment variables
-- `.env.atlas`: MongoDB Atlas connection string (not committed to git)
-- `frontend-web/src/config/api.ts`: Dynamic API URL configuration
+interface ContactList {
+  _id: ObjectId;
+  userId: ObjectId;
+  name: string;
+  color: string;
+  description?: string;
+  reminderDays: number;
+  isDefault: boolean;
+  timestamps: true;
+}
+```
 
-**Environment Variables (Backend):**
-- `NODE_ENV`: production
-- `PORT`: 3001
-- `MONGODB_URI`: MongoDB Atlas connection string
-- `JWT_SECRET`: Auto-generated by Render
-- `JWT_REFRESH_SECRET`: Auto-generated by Render
-- `CORS_ORIGIN`: https://kinect-web.onrender.com
-- `SMTP_*`: Email service configuration
+## Development Patterns
 
-**Build Commands:**
-- Backend/Cron: `npm ci --ignore-scripts && npm run build`
-- Frontend: `npm ci --ignore-scripts && npm run build`
-- Note: `--ignore-scripts` prevents Husky git hooks from running in CI
+### Code Organization
+- **Backend**: Layered architecture (routes → controllers → services → models)
+- **Frontend**: Feature-based structure with shared components
+- **Shared**: Common TypeScript types and constants
+- **Error Handling**: Centralized error boundaries and retry logic
+- **State Management**: Zustand stores with TypeScript interfaces
+- **API Integration**: Centralized API client with error handling
 
-**Important Notes:**
-- All services deployed in Virginia region for optimal MongoDB Atlas latency (~5ms)
-- Frontend uses Global CDN for worldwide performance
-- Automatic deploys triggered on push to main branch
-- Health check endpoint: `/health` for backend monitoring
+### Error Handling Architecture
+```typescript
+// Component-level error boundaries
+<ErrorBoundary>
+  <FeatureComponent />
+</ErrorBoundary>
 
-## Current Implementation Status
+// Network resilience with retry logic
+const retryConfigs = {
+  query: { maxAttempts: 3, baseDelay: 1000 },
+  mutation: { maxAttempts: 2, baseDelay: 1500 },
+  critical: { maxAttempts: 5, baseDelay: 2000 }
+};
 
-### Completed Features ✅
+// Form validation with user feedback
+<FormField error={errors.name}>
+  <input {...register('name')} />
+</FormField>
+```
 
-**Core Application:**
-- User authentication (register, login, logout, password reset)
-- Contact management with CRUD operations
-- Contact list creation and management with bidirectional references
-- Dashboard with overdue contacts and statistics
-- Modal-based UI for contact/list creation and editing
-- Professional UI/UX with Tailwind CSS
-- TypeScript implementation across frontend and backend
-- MongoDB integration with Mongoose
-- JWT-based authentication
-- State management with Zustand
-- Real-time contact-to-list synchronization
+### Security Patterns
+```typescript
+// Password hashing
+const salt = await bcrypt.genSalt(10);
+const hashedPassword = await bcrypt.hash(password, salt);
 
-**Error Handling & Reliability:**
-- Comprehensive error boundaries with retry mechanisms
-- Form validation with FormError, FormField, and FormErrorSummary components
-- Exponential backoff retry logic for failed operations
-- Request deduplication to prevent duplicate API calls
-- Circuit breaker pattern for network resilience
-- Toast notifications for all user actions
-- Optimistic UI updates with graceful rollback
-- Development error reporting and debugging tools
-- Global error handlers for unhandled errors and promise rejections
+// JWT with refresh tokens
+const tokens = {
+  accessToken: jwt.sign(payload, JWT_SECRET, { expiresIn: '15m' }),
+  refreshToken: jwt.sign(payload, JWT_REFRESH_SECRET, { expiresIn: '7d' })
+};
 
-**Self-Hosted Deployment:**
-- Docker Compose configuration with health checks
-- Multi-stage Docker builds for optimized containers
-- Nginx proxy configuration for API routing
-- MongoDB with automatic backup capabilities
-- Security headers and CORS configuration
-- Non-root container execution for security
+// CORS and security headers
+app.use(cors({ origin: process.env.CORS_ORIGIN }));
+app.use(helmet());
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
+```
 
-### Recent Major Improvements ✅
+## Known Issues & Limitations
 
-**Error Handling Overhaul:**
-- Eliminated silent failures with comprehensive user feedback
-- Added retry mechanisms with exponential backoff and jitter
-- Implemented error boundaries for graceful failure recovery
-- Created consistent form validation across all modals
-- Added development debugging tools accessible via `window.__debugErrors`
-
-**Docker & Deployment Fixes:**
-- Fixed TypeScript compilation errors in containerized builds
-- Resolved module resolution conflicts between CommonJS and ESM
-- Fixed Docker container startup issues and missing directories
-- Updated nginx configuration for proper API proxying
-- Added comprehensive health checks for all services
-
-**UI/UX Polish:**
-- Professional loading states with spinners and progress indicators
-- Consistent error messaging with icons and accessibility
-- Enhanced form validation with clear, actionable feedback
-- Optimistic updates for immediate user feedback
-- Toast notifications for all operations
-
-### Current Limitations ⚠️
-
+### Current Limitations
 - No automated test coverage (unit/integration/e2e tests missing)
 - Email notifications require SMTP configuration
 - iOS native app not yet implemented
@@ -269,190 +256,105 @@ npm run build:clean               # Clean dist directory (rm -rf dist)
 - Social media integration not available
 - Analytics dashboard not implemented
 
-### API Endpoints
+### Development Notes
+- Welcome Demo system was removed due to React hooks violations
+- All hooks must be called at top level (not in try-catch blocks)
+- Context providers must be properly nested
+- Error boundaries catch React errors, not async/promise errors
+- MongoDB connection issues are automatically retried
 
-```
-Authentication:
-- POST /api/auth/register
-- POST /api/auth/login
-- POST /api/auth/logout
-- POST /api/auth/forgot-password
-- POST /api/auth/reset-password
+## Development Commands
 
-Contacts:
-- GET /api/contacts (with pagination, filtering)
-- GET /api/contacts/overdue
-- GET /api/contacts/:id
-- POST /api/contacts
-- PUT /api/contacts/:id
-- DELETE /api/contacts/:id
-- POST /api/contacts/:id/log-contact
-- PATCH /api/contacts/:id/mark-contacted
-
-Lists:
-- GET /api/lists (with stats)
-- GET /api/lists/:id
-- GET /api/lists/:id/contacts
-- POST /api/lists
-- PUT /api/lists/:id
-- DELETE /api/lists/:id
-- POST /api/lists/:id/contacts/:contactId
-- DELETE /api/lists/:id/contacts/:contactId
-```
-
-## Future Enhancements (Post-MVP)
-
-**Communication Integration:**
-- Email and text message tracking
-- Phone log integration (iOS CallKit)
-- Social media integration
-- Calendar integration for birthdays and events
-- Group messaging reminders
-
-**Analytics & Intelligence:**
-- Analytics dashboard for communication patterns
-- AI-powered relationship insights
-- Custom notification messages
-- Relationship health scoring
-
-**Development & Operations:**
-- Comprehensive test suite (Jest, Vitest, Playwright)
-- CI/CD pipeline setup
-- API documentation with Swagger
-- Performance monitoring and alerting
-- Automated backup scheduling
-- Multi-user support with organizations
-
-**Mobile & Cross-Platform:**
-- iOS native app with SwiftUI
-- Android native app
-- Desktop applications (Electron)
-- Browser extensions for quick contact logging
-
-## Error Handling Architecture
-
-### Component-Level Error Handling
-
-**FormError Components (`/frontend-web/src/components/common/FormError.tsx`):**
-- `FormError`: Individual field error display with icons and accessibility
-- `FormField`: Wrapper component for consistent field styling and error display
-- `FormErrorSummary`: Aggregated error display for forms with multiple issues
-- Supports ARIA live regions for screen reader compatibility
-
-**Error Boundaries (`/frontend-web/src/components/common/ErrorBoundary.tsx`):**
-- Feature-specific boundaries: `ContactsErrorBoundary`, `ListsErrorBoundary`, `DashboardErrorBoundary`
-- Retry mechanisms with exponential backoff
-- Development debugging information display
-- Graceful fallback UI with user-friendly error messages
-
-### Network Resilience
-
-**Retry Logic (`/frontend-web/src/utils/retry.ts`):**
-- Exponential backoff with jitter to prevent thundering herd
-- Configurable retry strategies for different operation types
-- Circuit breaker pattern to prevent cascading failures
-- Request deduplication to avoid duplicate API calls
-
-**Request Configurations:**
-```typescript
-export const retryConfigs = {
-  query: { maxAttempts: 3, baseDelay: 1000, maxDelay: 8000 },
-  mutation: { maxAttempts: 2, baseDelay: 1500, maxDelay: 6000 },
-  critical: { maxAttempts: 5, baseDelay: 2000, maxDelay: 16000 }
-};
-```
-
-### Development Tools
-
-**Error Reporting (`/frontend-web/src/utils/errorReporting.ts`):**
-- Global error handlers for unhandled errors and promise rejections
-- Development-only error overlay with detailed stack traces
-- Error history tracking with context preservation
-- Debug tools accessible via `window.__debugErrors`:
-  - `showErrors()`: Display error history
-  - `downloadErrorReport()`: Export error data as JSON
-  - `testError(message)`: Trigger test error for boundary testing
-
-### State Management Integration
-
-**Zustand Store Enhancement:**
-- Optimistic updates with automatic rollback on failure
-- Error state management integrated into all store actions
-- Toast notifications for user feedback
-- Loading state management with proper cleanup
-
-## Self-Hosted Deployment Guide
-
-### Quick Start
+### Root Level
 ```bash
-# Clone repository and start services
-git clone <repository-url>
-cd kinect
-docker compose -f docker-compose.selfhosted.yml up -d
+# Development
+npm run dev:all          # Start both backend and frontend
+npm run dev:backend      # Backend only (port 3001)
+npm run dev:web          # Frontend only (port 5173)
 
-# Access application at http://localhost:3000
-# API available at http://localhost:3000/api
+# Building
+npm run build:all        # Build all packages
+npm run test             # Run all tests
+npm run lint             # Lint all workspaces
+
+# Database
+npm run seed             # Add sample data
+npm run reset-db         # Clear database
 ```
 
-### Service Architecture
-- **Frontend** (`kinect-web`): Nginx serving React app with API proxy
-- **Backend** (`kinect-api`): Node.js/Express API server
-- **Database** (`kinect-db`): MongoDB with health checks
-- **Networking**: Isolated bridge network with service discovery
-
-### Health Monitoring
+### Environment Setup
 ```bash
-# Check all services
-docker compose -f docker-compose.selfhosted.yml ps
+# Required environment variables
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/kinect
+JWT_SECRET=your-super-secure-jwt-secret
+JWT_REFRESH_SECRET=your-super-secure-refresh-secret
+CORS_ORIGIN=http://localhost:5173
 
-# Health check endpoints
-curl http://localhost:3000/health        # Frontend health
-curl http://localhost:3000/api/health    # Backend health via proxy
+# Optional (for email reminders)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
 ```
 
-### Backup & Maintenance
-```bash
-# Manual backup
-docker compose -f docker-compose.selfhosted.yml exec mongodb mongodump --out /backups
+## Testing Strategy
 
-# View logs
-docker compose -f docker-compose.selfhosted.yml logs -f [service-name]
+### Manual Testing Scenarios
+1. **User Registration & Login**: Create account, verify email validation, login/logout
+2. **Contact Management**: Add, edit, delete contacts with form validation
+3. **List Organization**: Create lists, add contacts to lists, manage relationships  
+4. **Error Handling**: Test network failures, form errors, boundary errors
+5. **Responsive Design**: Test on mobile devices and different screen sizes
 
-# Restart specific service
-docker compose -f docker-compose.selfhosted.yml restart [service-name]
-```
+### API Testing
+- REST Client collection available at `tests/api/kinect.http`
+- Postman collection at `tests/api/kinect.postman_collection.json`
+- Health check endpoint: `/health`
 
-## Testing the Enhanced Application
+### Error Testing
+- Error boundary testing: `window.__debugErrors.testError("Test")`
+- Network resilience: Disconnect internet during operations
+- Form validation: Submit forms with invalid/empty data
 
-### Form Validation Testing
-1. Navigate to any form (Add Contact, Register, etc.)
-2. Submit with empty required fields
-3. **Expected**: Clear error messages with icons appear
-4. **Expected**: Form submission is blocked until errors are resolved
+## Deployment Status
 
-### Network Resilience Testing
-1. Create a contact successfully
-2. Disconnect internet briefly
-3. Attempt another operation (edit/create contact)
-4. **Expected**: "Request failed. Retrying..." toast appears
-5. **Expected**: Operation succeeds automatically when connection restored
+### Production URLs
+- **Frontend**: https://kinect-web.onrender.com
+- **Backend**: https://kinect-api.onrender.com  
+- **Health**: https://kinect-api.onrender.com/health
 
-### Error Boundary Testing
-1. Open browser DevTools (F12) → Console
-2. Execute: `window.__debugErrors.testError("Test boundary")`
-3. **Expected**: Error boundary displays with retry option
-4. **Expected**: Retry button restores normal functionality
+### Deployment Pipeline
+- **Trigger**: Push to `main` branch
+- **Build**: Automated via `render.yaml` blueprint
+- **Services**: Backend API, Frontend static site, Cron jobs
+- **Monitoring**: Health checks, error alerts, deployment notifications
 
-### Debug Tools Testing
-1. In Console: `window.__debugErrors.showErrors()`
-2. **Expected**: Complete error history display
-3. Execute: `window.__debugErrors.downloadErrorReport()`
-4. **Expected**: Downloads comprehensive error report JSON
+## Important Development Notes
 
-### Load Testing Scenarios
-1. **Bulk Operations**: Create multiple contacts rapidly
-2. **Network Interruption**: Test during various operations
-3. **Invalid Data**: Submit malformed data to test validation
-4. **Concurrent Actions**: Perform multiple actions simultaneously
+### React Hooks Rules (Critical)
+- **NEVER** call hooks inside try-catch blocks
+- **ALWAYS** call hooks at the top level of components
+- **NEVER** call hooks conditionally
+- Use context providers properly and ensure hooks are called within provider scope
 
-All testing scenarios are documented and verified in `QUICKSTART.md` with step-by-step instructions.
+### Error Handling Best Practices
+- Use Error Boundaries for React component errors
+- Implement retry logic for network requests
+- Provide user-friendly error messages
+- Log errors for debugging but don't expose sensitive information
+
+### Database Best Practices
+- Use proper indexing for query performance
+- Validate data at both client and server level
+- Handle connection failures gracefully
+- Use transactions for related operations
+
+### Security Considerations
+- Hash passwords with bcrypt
+- Use JWT with short expiration times
+- Implement rate limiting on API endpoints
+- Validate and sanitize all user input
+- Use HTTPS in production
+- Set proper CORS policies
+
+This context document reflects the current stable state of the Kinect project after the Welcome Demo cleanup and documentation restructuring for portfolio presentation.
