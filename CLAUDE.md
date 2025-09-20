@@ -56,6 +56,14 @@ Kinect is a privacy-first relationship management application designed to help u
 
 ### 🔄 Recently Updated (September 2025)
 
+**Reminder System Testing & Database Issues (Sept 20, 2025):**
+- ✅ Created comprehensive reminder testing scripts
+- ✅ Configured Gmail SMTP for production email delivery
+- ✅ Fixed nodemailer integration issues (createTransport vs createTransporter)
+- ⚠️ Discovered database split: users in 'test' DB vs 'kinect' DB
+- ✅ Created user migration script to move accounts between databases
+- ✅ Successfully tested email reminders with real SMTP
+
 **Project Cleanup & Documentation:**
 - ✅ Removed Welcome Demo system that was causing React hooks violations
 - ✅ Cleaned up Railway deployment artifacts and references
@@ -250,7 +258,7 @@ app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
 ### Current Limitations
 - No automated test coverage (unit/integration/e2e tests missing)
-- Email notifications require SMTP configuration
+- ⚠️ Database inconsistency: Authentication may use 'test' DB while app uses 'kinect' DB
 - iOS native app not yet implemented
 - Phone log integration not implemented
 - Social media integration not available
@@ -282,6 +290,22 @@ npm run seed             # Add sample data
 npm run reset-db         # Clear database
 ```
 
+### Testing Reminders
+```bash
+# Complete demo with MailHog (local)
+cd backend
+npm run demo:reminders    # Full demo with test data and email viewer
+
+# Test with specific user
+TEST_USER_EMAIL=user@example.com node scripts/test-production-reminders.js
+node scripts/send-test-reminder.js
+
+# Database debugging
+node scripts/debug-database.js       # Check all users and databases
+node scripts/check-all-databases.js  # Search across multiple DBs
+node scripts/migrate-user.js         # Move user between databases
+```
+
 ### Environment Setup
 ```bash
 # Required environment variables
@@ -290,11 +314,16 @@ JWT_SECRET=your-super-secure-jwt-secret
 JWT_REFRESH_SECRET=your-super-secure-refresh-secret
 CORS_ORIGIN=http://localhost:5173
 
-# Optional (for email reminders)
+# Email configuration (Gmail SMTP)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
+SMTP_PASS=your-app-specific-password  # 16-char app password from Google
+FROM_EMAIL=your-email@gmail.com
+
+# Local testing with MailHog
+# SMTP_HOST=localhost
+# SMTP_PORT=1025
 ```
 
 ## Testing Strategy
@@ -357,4 +386,40 @@ SMTP_PASS=your-app-password
 - Use HTTPS in production
 - Set proper CORS policies
 
-This context document reflects the current stable state of the Kinect project after the Welcome Demo cleanup and documentation restructuring for portfolio presentation.
+## Known Database Issues
+
+### User Database Split Problem
+The application has a database consistency issue where:
+- Some users exist in the `test` database
+- Production operations use the `kinect` database  
+- Authentication may check different database than other operations
+
+**Symptoms:**
+- "User already exists" error during registration but user not found in queries
+- Reminder scripts process 0 users despite users existing
+- Different user counts in different operations
+
+**Solutions:**
+1. Use `scripts/check-all-databases.js` to locate users
+2. Use `scripts/migrate-user.js` to move users to correct database
+3. Ensure MONGODB_URI points to `/kinect` database path
+
+### Testing Email Reminders
+
+**Production Testing:**
+1. Create test contacts with old dates using `test-production-reminders.js`
+2. Send reminders with `send-test-reminder.js` (bypasses Mongoose models)
+3. Check email inbox for reminders from configured FROM_EMAIL
+
+**Local Testing with MailHog:**
+```bash
+docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+# View emails at http://localhost:8025
+```
+
+**Gmail SMTP Setup:**
+1. Enable 2-Factor Authentication on Google Account
+2. Generate App Password at https://myaccount.google.com/apppasswords
+3. Use 16-character app password in SMTP_PASS
+
+This context document reflects the current state of the Kinect project including recent reminder testing and database debugging efforts (September 20, 2025).

@@ -46,17 +46,13 @@ Kinect is a modern web application designed to solve a common problem: staying c
 
 **[Try Kinect Live](https://kinect-web.onrender.com)**
 
-```
-Demo Credentials:
-Email: demo@kinect.app
-Password: demo123
+Create your own account to experience the full functionality, including email reminders.
 
-Features to explore:
-• Dashboard with relationship insights
-• Add and organize contacts
-• Create custom contact lists
-• View reminder settings
-```
+**Features to Explore:**
+- Dashboard with overdue contact tracking
+- Smart contact organization with custom lists
+- Email reminder system (weekly on Mondays)
+- Customizable reminder intervals per contact
 
 ---
 
@@ -76,9 +72,10 @@ Features to explore:
 
 ### **Infrastructure**
 - **Render** for production deployment with auto-scaling
-- **MongoDB Atlas** for managed database hosting
+- **MongoDB Atlas** for managed database hosting (N. Virginia region)
+- **Cron Jobs** for automated weekly reminders (Mondays 9 AM UTC)
 - **Docker** for consistent local development
-- **GitHub Actions** for CI/CD (planned)
+- **Gmail SMTP** for production email delivery
 
 ### **Developer Experience**
 - **ESLint + Prettier** for code consistency
@@ -137,10 +134,14 @@ npm install
 
 # Configure environment
 cp .env.atlas.example .env
-# Add your MongoDB connection string
+# Add your MongoDB connection string and SMTP settings
 
 # Start development servers
 npm run dev:all
+
+# Test reminder system (with Docker for MailHog)
+docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+cd backend && npm run demo:reminders
 
 # Access at:
 # Frontend: http://localhost:5173
