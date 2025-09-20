@@ -19,7 +19,7 @@
     "build:esm": "tsc --project tsconfig.esm.json",
     "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist/types",
     "dev": "tsc --watch",
-    "lint": "eslint src",
+    "lint": "eslint 'src/**/*.ts'",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
