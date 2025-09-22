@@ -422,4 +422,23 @@ docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
 2. Generate App Password at https://myaccount.google.com/apppasswords
 3. Use 16-character app password in SMTP_PASS
 
-This context document reflects the current state of the Kinect project including recent reminder testing and database debugging efforts (September 20, 2025).
+### Critical Database Schema Issues (September 21, 2025)
+
+**UserId Type Mismatch Bug:**
+- **Problem**: Contact model schema defines `userId` as String, but data was stored as ObjectId
+- **Symptom**: API returns 0 contacts even though contacts exist in database
+- **Root Cause**: Type mismatch between schema (String) and stored data (ObjectId)
+- **Solution**: Run `scripts/fix-userid-type.js` to convert all userId fields to String
+
+**Diagnostic Scripts Created:**
+- `scripts/check-user-contacts.js` - View all contacts for a specific user
+- `scripts/debug-production-db.js` - Debug production database connections
+- `scripts/fix-userid-type.js` - Fix userId type mismatches
+- `scripts/cleanup-duplicate-contacts.js` - Remove duplicate contacts
+- `scripts/test-production-api.js` - Test production API endpoints
+
+**Environment Variable Configuration:**
+- Ensure MONGODB_URI includes database name: `/kinect` not just `/`
+- Example: `mongodb+srv://user:pass@cluster.mongodb.net/kinect?retryWrites=true`
+
+This context document reflects the current state of the Kinect project including recent reminder testing and critical database debugging efforts (September 21, 2025).
