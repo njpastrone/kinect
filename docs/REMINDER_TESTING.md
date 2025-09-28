@@ -155,6 +155,23 @@ npm install nodemailer
 Common error: `createTransporter is not a function`
 - Correct function is `createTransport` (not `createTransporter`)
 
+### Critical: UserId Type Compatibility
+
+**Important**: All scripts must query contacts with string userId:
+```javascript
+// ❌ Wrong - will find 0 contacts
+const contacts = await contactsCollection.find({ userId: user._id }).toArray();
+
+// ✅ Correct - userId is stored as String
+const contacts = await contactsCollection.find({ userId: user._id.toString() }).toArray();
+```
+
+This applies to:
+- `send-test-reminder.js`
+- `test-production-reminders.js`
+- `check-user-contacts.js`
+- Any custom scripts querying contacts
+
 ## Testing Checklist
 
 - [ ] SMTP configuration verified

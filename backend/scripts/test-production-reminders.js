@@ -42,8 +42,8 @@ async function testProductionReminders() {
 
     console.log(`\n👤 Found user: ${user.firstName} ${user.lastName} (${user.email})`);
 
-    // Get existing contacts
-    const existingContacts = await contactsCollection.find({ userId: user._id }).toArray();
+    // Get existing contacts - userId is stored as String in database
+    const existingContacts = await contactsCollection.find({ userId: user._id.toString() }).toArray();
     console.log(`📱 Found ${existingContacts.length} existing contacts`);
 
     if (existingContacts.length === 0) {
@@ -52,7 +52,7 @@ async function testProductionReminders() {
       // Create test contacts with various overdue states
       const testContacts = [
         {
-          userId: user._id,
+          userId: user._id.toString(),
           firstName: 'Test',
           lastName: 'Contact1',
           email: 'test1@example.com',
@@ -62,7 +62,7 @@ async function testProductionReminders() {
           updatedAt: new Date()
         },
         {
-          userId: user._id,
+          userId: user._id.toString(),
           firstName: 'Test',
           lastName: 'Contact2',
           email: 'test2@example.com',
@@ -72,7 +72,7 @@ async function testProductionReminders() {
           updatedAt: new Date()
         },
         {
-          userId: user._id,
+          userId: user._id.toString(),
           firstName: 'Test',
           lastName: 'Contact3',
           email: 'test3@example.com',
@@ -113,7 +113,7 @@ async function testProductionReminders() {
 
     // Check overdue contacts
     console.log('\n📊 Checking overdue contacts...');
-    const allContacts = await contactsCollection.find({ userId: user._id }).toArray();
+    const allContacts = await contactsCollection.find({ userId: user._id.toString() }).toArray();
     
     let overdueCount = 0;
     for (const contact of allContacts) {

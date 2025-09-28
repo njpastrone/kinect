@@ -430,12 +430,22 @@ docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
 - **Root Cause**: Type mismatch between schema (String) and stored data (ObjectId)
 - **Solution**: Run `scripts/fix-userid-type.js` to convert all userId fields to String
 
+**Script Query Fix (Critical):**
+- **Problem**: Scripts were querying with `userId: user._id` (ObjectId) but database stores as String
+- **Symptom**: Scripts find 0 contacts even though they exist and show in UI
+- **Solution**: All scripts must use `userId: user._id.toString()` when querying contacts
+- **Affected Scripts Fixed**: 
+  - `send-test-reminder.js`
+  - `test-production-reminders.js`  
+  - `check-user-contacts.js`
+
 **Diagnostic Scripts Created:**
-- `scripts/check-user-contacts.js` - View all contacts for a specific user
-- `scripts/debug-production-db.js` - Debug production database connections
-- `scripts/fix-userid-type.js` - Fix userId type mismatches
+- `scripts/check-user-contacts.js` - View all contacts for a specific user (uses string userId)
+- `scripts/debug-production-db.js` - Debug production database connections  
+- `scripts/fix-userid-type.js` - Fix userId type mismatches (ObjectId → String)
 - `scripts/cleanup-duplicate-contacts.js` - Remove duplicate contacts
 - `scripts/test-production-api.js` - Test production API endpoints
+- `scripts/send-test-reminder.js` - Send test reminder emails (uses string userId)
 
 **Environment Variable Configuration:**
 - Ensure MONGODB_URI includes database name: `/kinect` not just `/`

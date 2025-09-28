@@ -38,8 +38,8 @@ async function checkUserContacts() {
     console.log(`📧 User ID: ${user._id}`);
     console.log(`📅 Created: ${user.createdAt}`);
 
-    // Find all contacts for this user
-    const contacts = await contactsCollection.find({ userId: user._id }).toArray();
+    // Find all contacts for this user - userId is stored as String in database
+    const contacts = await contactsCollection.find({ userId: user._id.toString() }).toArray();
     console.log(`\n📱 Found ${contacts.length} contacts:`);
     console.log('━'.repeat(80));
 

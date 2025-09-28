@@ -51,8 +51,8 @@ async function sendTestReminder() {
 
     console.log(`👤 Processing reminders for: ${user.firstName} ${user.lastName} (${user.email})`);
 
-    // Find overdue contacts
-    const contacts = await contactsCollection.find({ userId: user._id }).toArray();
+    // Find overdue contacts - userId is stored as String in database
+    const contacts = await contactsCollection.find({ userId: user._id.toString() }).toArray();
     const now = new Date();
     const overdueContacts = [];
 
