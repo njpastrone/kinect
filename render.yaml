@@ -32,7 +32,7 @@ services:
       - key: SMTP_PASS
         sync: false
       - key: FROM_EMAIL
-        value: noreply@kinect.app
+        value: kinect.exec.team@gmail.com
 
   # Frontend Static Site
   - type: web
@@ -57,29 +57,29 @@ services:
       - key: VITE_API_URL
         value: https://kinect-api.onrender.com/api
 
-  # Weekly Reminder Cron Job
-  - type: cron
-    name: kinect-reminders
-    runtime: node
-    region: virginia
-    schedule: "0 9 * * 1" # Monday 9 AM UTC
-    buildCommand: cd backend && npm ci --ignore-scripts && npm run build
-    startCommand: cd backend && node scripts/send-reminders.js
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: MONGODB_URI
-        sync: false
-      - key: SMTP_HOST
-        sync: false
-      - key: SMTP_PORT
-        value: 587
-      - key: SMTP_USER
-        sync: false
-      - key: SMTP_PASS
-        sync: false
-      - key: FROM_EMAIL
-        value: noreply@kinect.app
+  # Weekly Reminder Cron Job (DISABLED - using internal cron jobs instead)
+  # - type: cron
+  #   name: kinect-reminders
+  #   runtime: node
+  #   region: virginia
+  #   schedule: "0 9 * * 1" # Monday 9 AM UTC
+  #   buildCommand: cd backend && npm ci --ignore-scripts && npm run build
+  #   startCommand: cd backend && node scripts/send-reminders.js
+  #   envVars:
+  #     - key: NODE_ENV
+  #       value: production
+  #     - key: MONGODB_URI
+  #       sync: false
+  #     - key: SMTP_HOST
+  #       sync: false
+  #     - key: SMTP_PORT
+  #       value: 587
+  #     - key: SMTP_USER
+  #       sync: false
+  #     - key: SMTP_PASS
+  #       sync: false
+  #     - key: FROM_EMAIL
+  #       value: kinect.exec.team@gmail.com
 
 databases:
   # MongoDB Atlas (external)

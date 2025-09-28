@@ -73,7 +73,7 @@ Create your own account to experience the full functionality, including email re
 ### **Infrastructure**
 - **Render** for production deployment with auto-scaling
 - **MongoDB Atlas** for managed database hosting (N. Virginia region)
-- **Cron Jobs** for automated weekly reminders (Mondays 9 AM UTC)
+- **Automated Reminders** with internal cron jobs (Mondays 9 AM UTC)
 - **Docker** for consistent local development
 - **Gmail SMTP** for production email delivery
 

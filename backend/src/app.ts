@@ -14,7 +14,8 @@ import communicationsRoutes from './api/routes/communications.routes';
 import devRoutes from './api/routes/dev.routes';
 import exportRoutes from './api/routes/export.routes';
 import { errorHandler, notFound } from './api/middleware/error.middleware';
-// Cron jobs will be handled by Render cron service
+// Initialize notification service for internal cron jobs
+import './services/notification.service.simple';
 
 dotenv.config();
 

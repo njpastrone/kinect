@@ -451,4 +451,29 @@ docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
 - Ensure MONGODB_URI includes database name: `/kinect` not just `/`
 - Example: `mongodb+srv://user:pass@cluster.mongodb.net/kinect?retryWrites=true`
 
-This context document reflects the current state of the Kinect project including recent reminder testing and critical database debugging efforts (September 21, 2025).
+### Automated Reminder System (September 28, 2025)
+
+**Fully Automated Email Reminders:**
+- ✅ Internal cron jobs enabled in production API service
+- ✅ Weekly reminders run automatically (Mondays 9 AM UTC)
+- ✅ No manual intervention required - fully hands-off operation
+- ✅ Uses `kinect.exec.team@gmail.com` as sender address
+
+**Automation Schedule:**
+- **Weekly Reminders**: Every Monday at 9 AM UTC
+- **Processing**: Scans all users for overdue contacts
+- **Email Delivery**: Professional HTML emails with dashboard links
+- **Rate Limiting**: 1-second delay between emails to avoid spam
+
+**Technical Implementation:**
+- Internal `NotificationService` with `node-cron` scheduling
+- Render external cron job disabled (using internal crons instead)
+- Automatic service initialization on app startup
+- Production-ready error handling and logging
+
+**Testing Scripts:**
+- `scripts/test-automation.js` - Test the full automation system
+- `scripts/send-test-reminder.js` - Manual reminder testing
+- Verified working with real Gmail SMTP delivery
+
+This context document reflects the current state of the Kinect project including recent reminder testing, critical database debugging, and full automation implementation (September 28, 2025).
