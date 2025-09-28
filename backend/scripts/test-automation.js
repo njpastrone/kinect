@@ -19,14 +19,14 @@ async function testAutomation() {
     // Import and test the notification service
     const { notificationService } = require('../dist/backend/src/services/notification.service.simple');
     
-    console.log('\n📅 Testing weekly reminders process...');
-    await notificationService.processWeeklyReminders();
+    console.log('\n📅 Testing daily reminders process...');
+    await notificationService.processDailyReminders();
     
     console.log('\n✅ Automation test completed successfully!');
     console.log('\n📋 Next steps:');
     console.log('   1. Deploy to production (git push)');
     console.log('   2. Cron jobs will run automatically:');
-    console.log('      - Weekly: Mondays at 9 AM UTC');
+    console.log('      - Daily: Every day at 9 AM UTC');
     console.log('   3. Check your email for reminders!');
 
     await mongoose.disconnect();

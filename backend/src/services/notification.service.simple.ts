@@ -19,18 +19,18 @@ class NotificationService {
   }
 
   private initializeCronJobs() {
-    // Weekly check on Monday at 9 AM
-    cron.schedule('0 9 * * 1', () => {
-      this.processWeeklyReminders().catch((error) => {
-        console.error('Weekly reminders processing failed:', error);
+    // Daily check at 9 AM
+    cron.schedule('0 9 * * *', () => {
+      this.processDailyReminders().catch((error) => {
+        console.error('Daily reminders processing failed:', error);
       });
     });
 
-    console.log('📅 Notification cron jobs initialized');
+    console.log('📅 Notification cron jobs initialized (daily at 9 AM)');
   }
 
-  async processWeeklyReminders() {
-    console.log('🔄 Processing weekly reminders...');
+  async processDailyReminders() {
+    console.log('🔄 Processing daily reminders...');
 
     if (this.isRunning) {
       console.log('⏳ Notification processing already in progress, skipping...');
@@ -52,15 +52,13 @@ class NotificationService {
             continue;
           }
 
-          // Limit to 5 contacts per email
-          const contactsToNotify = overdueContacts.slice(0, 5);
-
-          await emailService.sendContactReminderEmail(user.toJSON() as any, contactsToNotify);
+          // Send reminder email
+          await emailService.sendContactReminderEmail(user.toJSON() as any, overdueContacts);
           sentEmails++;
           processedUsers++;
 
           // Add delay to avoid overwhelming email service
-          await this.delay(1000);
+          await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
           console.error(`Failed to process reminders for user ${user.email}:`, error);
         }
@@ -72,6 +70,12 @@ class NotificationService {
     } finally {
       this.isRunning = false;
     }
+  }
+
+  // Keep weekly method for backward compatibility and manual testing
+  async processWeeklyReminders() {
+    console.log('🔄 Processing weekly reminders (redirecting to daily)...');
+    return this.processDailyReminders();
   }
 
   private async getOverdueContacts(userId: string): Promise<OverdueContact[]> {
@@ -137,9 +141,6 @@ class NotificationService {
     return 90;
   }
 
-  private delay(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
 
   // Manual trigger for testing
   async sendTestReminder(userId: string): Promise<void> {
