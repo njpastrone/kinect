@@ -24,9 +24,10 @@ Kinect is a modern web application designed to solve a common problem: staying c
 - **Last Contact Tracking**: Manual logging with timestamps and notes
 
 ### 📧 **Proactive Communication**
-- **Email Reminders**: Get notified when it's time to reach out
+- **Automated Email Reminders**: Daily automated notifications when it's time to reach out
+- **Manual Trigger Controls**: Test and trigger reminder emails on-demand from dashboard
 - **Overdue Tracking**: Dashboard view of relationships needing attention
-- **Batch Processing**: Efficient weekly reminder system
+- **Batch Processing**: Efficient daily reminder system with rate limiting
 
 ### 🔒 **Privacy & Security**
 - **Data Ownership**: Your data in your MongoDB instance (Atlas or self-hosted)
@@ -49,9 +50,10 @@ Kinect is a modern web application designed to solve a common problem: staying c
 Create your own account to experience the full functionality, including email reminders.
 
 **Features to Explore:**
-- Dashboard with overdue contact tracking
+- Dashboard with overdue contact tracking and manual trigger controls
 - Smart contact organization with custom lists
-- Email reminder system (weekly on Mondays)
+- Automated email reminder system (daily at 9 AM UTC)
+- Manual email trigger controls for testing and immediate processing
 - Customizable reminder intervals per contact
 
 ---

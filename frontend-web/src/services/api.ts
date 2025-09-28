@@ -272,6 +272,26 @@ class ApiService {
     });
     return response.data.data!;
   }
+
+  // Notification methods
+  async sendTestReminder(): Promise<{ message: string }> {
+    const response = await this.api.post<ApiResponse<{ message: string }>>('/notifications/test');
+    return response.data.data || { message: response.data.message || 'Test reminder sent' };
+  }
+
+  async triggerDailyReminders(): Promise<{ message: string }> {
+    const response = await this.api.post<ApiResponse<{ message: string }>>(
+      '/notifications/trigger-daily'
+    );
+    return response.data.data || { message: response.data.message || 'Daily reminders triggered' };
+  }
+
+  async getReminderStats(): Promise<{ overdueCount: number; upcomingCount: number }> {
+    const response = await this.api.get<
+      ApiResponse<{ overdueCount: number; upcomingCount: number }>
+    >('/notifications/stats');
+    return response.data.data!;
+  }
 }
 
 export default new ApiService();

@@ -101,8 +101,25 @@ router.post(
         success: true,
         message: 'Test reminder sent successfully',
       });
-    } catch (error) {
+    } catch {
       throw new AppError('Failed to send test reminder', 500);
+    }
+  })
+);
+
+// Manual trigger for processing all daily reminders
+router.post(
+  '/trigger-daily',
+  asyncHandler(async (_req: AuthRequest, res: Response) => {
+    try {
+      await notificationService.processDailyReminders();
+
+      res.json({
+        success: true,
+        message: 'Daily reminders processed successfully',
+      });
+    } catch {
+      throw new AppError('Failed to process daily reminders', 500);
     }
   })
 );
@@ -123,7 +140,7 @@ router.post(
         success: true,
         message: 'Weekly reminders processed successfully',
       });
-    } catch (error) {
+    } catch {
       throw new AppError('Failed to process reminders', 500);
     }
   })

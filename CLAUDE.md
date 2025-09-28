@@ -41,7 +41,8 @@ Kinect is a privacy-first relationship management application designed to help u
 - ✅ Frontend: https://kinect-web.onrender.com (Global CDN)
 - ✅ Backend API: https://kinect-api.onrender.com (Virginia region)
 - ✅ Database: MongoDB Atlas cluster (N. Virginia us-east-1)
-- ✅ Cron Jobs: Weekly reminders scheduled for Monday 9 AM UTC
+- ✅ Automated Daily Reminders: Internal cron jobs running at 9 AM UTC daily
+- ✅ Manual Trigger Controls: Dashboard UI for testing and immediate processing
 - ✅ Automated deployments from GitHub main branch
 - ✅ Health monitoring and error alerts
 - ✅ SSL/TLS encryption and security headers
@@ -300,6 +301,10 @@ npm run demo:reminders    # Full demo with test data and email viewer
 TEST_USER_EMAIL=user@example.com node scripts/test-production-reminders.js
 node scripts/send-test-reminder.js
 
+# Manual trigger testing
+node scripts/test-notification-service.js  # Test service methods directly
+node scripts/test-manual-triggers.js       # Test API endpoints (requires auth)
+
 # Database debugging
 node scripts/debug-database.js       # Check all users and databases
 node scripts/check-all-databases.js  # Search across multiple DBs
@@ -471,10 +476,22 @@ docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
 - Automatic service initialization on app startup
 - Production-ready error handling and logging
 
+**Manual Trigger Controls (September 28, 2025):**
+- ✅ Dashboard UI controls for manual email triggers
+- ✅ API endpoints: `/notifications/test` and `/notifications/trigger-daily`
+- ✅ Two trigger types:
+  - **Test Personal Reminder**: Send test email to current user with their overdue contacts
+  - **Trigger All Daily Reminders**: Process and send reminders to all users with overdue contacts
+- ✅ Professional UI with loading states and toast notifications
+- ✅ Rate limiting and error handling for manual triggers
+- ✅ Fully tested with real Gmail SMTP delivery
+
 **Testing Scripts:**
 - `scripts/test-automation.js` - Test the full automation system
+- `scripts/test-notification-service.js` - Test service methods directly (NEW)
+- `scripts/test-manual-triggers.js` - Test API endpoints with authentication (NEW)
 - `scripts/send-test-reminder.js` - Manual reminder testing
 - Verified working with real Gmail SMTP delivery
 
-This context document reflects the current state of the Kinect project including recent reminder testing, critical database debugging, and full automation implementation (September 28, 2025).
+This context document reflects the current state of the Kinect project including recent reminder testing, critical database debugging, full automation implementation, and manual trigger controls (September 28, 2025).
 - to memorize

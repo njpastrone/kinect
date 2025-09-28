@@ -324,6 +324,8 @@ export const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedContact, setSelectedContact] = useState<OverdueContact | null>(null);
   const [logContactModal, setLogContactModal] = useState<OverdueContact | null>(null);
+  const [triggeringReminders, setTriggeringReminders] = useState(false);
+  const [sendingTestReminder, setSendingTestReminder] = useState(false);
   const { preferences, updateView, updateSort, updateGrouping } = usePagePreferences('dashboard');
   const handleError = useErrorHandler();
 
@@ -356,6 +358,30 @@ export const Dashboard: React.FC = () => {
   const handleContactMarked = () => {
     // Refresh the dashboard data after a contact is marked
     loadDashboardData();
+  };
+
+  const handleTriggerDailyReminders = async () => {
+    try {
+      setTriggeringReminders(true);
+      const result = await api.triggerDailyReminders();
+      toast.success(result.message || 'Daily reminders triggered successfully');
+    } catch (error) {
+      handleError(error, 'Failed to trigger daily reminders');
+    } finally {
+      setTriggeringReminders(false);
+    }
+  };
+
+  const handleSendTestReminder = async () => {
+    try {
+      setSendingTestReminder(true);
+      const result = await api.sendTestReminder();
+      toast.success(result.message || 'Test reminder sent successfully');
+    } catch (error) {
+      handleError(error, 'Failed to send test reminder');
+    } finally {
+      setSendingTestReminder(false);
+    }
   };
 
   const getDaysOverdueColor = (days: number) => {
@@ -490,6 +516,77 @@ export const Dashboard: React.FC = () => {
                     d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                   />
                 </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Notification Controls */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900">Email Reminder Controls</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Manually trigger email reminders for testing or immediate processing
+            </p>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <div className="p-2 bg-blue-100 rounded-full">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-medium text-blue-900">Test Personal Reminder</h3>
+                    <p className="text-sm text-blue-700 mt-1">
+                      Send yourself a test reminder email with your current overdue contacts
+                    </p>
+                    <button
+                      onClick={handleSendTestReminder}
+                      disabled={sendingTestReminder}
+                      className="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-md transition-colors"
+                    >
+                      {sendingTestReminder ? 'Sending...' : 'Send Test Reminder'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <div className="p-2 bg-green-100 rounded-full">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-medium text-green-900">Trigger All Daily Reminders</h3>
+                    <p className="text-sm text-green-700 mt-1">
+                      Process and send reminder emails to all users with overdue contacts
+                    </p>
+                    <button
+                      onClick={handleTriggerDailyReminders}
+                      disabled={triggeringReminders}
+                      className="mt-3 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white text-sm font-medium rounded-md transition-colors"
+                    >
+                      {triggeringReminders ? 'Processing...' : 'Trigger Daily Reminders'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-start space-x-2">
+                <svg className="w-5 h-5 text-gray-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="text-sm text-gray-600">
+                  <p><strong>Automatic Schedule:</strong> Daily reminders run automatically at 9 AM UTC (daily).</p>
+                  <p><strong>Manual Triggers:</strong> Use these controls for testing or immediate processing outside the normal schedule.</p>
+                </div>
               </div>
             </div>
           </div>
