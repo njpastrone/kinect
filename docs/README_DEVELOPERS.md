@@ -124,6 +124,12 @@ npm run dev              # Start with nodemon
 npm run build            # TypeScript compilation
 npm run start            # Production start
 npm run test:atlas       # Test MongoDB connection
+
+# Reminder System Testing
+node scripts/test-notification-service.js  # Test service methods
+node scripts/test-manual-triggers.js       # Test API endpoints
+node scripts/test-production-email.js      # Test email delivery
+npm run demo:reminders                      # Full demo with MailHog
 ```
 
 ### Frontend Commands

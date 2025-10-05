@@ -39,8 +39,8 @@ Kinect uses a modern cloud architecture optimized for performance and reliabilit
 │  └──────────────────────────────────────────────┘  │
 │                                                     │
 │  ┌──────────────────────────────────────────────┐  │
-│  │        Render Cron Service                   │  │
-│  │     (Weekly Reminder Emails)                 │  │
+│  │        Internal Cron Jobs                    │  │
+│  │     (Daily Automated Reminder Emails)       │  │
 │  └──────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────┘
 ```

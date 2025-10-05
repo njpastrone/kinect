@@ -44,7 +44,7 @@
 #### Services Created
 - **Backend API**: `kinect-api` (Node.js service)
 - **Frontend**: `kinect-web` (Static site)
-- **Cron Jobs**: `kinect-reminders` (Weekly email reminders)
+- **Automated Reminders**: Internal cron jobs (Daily email reminders at 9 AM UTC)
 
 #### Monitoring
 - **Health Checks**: `/health` endpoint monitoring

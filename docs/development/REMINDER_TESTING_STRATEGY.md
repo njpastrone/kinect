@@ -3,17 +3,23 @@
 ## 🔍 Current Implementation Analysis
 
 ### Architecture Overview:
-- **Scheduler**: Node-cron jobs (daily 9 AM, weekly Monday 9 AM, monthly 1st 9 AM)
+- **Scheduler**: Internal Node-cron jobs (daily automated at 9 AM UTC)
 - **Trigger Logic**: Time-based cron jobs in `notification.service.simple.ts`
 - **Calculation**: `customReminderDays` > `list.reminderDays` > 90-day default
 - **Delivery**: Email via Nodemailer (test mode in dev, SMTP in production)
-- **API**: Manual testing via `/api/notifications/test/:userId`
+- **API**: Manual testing via `/api/notifications/test` and `/api/notifications/trigger-daily`
 
 ### Key Components:
 1. **NotificationService** - Cron job orchestration and batch processing
 2. **EmailService** - Message delivery with fallback to test mode
 3. **Overdue Detection** - Contact reminder calculations with hierarchy
 4. **User Preferences** - Notification frequency and quiet hours
+5. **Manual Trigger Controls** - Dashboard UI for immediate testing and processing
+
+### Manual Testing Options:
+- **Dashboard Controls**: Professional UI with "Test Personal Reminder" and "Trigger All Daily Reminders"
+- **API Endpoints**: Direct calls to `/api/notifications/test` and `/api/notifications/trigger-daily`
+- **Script Testing**: Direct service method calls for debugging and validation
 
 ---
 

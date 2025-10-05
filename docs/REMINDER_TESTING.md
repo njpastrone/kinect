@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Kinect reminder system sends weekly email notifications to users about contacts they haven't spoken to recently. This guide covers testing the reminder system in both development and production environments.
+The Kinect reminder system sends daily automated email notifications to users about contacts they haven't spoken to recently. It also provides manual trigger controls for immediate testing and processing. This guide covers testing the reminder system in both development and production environments.
 
 ## Quick Start
 
@@ -29,6 +29,39 @@ cd backend
 npm run demo:reminders
 
 # View emails at http://localhost:8025
+```
+
+### Manual Trigger Controls (Dashboard)
+
+The dashboard provides manual trigger controls for immediate testing:
+
+1. **Access Dashboard**
+   - Production: https://kinect-web.onrender.com/dashboard
+   - Local: http://localhost:5173/dashboard
+
+2. **Manual Trigger Options**
+   - **Test Personal Reminder**: Send test email to yourself with your overdue contacts
+   - **Trigger All Daily Reminders**: Process and send reminders to all users immediately
+
+3. **Benefits**
+   - Real-time testing without waiting for scheduled runs
+   - Immediate feedback with toast notifications
+   - Professional UI with loading states
+   - No command-line tools required
+
+### Script-Based Testing
+
+```bash
+cd backend
+
+# Test notification service methods directly
+node scripts/test-notification-service.js
+
+# Test API endpoints with authentication
+node scripts/test-manual-triggers.js
+
+# Test production email delivery
+node scripts/test-production-email.js
 ```
 
 ## Configuration
