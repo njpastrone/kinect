@@ -83,7 +83,7 @@ export const listValidation = {
 
 export const validate = (schema: Joi.Schema) => {
   return (req: Request, res: Response, next: NextFunction): void => {
-    const { error } = schema.validate(req.body);
+    const { error, value } = schema.validate(req.body);
     if (error) {
       res.status(400).json({
         success: false,
@@ -91,6 +91,8 @@ export const validate = (schema: Joi.Schema) => {
       });
       return;
     }
+    // Replace req.body with the validated and stripped data
+    req.body = value;
     next();
   };
 };
