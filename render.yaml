@@ -23,6 +23,8 @@ services:
         generateValue: true
       - key: CORS_ORIGIN
         value: https://kinect-web.onrender.com
+      - key: FRONTEND_URL
+        value: https://kinect-web.onrender.com
       - key: SMTP_HOST
         sync: false
       - key: SMTP_PORT
