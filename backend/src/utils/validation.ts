@@ -41,6 +41,7 @@ export const contactValidation = {
   }),
 
   update: Joi.object({
+    _id: Joi.any().strip(), // Allow but strip _id from updates
     firstName: Joi.string(),
     lastName: Joi.string(),
     phoneNumber: Joi.string().allow(''),
@@ -50,6 +51,10 @@ export const contactValidation = {
     listId: Joi.string().allow(null),
     notes: Joi.string().max(1000).allow(''),
     lastContactDate: Joi.date(),
+    userId: Joi.any().strip(), // Allow but strip userId from updates
+    createdAt: Joi.any().strip(), // Allow but strip createdAt from updates
+    updatedAt: Joi.any().strip(), // Allow but strip updatedAt from updates
+    __v: Joi.any().strip(), // Allow but strip __v from updates
   }),
 };
 
@@ -62,11 +67,17 @@ export const listValidation = {
   }),
 
   update: Joi.object({
+    _id: Joi.any().strip(), // Allow but strip _id from updates
     name: Joi.string(),
     description: Joi.string().max(500).allow(''),
     color: Joi.string().pattern(/^#[0-9A-F]{6}$/i),
     reminderDays: Joi.number().min(1).max(365).optional(),
     contactIds: Joi.array().items(Joi.string()),
+    userId: Joi.any().strip(), // Allow but strip userId from updates
+    createdAt: Joi.any().strip(), // Allow but strip createdAt from updates
+    updatedAt: Joi.any().strip(), // Allow but strip updatedAt from updates
+    __v: Joi.any().strip(), // Allow but strip __v from updates
+    isDefault: Joi.any().strip(), // Allow but strip isDefault from updates
   }),
 };
 
