@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface SearchBarProps {
   value: string;
@@ -14,15 +14,21 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   className = '',
 }) => {
   const [localValue, setLocalValue] = useState(value);
+  const onChangeRef = useRef(onChange);
+
+  // Keep ref up to date
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   // Debounce the search input
   useEffect(() => {
     const timer = setTimeout(() => {
-      onChange(localValue);
+      onChangeRef.current(localValue);
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [localValue, onChange]);
+  }, [localValue]);
 
   // Sync with external value changes
   useEffect(() => {
