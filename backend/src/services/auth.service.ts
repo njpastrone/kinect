@@ -6,9 +6,11 @@ export class AuthService {
     const secret = process.env.JWT_SECRET || 'secret';
     const refreshSecret = process.env.JWT_REFRESH_SECRET || 'refresh-secret';
 
-    const accessToken = jwt.sign({ userId }, secret, { expiresIn: '15m' });
+    // Access token valid for 1 hour - balances security with user experience
+    const accessToken = jwt.sign({ userId }, secret, { expiresIn: '1h' });
 
-    const refreshToken = jwt.sign({ userId }, refreshSecret, { expiresIn: '7d' });
+    // Refresh token valid for 30 days - allows users to stay logged in
+    const refreshToken = jwt.sign({ userId }, refreshSecret, { expiresIn: '30d' });
 
     return { accessToken, refreshToken };
   }

@@ -58,6 +58,13 @@ Kinect is a privacy-first relationship management application designed to help u
 
 ### 🔄 Recently Updated (October 2025)
 
+**UX Fixes from Automated Review (Oct 22, 2025):**
+- ✅ **Fixed Critical Bug**: Contact creation now works with optional `customReminderDays` and `listId` fields
+- ✅ **Fixed Missing Asset**: Added vite.svg favicon (eliminates 404 errors)
+- ✅ **Fixed SPA Routing**: Added `_redirects` file for direct URL navigation in production
+- ✅ **Improved Session Management**: Extended JWT access token to 1 hour, refresh token to 30 days
+- ✅ Validated all fixes with automated Playwright testing
+
 **Contact Search Feature (Oct 22, 2025):**
 - ✅ Real-time search functionality on Contacts page
 - ✅ Reusable SearchBar component with debounced input (300ms)

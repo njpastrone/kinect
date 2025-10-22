@@ -35,8 +35,8 @@ export const contactValidation = {
     phoneNumber: Joi.string().allow(''),
     email: Joi.string().email().allow(''),
     birthday: Joi.date().allow(null),
-    customReminderDays: Joi.number().min(1).max(365),
-    listId: Joi.string().allow(null),
+    customReminderDays: Joi.number().min(1).max(365).allow(null, '').optional(),
+    listId: Joi.string().allow(null, '').optional(),
     notes: Joi.string().max(1000).allow(''),
   }),
 
@@ -47,8 +47,8 @@ export const contactValidation = {
     phoneNumber: Joi.string().allow(''),
     email: Joi.string().email().allow(''),
     birthday: Joi.date().allow(null),
-    customReminderDays: Joi.number().min(1).max(365),
-    listId: Joi.string().allow(null),
+    customReminderDays: Joi.number().min(1).max(365).allow(null, '').optional(),
+    listId: Joi.string().allow(null, '').optional(),
     notes: Joi.string().max(1000).allow(''),
     lastContactDate: Joi.date(),
     userId: Joi.any().strip(), // Allow but strip userId from updates
