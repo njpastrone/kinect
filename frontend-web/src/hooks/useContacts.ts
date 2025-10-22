@@ -43,7 +43,7 @@ export const useContacts = create<ContactsState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await withRetry(
-        () => dedupedRequest('fetch-contacts', () => api.getContacts()),
+        () => dedupedRequest('fetch-contacts', () => api.getContacts({ limit: 1000 })),
         retryConfigs.fetch
       );
       set({ contacts: response.items, isLoading: false });

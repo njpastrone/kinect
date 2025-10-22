@@ -98,7 +98,7 @@ export const GroupedContactList: React.FC<GroupedContactListProps> = ({
                     <div className="flex items-center space-x-4">
                       <div>
                         <h3 className="font-medium text-gray-900">
-                          {contact.firstName} {contact.lastName}
+                          {contact.firstName}{contact.lastName ? ` ${contact.lastName}` : ''}
                         </h3>
                         <div className="flex items-center space-x-4 text-sm text-gray-600">
                           {contact.phoneNumber && <span>📞 {contact.phoneNumber}</span>}

@@ -90,7 +90,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
       <div className="bg-white rounded-lg p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-gray-900">
-            Update Status: {contact.firstName} {contact.lastName}
+            Update Status: {contact.firstName}{contact.lastName ? ` ${contact.lastName}` : ''}
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

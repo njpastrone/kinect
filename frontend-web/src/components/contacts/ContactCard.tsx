@@ -87,7 +87,7 @@ export const ContactCard: React.FC<ContactCardProps> = ({
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      {contact.firstName} {contact.lastName}
+                      {contact.firstName}{contact.lastName ? ` ${contact.lastName}` : ''}
                     </h3>
                     <span
                       className={`inline-block px-2 py-1 text-xs rounded-full ${getListColorClasses(getListInfo().color)}`}
@@ -164,7 +164,7 @@ export const ContactCard: React.FC<ContactCardProps> = ({
         <div className="flex justify-between items-start mb-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
-              {contact.firstName} {contact.lastName}
+              {contact.firstName}{contact.lastName ? ` ${contact.lastName}` : ''}
             </h3>
             <span
               className={`inline-block px-2 py-1 text-xs rounded-full ${getListColorClasses(getListInfo().color)} mt-1`}

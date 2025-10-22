@@ -21,8 +21,9 @@ const contactSchema = new Schema<IContactDocument>(
     },
     lastName: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
+      default: '',
     },
     phoneNumber: {
       type: String,

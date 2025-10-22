@@ -446,16 +446,16 @@ router.post(
 
     for (const contactData of contacts) {
       // Validate required fields
-      if (!contactData.firstName || !contactData.lastName) {
+      if (!contactData.firstName) {
         skippedContacts.push(contactData);
-        errors.push(`Skipped contact: Missing required fields`);
+        errors.push(`Skipped contact: Missing required field firstName`);
         continue;
       }
 
       contactsToInsert.push({
         userId: req.userId,
         firstName: contactData.firstName,
-        lastName: contactData.lastName,
+        lastName: contactData.lastName || '',
         email: contactData.email,
         phoneNumber: contactData.phoneNumber,
         lastContactDate: new Date(),

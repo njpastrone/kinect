@@ -330,7 +330,7 @@ export const ImportContactsModal: React.FC<ImportContactsModalProps> = ({
                             />
                           </td>
                           <td className="px-4 py-3 text-sm">
-                            {contact.firstName === contact.lastName
+                            {!contact.lastName || contact.firstName === contact.lastName
                               ? contact.firstName
                               : `${contact.firstName} ${contact.lastName}`}
                           </td>

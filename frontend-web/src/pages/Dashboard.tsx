@@ -45,7 +45,7 @@ const OverdueContactItem: React.FC<OverdueContactItemProps> = ({
     <div className="flex-1">
       <div className="flex items-center gap-3 mb-2">
         <h3 className="font-medium text-gray-900">
-          {contact.firstName} {contact.lastName}
+          {contact.firstName}{contact.lastName ? ` ${contact.lastName}` : ''}
         </h3>
         {showListName && (
           <span className="text-sm text-gray-500">in {contact.list?.name || 'No list'}</span>
@@ -191,7 +191,7 @@ const ContactNowModal: React.FC<ContactNowModalProps> = ({ contact, onClose, onC
       <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-gray-900">
-            Contact {contact.firstName} {contact.lastName}
+            Contact {contact.firstName}{contact.lastName ? ` ${contact.lastName}` : ''}
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -399,7 +399,9 @@ export const Dashboard: React.FC = () => {
 
       switch (preferences.sortBy) {
         case 'name':
-          comparison = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+          const nameA = a.lastName ? `${a.firstName} ${a.lastName}` : a.firstName;
+          const nameB = b.lastName ? `${b.firstName} ${b.lastName}` : b.firstName;
+          comparison = nameA.localeCompare(nameB);
           break;
         case 'updated':
           comparison = b.daysSinceLastContact - a.daysSinceLastContact;
@@ -411,7 +413,9 @@ export const Dashboard: React.FC = () => {
           break;
         }
         default:
-          comparison = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+          const defaultNameA = a.lastName ? `${a.firstName} ${a.lastName}` : a.firstName;
+          const defaultNameB = b.lastName ? `${b.firstName} ${b.lastName}` : b.firstName;
+          comparison = defaultNameA.localeCompare(defaultNameB);
       }
 
       return preferences.sortOrder === 'asc' ? comparison : -comparison;

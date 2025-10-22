@@ -153,8 +153,8 @@ export class VcfParserService {
           contact.firstName = firstNameParts[0];
           contact.lastName = firstNameParts.slice(1).join(' ');
         } else {
-          // Single word firstName, duplicate it for lastName
-          contact.lastName = contact.firstName;
+          // Single word firstName, leave lastName empty
+          contact.lastName = '';
         }
       } else if (contact.lastName && !contact.firstName) {
         // Have lastName from N field but no firstName (unusual but handle it)
@@ -185,8 +185,8 @@ export class VcfParserService {
       }
 
       // Validate contact
-      if (!contact.firstName && !contact.lastName) {
-        contact.errors.push('Missing required fields: firstName and lastName');
+      if (!contact.firstName) {
+        contact.errors.push('Missing required field: firstName');
       }
 
       if (contact.firstName && contact.firstName.length > 100) {
@@ -202,7 +202,7 @@ export class VcfParserService {
         contact.email = undefined; // Remove invalid email
       }
 
-      contact.isValid = contact.errors.length === 0 && !!contact.firstName && !!contact.lastName;
+      contact.isValid = contact.errors.length === 0 && !!contact.firstName;
 
     } catch (error) {
       contact.errors.push(`Failed to extract contact data: ${error instanceof Error ? error.message : 'Unknown error'}`);

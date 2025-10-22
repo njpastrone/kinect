@@ -63,13 +63,16 @@ Kinect is a privacy-first relationship management application designed to help u
 - ✅ Drag-and-drop file upload with preview
 - ✅ Automatic parsing of vCard 3.0 format
 - ✅ Intelligent name splitting for single-field names
+- ✅ **Single-name contact support** (e.g., "Madonna", "Prince")
 - ✅ Duplicate detection (email, phone, exact name match)
 - ✅ Bulk import optimization (up to 1000 contacts)
 - ✅ Preview table with validation status indicators
 - ✅ Selective import (checkbox selection)
 - ✅ 60-second timeout for large imports
 - ✅ Fallback to individual inserts if bulk fails
-- ⚠️ Known issue: Some edge cases in name parsing may need refinement
+- ✅ **Fixed**: No longer duplicates single names (Alphonso → firstName: "Alphonso", lastName: "")
+- ✅ **Fixed**: Pagination limit removed - all contacts now display (up to 1000)
+- ⚠️ **Known issue**: Contacts page sorting may not work correctly with single-name contacts
 
 ### 🔄 Previously Updated (September 2025)
 
@@ -278,6 +281,7 @@ app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 ### Current Limitations
 - No automated test coverage (unit/integration/e2e tests missing)
 - ⚠️ Database inconsistency: Authentication may use 'test' DB while app uses 'kinect' DB
+- ⚠️ **Contacts page sorting**: May not handle single-name contacts optimally in some views
 - iOS native app not yet implemented
 - Phone log integration not implemented
 - Social media integration not available
@@ -511,5 +515,37 @@ docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
 - `scripts/send-test-reminder.js` - Manual reminder testing
 - Verified working with real Gmail SMTP delivery
 
-This context document reflects the current state of the Kinect project including recent reminder testing, critical database debugging, full automation implementation, and manual trigger controls (September 28, 2025).
+### VCF Import Bug Fixes (October 21, 2025)
+
+**Issue 1: Duplicate Name Assignment**
+- **Problem**: Single-name contacts (e.g., "Alphonso") were imported with duplicated names ("Alphonso Alphonso")
+- **Root Cause**: VCF parser duplicated firstName as lastName when lastName was empty
+- **Fix**:
+  - Updated `vcf-parser.service.ts` to set `lastName = ''` for single names
+  - Modified Mongoose schema to make `lastName` optional (`required: false, default: ''`)
+  - Updated validation to only require `firstName`
+  - Fixed 7 frontend components to properly display empty lastName
+- **Files Changed**:
+  - `backend/src/services/vcf-parser.service.ts`
+  - `backend/src/models/Contact.model.ts`
+  - `backend/src/api/routes/contacts.routes.ts`
+  - `frontend-web/src/components/contacts/ContactCard.tsx`
+  - `frontend-web/src/components/contacts/DeleteConfirmationModal.tsx`
+  - `frontend-web/src/components/contacts/ImportContactsModal.tsx`
+  - `frontend-web/src/components/contacts/GroupedContactList.tsx`
+  - `frontend-web/src/components/contacts/LogContactModal.tsx`
+  - `frontend-web/src/components/contacts/StatusUpdateModal.tsx`
+  - `frontend-web/src/pages/Dashboard.tsx`
+
+**Issue 2: 20-Contact Display Limit**
+- **Problem**: Contacts page only displayed first 20 contacts regardless of total imported
+- **Root Cause**: Default pagination limit of 20 in API, frontend not requesting more
+- **Fix**: Updated `useContacts` hook to request `limit: 1000` contacts
+- **Files Changed**:
+  - `frontend-web/src/hooks/useContacts.ts`
+
+**Test File Created**:
+- `tests/test-single-names.vcf` - Contains test cases for single-name contacts (Alphonso, Madonna, Cher, Prince) and regular contacts
+
+This context document reflects the current state of the Kinect project including recent VCF import fixes, reminder testing, critical database debugging, full automation implementation, and manual trigger controls (October 21, 2025).
 - to memorize

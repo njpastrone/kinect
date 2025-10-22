@@ -15,7 +15,9 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
   const [confirmText, setConfirmText] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const contactName = `${contact.firstName} ${contact.lastName}`;
+  const contactName = contact.lastName
+    ? `${contact.firstName} ${contact.lastName}`
+    : contact.firstName;
   const isConfirmValid = confirmText === 'DELETE' || confirmText === contactName;
 
   const handleDelete = async () => {
