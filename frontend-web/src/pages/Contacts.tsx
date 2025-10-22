@@ -10,6 +10,7 @@ import { ImportContactsModal } from '../components/contacts/ImportContactsModal'
 import { ControlBar } from '../components/common/ControlBar';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { EmptyState } from '../components/common/EmptyState';
+import { SearchBar } from '../components/common/SearchBar';
 import { usePagePreferences } from '../hooks/usePreferences';
 import { useContacts } from '../hooks/useContacts';
 import { IContact, IContactList } from '@kinect/shared';
@@ -30,6 +31,7 @@ export const Contacts: React.FC = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<IContact | null>(null);
   const [lists, setLists] = useState<IContactList[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const { preferences, updateView, updateSort, updateGrouping } = usePagePreferences('contacts');
   const handleError = useErrorHandler();
 
@@ -98,7 +100,7 @@ export const Contacts: React.FC = () => {
     return isContactOverdue(contact, lists);
   };
 
-  // Filter contacts based on URL parameters and route params
+  // Filter contacts based on URL parameters, route params, and search query
   const filteredContacts = useMemo(() => {
     let filtered = contacts;
 
@@ -114,8 +116,26 @@ export const Contacts: React.FC = () => {
       filtered = filtered.filter(checkContactOverdue);
     }
 
+    // Apply search query filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((contact) => {
+        const fullName = `${contact.firstName} ${contact.lastName}`.toLowerCase();
+        const email = contact.email?.toLowerCase() || '';
+        const phone = contact.phoneNumber?.toLowerCase() || '';
+        const notes = contact.notes?.toLowerCase() || '';
+
+        return (
+          fullName.includes(query) ||
+          email.includes(query) ||
+          phone.includes(query) ||
+          notes.includes(query)
+        );
+      });
+    }
+
     return filtered;
-  }, [contacts, searchParams, routeListId, lists]);
+  }, [contacts, searchParams, routeListId, lists, searchQuery]);
 
   // Sort and group contacts
   const processedContacts = useMemo(() => {
@@ -158,14 +178,19 @@ export const Contacts: React.FC = () => {
   // Get page subtitle with count
   const pageSubtitle = useMemo(() => {
     const filter = searchParams.get('filter');
+    const hasSearch = searchQuery.trim().length > 0;
+
     if (filter === 'overdue') {
-      return `${filteredContacts.length} overdue contact${filteredContacts.length !== 1 ? 's' : ''}`;
+      return `${filteredContacts.length} overdue contact${filteredContacts.length !== 1 ? 's' : ''}${hasSearch ? ' matching search' : ''}`;
     }
     if (currentList) {
-      return `${filteredContacts.length} contact${filteredContacts.length !== 1 ? 's' : ''} in this list`;
+      return `${filteredContacts.length} contact${filteredContacts.length !== 1 ? 's' : ''} in this list${hasSearch ? ' matching search' : ''}`;
+    }
+    if (hasSearch) {
+      return `${filteredContacts.length} contact${filteredContacts.length !== 1 ? 's' : ''} found`;
     }
     return null;
-  }, [currentList, filteredContacts.length, searchParams]);
+  }, [currentList, filteredContacts.length, searchParams, searchQuery]);
 
   // Sort options for contacts
   const contactSortOptions = [
@@ -209,6 +234,13 @@ export const Contacts: React.FC = () => {
             </button>
           </div>
         </div>
+
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search contacts by name, email, phone, or notes..."
+          className="mb-4"
+        />
 
         <ControlBar
           view={preferences.view}
