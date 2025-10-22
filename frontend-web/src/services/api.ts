@@ -8,6 +8,8 @@ import {
   IUser,
   ApiResponse,
   PaginatedResponse,
+  IImportContactPreview,
+  IImportResult,
 } from '@kinect/shared';
 import getApiUrl from '../config/api';
 
@@ -290,6 +292,49 @@ class ApiService {
     const response = await this.api.get<
       ApiResponse<{ overdueCount: number; upcomingCount: number }>
     >('/notifications/stats');
+    return response.data.data!;
+  }
+
+  // Contact import methods
+  async parseVcfFile(
+    file: File
+  ): Promise<{
+    contacts: IImportContactPreview[];
+    totalParsed: number;
+    validContacts: number;
+    invalidContacts: number;
+    duplicatesFound: number;
+    errors: string[];
+  }> {
+    const formData = new FormData();
+    formData.append('vcfFile', file);
+
+    const response = await this.api.post<
+      ApiResponse<{
+        contacts: IImportContactPreview[];
+        totalParsed: number;
+        validContacts: number;
+        invalidContacts: number;
+        duplicatesFound: number;
+        errors: string[];
+      }>
+    >('/contacts/import/parse', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data.data!;
+  }
+
+  async importContacts(contacts: Partial<IContact>[]): Promise<IImportResult> {
+    const response = await this.api.post<ApiResponse<IImportResult>>(
+      '/contacts/import/confirm',
+      { contacts },
+      {
+        timeout: 60000, // 60 second timeout for large imports
+      }
+    );
     return response.data.data!;
   }
 }

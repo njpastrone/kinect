@@ -9,7 +9,7 @@ Kinect is a privacy-first relationship management application designed to help u
 **☁️ Production Ready**: Fully deployed on Render with MongoDB Atlas  
 **🏠 Self-Hosted Option**: Local development with Docker Compose available  
 
-## Current State (Updated: September 7, 2025)
+## Current State (Updated: January 21, 2025)
 
 ### ✅ Completed & Production Ready
 
@@ -17,6 +17,7 @@ Kinect is a privacy-first relationship management application designed to help u
 - ✅ User authentication (register, login, logout, password reset)
 - ✅ Contact management with CRUD operations
 - ✅ Contact list creation and management with bidirectional references
+- ✅ **VCF Contact Import**: Import contacts from phones via .vcf files (up to 1000 contacts)
 - ✅ Dashboard with overdue contacts and statistics
 - ✅ Modal-based UI for contact/list creation and editing
 - ✅ Professional UI/UX with Tailwind CSS
@@ -55,7 +56,22 @@ Kinect is a privacy-first relationship management application designed to help u
 - ✅ Security headers and CORS configuration
 - ✅ Non-root container execution for security
 
-### 🔄 Recently Updated (September 2025)
+### 🔄 Recently Updated (January 2025)
+
+**VCF Contact Import Feature (Jan 21, 2025):**
+- ✅ Full VCF (.vcf) file import functionality
+- ✅ Drag-and-drop file upload with preview
+- ✅ Automatic parsing of vCard 3.0 format
+- ✅ Intelligent name splitting for single-field names
+- ✅ Duplicate detection (email, phone, exact name match)
+- ✅ Bulk import optimization (up to 1000 contacts)
+- ✅ Preview table with validation status indicators
+- ✅ Selective import (checkbox selection)
+- ✅ 60-second timeout for large imports
+- ✅ Fallback to individual inserts if bulk fails
+- ⚠️ Known issue: Some edge cases in name parsing may need refinement
+
+### 🔄 Previously Updated (September 2025)
 
 **Reminder System Testing & Database Issues (Sept 20, 2025):**
 - ✅ Created comprehensive reminder testing scripts
@@ -152,6 +168,8 @@ PUT    /api/contacts/:id
 DELETE /api/contacts/:id
 POST   /api/contacts/:id/log-contact
 PATCH  /api/contacts/:id/mark-contacted
+POST   /api/contacts/import/parse      # Parse VCF file and preview
+POST   /api/contacts/import/confirm    # Bulk import contacts
 
 // Lists
 GET    /api/lists             # with stats

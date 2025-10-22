@@ -1,4 +1,5 @@
 import { Router, Response } from 'express';
+import multer from 'multer';
 import { Contact } from '../../models/Contact.model';
 import { ContactList } from '../../models/ContactList.model';
 import { CommunicationLog } from '../../models/CommunicationLog.model';
@@ -6,8 +7,25 @@ import { authenticate, AuthRequest } from '../middleware/auth.middleware';
 import { contactValidation, validate } from '../../utils/validation';
 import { asyncHandler } from '../middleware/error.middleware';
 import { AppError } from '../middleware/error.middleware';
+import { VcfParserService } from '../../services/vcf-parser.service';
 
 const router = Router();
+
+// Configure multer for file uploads (memory storage for small VCF files)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max file size
+  },
+  fileFilter: (_req, file, cb) => {
+    // Accept .vcf and .vcard files
+    if (file.mimetype === 'text/vcard' || file.mimetype === 'text/x-vcard' || file.originalname.endsWith('.vcf')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only VCF files are allowed'));
+    }
+  },
+});
 
 router.use(authenticate);
 
@@ -319,6 +337,169 @@ router.post(
       success: true,
       data: { contact, log },
       message: 'Reminder scheduled successfully',
+    });
+  })
+);
+
+// Parse VCF file and return preview of contacts
+router.post(
+  '/import/parse',
+  upload.single('vcfFile'),
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (!req.file) {
+      throw new AppError('No VCF file uploaded', 400);
+    }
+
+    // Convert buffer to string
+    const vcfContent = req.file.buffer.toString('utf-8');
+
+    // Log first 500 characters for debugging
+    console.log('VCF Content (first 500 chars):', vcfContent.substring(0, 500));
+
+    // Parse the VCF file
+    const parseResult = VcfParserService.parseVcf(vcfContent);
+
+    console.log('Parse result:', {
+      totalParsed: parseResult.totalParsed,
+      validContacts: parseResult.validContacts,
+      invalidContacts: parseResult.invalidContacts,
+      errorsCount: parseResult.errors.length,
+      errors: parseResult.errors,
+    });
+
+    // Get user's existing contacts to check for duplicates
+    const existingContactDocs = await Contact.find({ userId: req.userId });
+
+    // Convert Mongoose documents to plain objects for duplicate detection
+    const existingContacts = existingContactDocs.map(doc => ({
+      _id: (doc._id as any).toString(),
+      userId: doc.userId,
+      firstName: doc.firstName,
+      lastName: doc.lastName,
+      email: doc.email,
+      phoneNumber: doc.phoneNumber,
+      listId: doc.listId,
+      customReminderDays: doc.customReminderDays,
+      lastContactDate: doc.lastContactDate,
+      notes: doc.notes,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+    }));
+
+    // Find duplicates
+    const duplicates = VcfParserService.findDuplicates(parseResult.contacts, existingContacts);
+
+    // Mark duplicates in the preview
+    const previewContacts = parseResult.contacts.map(contact => {
+      const duplicate = duplicates.find(d => d.contact === contact);
+      return {
+        ...contact,
+        isDuplicate: !!duplicate,
+        duplicateOf: duplicate?.duplicateOf,
+      };
+    });
+
+    res.json({
+      success: true,
+      data: {
+        contacts: previewContacts,
+        totalParsed: parseResult.totalParsed,
+        validContacts: parseResult.validContacts,
+        invalidContacts: parseResult.invalidContacts,
+        duplicatesFound: duplicates.length,
+        errors: parseResult.errors,
+      },
+    });
+  })
+);
+
+// Import contacts after user confirmation
+router.post(
+  '/import/confirm',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    console.log('Import confirm endpoint called');
+    console.log('Request body:', JSON.stringify(req.body).substring(0, 500));
+
+    const { contacts } = req.body;
+
+    if (!contacts || !Array.isArray(contacts)) {
+      console.error('Invalid contacts data - not an array');
+      throw new AppError('Invalid contacts data', 400);
+    }
+
+    console.log(`Attempting to import ${contacts.length} contacts`);
+
+    if (contacts.length === 0) {
+      throw new AppError('No contacts to import', 400);
+    }
+
+    if (contacts.length > 1000) {
+      throw new AppError('Too many contacts. Maximum 1000 contacts per import.', 400);
+    }
+
+    const importedContacts = [];
+    const skippedContacts = [];
+    const errors: string[] = [];
+
+    // Prepare contacts for bulk insertion
+    const contactsToInsert = [];
+
+    for (const contactData of contacts) {
+      // Validate required fields
+      if (!contactData.firstName || !contactData.lastName) {
+        skippedContacts.push(contactData);
+        errors.push(`Skipped contact: Missing required fields`);
+        continue;
+      }
+
+      contactsToInsert.push({
+        userId: req.userId,
+        firstName: contactData.firstName,
+        lastName: contactData.lastName,
+        email: contactData.email,
+        phoneNumber: contactData.phoneNumber,
+        lastContactDate: new Date(),
+      });
+    }
+
+    console.log(`Prepared ${contactsToInsert.length} contacts for insertion`);
+
+    // Bulk insert contacts
+    try {
+      const insertedContacts = await Contact.insertMany(contactsToInsert, { ordered: false });
+      importedContacts.push(...insertedContacts);
+      console.log(`Successfully inserted ${insertedContacts.length} contacts`);
+    } catch (error: any) {
+      console.error('Bulk insert error:', error);
+
+      // If bulk insert fails, try individual inserts
+      console.log('Falling back to individual inserts...');
+      for (const contactData of contactsToInsert) {
+        try {
+          const contact = await Contact.create(contactData);
+          importedContacts.push(contact);
+        } catch (err) {
+          console.error(`Error importing contact ${contactData.firstName} ${contactData.lastName}:`, err);
+          skippedContacts.push(contactData);
+          errors.push(`Failed to import ${contactData.firstName} ${contactData.lastName}: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        }
+      }
+    }
+
+    console.log(`Import complete: ${importedContacts.length} imported, ${skippedContacts.length} skipped`);
+
+    res.json({
+      success: true,
+      data: {
+        imported: importedContacts.length,
+        skipped: skippedContacts.length,
+        totalParsed: contacts.length,
+        validContacts: importedContacts.length,
+        invalidContacts: skippedContacts.length,
+        duplicatesFound: 0, // Duplicates already filtered on client
+        errors,
+      },
+      message: `Successfully imported ${importedContacts.length} contact${importedContacts.length !== 1 ? 's' : ''}`,
     });
   })
 );

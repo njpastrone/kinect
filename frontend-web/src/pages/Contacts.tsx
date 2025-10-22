@@ -6,6 +6,7 @@ import { ContactsErrorBoundary, FormErrorBoundary } from '../components/common/F
 import { ContactList } from '../components/contacts/ContactList';
 import { GroupedContactList } from '../components/contacts/GroupedContactList';
 import { AddContactModal } from '../components/contacts/AddContactModal';
+import { ImportContactsModal } from '../components/contacts/ImportContactsModal';
 import { ControlBar } from '../components/common/ControlBar';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { EmptyState } from '../components/common/EmptyState';
@@ -26,6 +27,7 @@ export const Contacts: React.FC = () => {
   const { listId: routeListId } = useParams<{ listId: string }>();
   const { contacts, fetchContacts, isLoading } = useContacts();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<IContact | null>(null);
   const [lists, setLists] = useState<IContactList[]>([]);
   const { preferences, updateView, updateSort, updateGrouping } = usePagePreferences('contacts');
@@ -48,6 +50,14 @@ export const Contacts: React.FC = () => {
   const handleAddContact = () => {
     setSelectedContact(null);
     setIsModalOpen(true);
+  };
+
+  const handleImportContacts = () => {
+    setIsImportModalOpen(true);
+  };
+
+  const handleImportComplete = () => {
+    fetchContacts();
   };
 
   const handleEditContact = (contact: IContact) => {
@@ -184,12 +194,20 @@ export const Contacts: React.FC = () => {
             <h1 className="text-3xl font-bold text-gray-900">{pageTitle}</h1>
             {pageSubtitle && <p className="mt-1 text-sm text-gray-600">{pageSubtitle}</p>}
           </div>
-          <button
-            onClick={handleAddContact}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-          >
-            Add Contact
-          </button>
+          <div className="flex space-x-2">
+            <button
+              onClick={handleImportContacts}
+              className="bg-white text-blue-600 px-4 py-2 rounded-md border border-blue-600 hover:bg-blue-50"
+            >
+              Import Contacts
+            </button>
+            <button
+              onClick={handleAddContact}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            >
+              Add Contact
+            </button>
+          </div>
         </div>
 
         <ControlBar
@@ -260,6 +278,14 @@ export const Contacts: React.FC = () => {
             isOpen={isModalOpen}
             onClose={handleCloseModal}
             contact={selectedContact}
+          />
+        </FormErrorBoundary>
+
+        <FormErrorBoundary>
+          <ImportContactsModal
+            isOpen={isImportModalOpen}
+            onClose={() => setIsImportModalOpen(false)}
+            onImportComplete={handleImportComplete}
           />
         </FormErrorBoundary>
       </div>

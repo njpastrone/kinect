@@ -36,3 +36,24 @@ export interface ICommunicationLog {
   notes?: string;
   createdAt?: Date;
 }
+
+export interface IImportContactPreview {
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phoneNumber?: string;
+  isValid: boolean;
+  errors: string[];
+  isDuplicate?: boolean;
+  duplicateOf?: IContact;
+}
+
+export interface IImportResult {
+  totalParsed: number;
+  validContacts: number;
+  invalidContacts: number;
+  duplicatesFound: number;
+  imported: number;
+  skipped: number;
+  errors: string[];
+}

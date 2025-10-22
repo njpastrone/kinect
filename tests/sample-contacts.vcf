@@ -1,0 +1,78 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Doe;John;;;
+FN:John Doe
+EMAIL;TYPE=INTERNET:john.doe@example.com
+TEL;TYPE=CELL:+1-555-123-4567
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+N:Smith;Jane;;;
+FN:Jane Smith
+EMAIL;TYPE=INTERNET:jane.smith@example.com
+TEL;TYPE=WORK:+1-555-987-6543
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+N:Johnson;Robert;Michael;;
+FN:Robert Michael Johnson
+EMAIL;TYPE=INTERNET:robert.johnson@example.com
+TEL;TYPE=CELL:+1-555-456-7890
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+N:Williams;Emily;;;
+FN:Emily Williams
+TEL;TYPE=CELL:+1-555-234-5678
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+N:Brown;Michael;;;
+FN:Michael Brown
+EMAIL;TYPE=INTERNET:michael.brown@example.com
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+N:Davis;Sarah;Ann;;
+FN:Sarah Ann Davis
+EMAIL;TYPE=INTERNET:sarah.davis@example.com
+TEL;TYPE=HOME:+1-555-345-6789
+TEL;TYPE=CELL:+1-555-876-5432
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+N:Miller;James;;;
+FN:James Miller
+EMAIL;TYPE=INTERNET:james.miller@example.com
+TEL;TYPE=WORK:+1-555-567-8901
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+N:Wilson;Jennifer;;;
+FN:Jennifer Wilson
+EMAIL;TYPE=INTERNET:jennifer.wilson@example.com
+TEL;TYPE=CELL:+1-555-678-9012
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+N:Moore;David;;;
+FN:David Moore
+EMAIL;TYPE=INTERNET:david.moore@example.com
+TEL;TYPE=CELL:+1-555-789-0123
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+N:Taylor;Lisa;;;
+FN:Lisa Taylor
+EMAIL;TYPE=INTERNET:lisa.taylor@example.com
+TEL;TYPE=CELL:+1-555-890-1234
+END:VCARD
