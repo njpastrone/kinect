@@ -71,8 +71,10 @@ export const createSortFunction = <T extends Record<string, any>>(
 
     switch (sortBy) {
       case 'name':
-        if (a.firstName && a.lastName && b.firstName && b.lastName) {
-          comparison = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+        if (a.firstName && b.firstName) {
+          const nameA = a.lastName ? `${a.firstName} ${a.lastName}` : a.firstName;
+          const nameB = b.lastName ? `${b.firstName} ${b.lastName}` : b.firstName;
+          comparison = nameA.localeCompare(nameB);
         } else if (a.name && b.name) {
           comparison = a.name.localeCompare(b.name);
         }
@@ -118,8 +120,10 @@ export const createSortFunction = <T extends Record<string, any>>(
 
       default:
         // Fallback to name sorting
-        if (a.firstName && a.lastName && b.firstName && b.lastName) {
-          comparison = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+        if (a.firstName && b.firstName) {
+          const nameA = a.lastName ? `${a.firstName} ${a.lastName}` : a.firstName;
+          const nameB = b.lastName ? `${b.firstName} ${b.lastName}` : b.firstName;
+          comparison = nameA.localeCompare(nameB);
         } else if (a.name && b.name) {
           comparison = a.name.localeCompare(b.name);
         }

@@ -72,7 +72,7 @@ Kinect is a privacy-first relationship management application designed to help u
 - ✅ Fallback to individual inserts if bulk fails
 - ✅ **Fixed**: No longer duplicates single names (Alphonso → firstName: "Alphonso", lastName: "")
 - ✅ **Fixed**: Pagination limit removed - all contacts now display (up to 1000)
-- ⚠️ **Known issue**: Contacts page sorting may not work correctly with single-name contacts
+- ✅ **Fixed**: Sorting now properly handles single-name contacts alphabetically
 
 ### 🔄 Previously Updated (September 2025)
 
@@ -281,7 +281,6 @@ app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 ### Current Limitations
 - No automated test coverage (unit/integration/e2e tests missing)
 - ⚠️ Database inconsistency: Authentication may use 'test' DB while app uses 'kinect' DB
-- ⚠️ **Contacts page sorting**: May not handle single-name contacts optimally in some views
 - iOS native app not yet implemented
 - Phone log integration not implemented
 - Social media integration not available
@@ -543,6 +542,13 @@ docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
 - **Fix**: Updated `useContacts` hook to request `limit: 1000` contacts
 - **Files Changed**:
   - `frontend-web/src/hooks/useContacts.ts`
+
+**Issue 3: Contact Sorting with Single Names**
+- **Problem**: Contacts with empty lastName (single-name contacts) were not sorted alphabetically
+- **Root Cause**: Sort function required both firstName AND lastName, causing empty lastName contacts to be skipped
+- **Fix**: Updated sorting logic to handle empty lastName gracefully using ternary operator
+- **Files Changed**:
+  - `frontend-web/src/utils/grouping.ts` (lines 74-77, 123-126)
 
 **Test File Created**:
 - `tests/test-single-names.vcf` - Contains test cases for single-name contacts (Alphonso, Madonna, Cher, Prince) and regular contacts
